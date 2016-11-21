@@ -20,6 +20,7 @@ namespace BaiduCloudSupport
                 if (_Access_Token != value)
                 {
                     _Access_Token = value;
+                    Setting.WriteAppSetting("Baidu_Access_Token", value, true);
                     if (PropertyChanged != null)
                     {
                         PropertyChanged(this, new PropertyChangedEventArgs("Access_Token"));
@@ -37,6 +38,7 @@ namespace BaiduCloudSupport
                 if (_Expires_In != value)
                 {
                     _Expires_In = value;
+                    Setting.WriteAppSetting("Baidu_Expires_In", value, true);
                     if (PropertyChanged != null)
                     {
                         PropertyChanged(this, new PropertyChangedEventArgs("Expires_In"));
@@ -54,6 +56,7 @@ namespace BaiduCloudSupport
                 if (_Session_Secret != value)
                 {
                     _Session_Secret = value;
+                    Setting.WriteAppSetting("Baidu_Session_Secret", value, true);
                     if (PropertyChanged != null)
                     {
                         PropertyChanged(this, new PropertyChangedEventArgs("Session_Secret"));
@@ -71,6 +74,7 @@ namespace BaiduCloudSupport
                 if (_Session_Key != value)
                 {
                     _Session_Key = value;
+                    Setting.WriteAppSetting("Baidu_Session_Key", value, true);
                     if (PropertyChanged != null)
                     {
                         PropertyChanged(this, new PropertyChangedEventArgs("Session_Key"));
@@ -88,6 +92,7 @@ namespace BaiduCloudSupport
                 if (_Scope != value)
                 {
                     _Scope = value;
+                    Setting.WriteAppSetting("Baidu_Scope", value, true);
                     if (PropertyChanged != null)
                     {
                         PropertyChanged(this, new PropertyChangedEventArgs("Scope"));

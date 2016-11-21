@@ -23,6 +23,16 @@ namespace BaiduCloudSupport
 
         public static string Baidu_redirect_uri = ConfigurationManager.AppSettings["Baidu_redirect_uri"];
 
+        public static string Baidu_Access_Token = ConfigurationManager.AppSettings["Baidu_Access_Token"];
+
+        public static string Baidu_Expires_In = ConfigurationManager.AppSettings["Baidu_Expires_In"];
+
+        public static string Baidu_Session_Secret = ConfigurationManager.AppSettings["Baidu_Session_Secret"];
+
+        public static string Baidu_Session_Key = ConfigurationManager.AppSettings["Baidu_Session_Key"];
+
+        public static string Baidu_Scope = ConfigurationManager.AppSettings["Baidu_Scope"];
+
         /// <summary>
         /// Reload setting data
         /// </summary>
@@ -32,6 +42,49 @@ namespace BaiduCloudSupport
             MainLanguage = ConfigurationManager.AppSettings["MainLanguage"];
             Baidu_client_id = ConfigurationManager.AppSettings["Baidu_client_id"];
             Baidu_redirect_uri = ConfigurationManager.AppSettings["Baidu_redirect_uri"];
+            Baidu_Access_Token = ConfigurationManager.AppSettings["Baidu_Access_Token"];
+            Baidu_Expires_In = ConfigurationManager.AppSettings["Baidu_Expires_In"];
+            Baidu_Session_Secret = ConfigurationManager.AppSettings["Baidu_Session_Secret"];
+            Baidu_Session_Key = ConfigurationManager.AppSettings["Baidu_Session_Key"];
+            Baidu_Scope = ConfigurationManager.AppSettings["Baidu_Scope"];
+        }
+
+        /// <summary>
+        /// Read app setting from app.config
+        /// </summary>
+        /// <param name="keyword">Resource keyword</param>
+        /// <returns>Resource</returns>
+        public static string ReadAppSetting(string keyword)
+        {
+            return System.Configuration.ConfigurationManager.AppSettings[keyword];
+        }
+
+        /// <summary>
+        /// Set app setting to app.config
+        /// </summary>
+        /// <param name="keyword">Resource keyword</param>
+        /// <param name="value">Resource</param>
+        /// <param name="needReloadSetting">Reload Setting after set config</param>
+        /// <returns></returns>
+        public static bool WriteAppSetting(string keyword, string value, bool needReloadSetting = true)
+        {
+            try
+            {
+                System.Configuration.Configuration config = System.Configuration.ConfigurationManager.OpenExeConfiguration(System.Configuration.ConfigurationUserLevel.None);
+                config.AppSettings.Settings[keyword].Value = value;
+                config.Save();
+                if (needReloadSetting)
+                {
+                    Setting.Reload();
+                }
+                config = null;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WriteLog("", ex);
+                return false;
+            }
         }
     }
 }

@@ -6,4 +6,11 @@
     <sys:String x:Key="CommonMessage_Result">Result</sys:String>
     <sys:String x:Key="LoginWindow_LoginSucceed">Login succeed.</sys:String>
     <sys:String x:Key="LoginWindow_LoginFailed">Login failed.Please try again.</sys:String>
+    <sys:String x:Key="TopBar_Setting">Setting</sys:String>
+    <sys:String x:Key="TopBar_About">About</sys:String>
+    <sys:String x:Key="AboutWindow_TextBlock_Project">BaiduCloudSupport</sys:String>
+    <sys:String x:Key="AboutWindow_TextBlock_Version">Version: {0}</sys:String>
+    <sys:String x:Key="AboutWindow_TextBlock_Author">Author: GY</sys:String>
+    <sys:String x:Key="AboutWindow_TextBlock_Mail">Mail: wo@shi.gy</sys:String>
+    <sys:String x:Key="AboutWindow_TextBlock_License">Under the GPL license.See the LICENSE file for more info.</sys:String>
 </ResourceDictionary>

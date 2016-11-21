@@ -65,6 +65,8 @@ namespace BaiduCloudSupport
         private async void button_Login_Click(object sender, RoutedEventArgs e)
         {
             Login.LoginWindow LW = new Login.LoginWindow();
+            LW.Owner = this;
+            LW.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             if ((bool)LW.ShowDialog())
             {
                 await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("LoginWindow_LoginSucceed"));
@@ -73,6 +75,14 @@ namespace BaiduCloudSupport
             {
                 await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("LoginWindow_LoginFailed"));
             }
+        }
+
+        private void button_About_Click(object sender, RoutedEventArgs e)
+        {
+            AboutWindow AB = new AboutWindow();
+            AB.Owner = this;
+            AB.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            AB.ShowDialog();
         }
     }
 }
