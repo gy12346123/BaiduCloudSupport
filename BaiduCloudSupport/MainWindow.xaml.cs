@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +22,16 @@ namespace BaiduCloudSupport
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        /// <summary>
+        /// All UI binding and necessary data
+        /// </summary>
+        public static TotalData totalData;
         public MainWindow()
         {
             // Set default Language
             GlobalLanguage.SetLanguage(Setting.MainLanguage);
             InitializeComponent();
+            totalData = new TotalData();
         }
 
         private System.Windows.Input.ICommand openFirstFlyoutCommand;
@@ -56,10 +62,17 @@ namespace BaiduCloudSupport
             flyout.IsOpen = !flyout.IsOpen;
         }
 
-        private void button_Login_Click(object sender, RoutedEventArgs e)
+        private async void button_Login_Click(object sender, RoutedEventArgs e)
         {
             Login.LoginWindow LW = new Login.LoginWindow();
-            LW.ShowDialog();
+            if ((bool)LW.ShowDialog())
+            {
+                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("LoginWindow_LoginSucceed"));
+            }
+            else
+            {
+                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("LoginWindow_LoginFailed"));
+            }
         }
     }
 }

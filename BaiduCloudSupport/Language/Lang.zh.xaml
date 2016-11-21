@@ -3,4 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="MainWindow_Title">百度云不云</sys:String>
     <sys:String x:Key="LoginWindow_Title">登录账号</sys:String>
+    <sys:String x:Key="CommonMessage_Result">结果</sys:String>
+    <sys:String x:Key="LoginWindow_LoginSucceed">登录成功。</sys:String>
+    <sys:String x:Key="LoginWindow_LoginFailed">登录失败，请尝试重新登录。</sys:String>
 </ResourceDictionary>
