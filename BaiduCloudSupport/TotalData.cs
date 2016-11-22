@@ -100,5 +100,56 @@ namespace BaiduCloudSupport
                 }
             }
         }
+
+        private long _SingleFileSize;
+        public long SingleFileSize
+        {
+            get { return _SingleFileSize; }
+            set
+            {
+                if (_SingleFileSize != value)
+                {
+                    _SingleFileSize = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("SingleFileSize"));
+                    }
+                }
+            }
+        }
+
+        private long _SingleFileBytesReceived;
+        public long SingleFileBytesReceived
+        {
+            get { return _SingleFileBytesReceived; }
+            set
+            {
+                if (_SingleFileBytesReceived != value)
+                {
+                    _SingleFileBytesReceived = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("SingleFileBytesReceived"));
+                    }
+                }
+            }
+        }
+
+        private int _SingleFileProgressPercentage;
+        public int SingleFileProgressPercentage
+        {
+            get { return _SingleFileProgressPercentage; }
+            set
+            {
+                if (_SingleFileProgressPercentage != value)
+                {
+                    _SingleFileProgressPercentage = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("SingleFileProgressPercentage"));
+                    }
+                }
+            }
+        }
     }
 }

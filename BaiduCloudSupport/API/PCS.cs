@@ -3,7 +3,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +18,8 @@ namespace BaiduCloudSupport.API
         /// Baidu PCS api base URL
         /// </summary>
         private static string BaseURL = "https://pcs.baidu.com/rest/2.0/pcs/";
+
+        private static string DownloadBaseURL = "https://d.pcs.baidu.com/rest/2.0/pcs/";
 
         /// <summary>
         /// Project base path
@@ -33,6 +38,16 @@ namespace BaiduCloudSupport.API
         public static void SetTimeout(int time)
         {
             Timeout = time;
+        }
+
+        private static string ConvertPath2URLFormat(string path)
+        {
+            string convertedPath = (PCS.BasePath + path).Replace("/", "%2F");
+            if (convertedPath[0] != '%')
+            {
+                convertedPath = string.Format("%2F{0}", convertedPath);
+            }
+            return convertedPath;
         }
 
         /// <summary>
@@ -87,15 +102,10 @@ namespace BaiduCloudSupport.API
         {
             try
             {
-                string convertedPath = (PCS.BasePath + path).Replace("/", "%2F");
-                if (convertedPath[0] != '%')
-                {
-                    convertedPath = string.Format("%2F{0}", convertedPath);
-                }
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = BaseURL + "file?method=meta&access_token=" + access_token + "&path=" + convertedPath,
+                    URL = BaseURL + "file?method=meta&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
                     Encoding = Encoding.UTF8,
                     Timeout = PCS.Timeout
                 };
@@ -148,15 +158,10 @@ namespace BaiduCloudSupport.API
         {
             try
             {
-                string convertedPath = (PCS.BasePath + path).Replace("/", "%2F");
-                if (convertedPath[0] != '%')
-                {
-                    convertedPath = string.Format("%2F{0}", convertedPath);
-                }
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = BaseURL + "file?method=list&access_token=" + access_token + "&path=" + convertedPath,
+                    URL = BaseURL + "file?method=list&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
                     Encoding = Encoding.UTF8,
                     Timeout = PCS.Timeout
                 };
@@ -164,7 +169,6 @@ namespace BaiduCloudSupport.API
                 if (result.Contains("list"))
                 {
                     var json = (JObject)JsonConvert.DeserializeObject(result);
-                    string str = json["list"][0]["path"].ToString();
                     int listCount = json["list"].Count();
                     FileListStruct[] fileListStruct = new FileListStruct[listCount];
                     for (int i = 0; i < listCount; i++)
@@ -198,6 +202,105 @@ namespace BaiduCloudSupport.API
         public static FileListStruct[] SingleFloder(string path)
         {
             return SingleFloder(Setting.Baidu_Access_Token, path);
+        }
+
+        /// <summary>
+        /// Search file in path with keyword
+        /// </summary>
+        /// <param name="access_token">Baidu access token</param>
+        /// <param name="path">Floder path used to search file</param>
+        /// <param name="keyword">Keyword used to search file</param>
+        /// <param name="traversing">Traverse the folder:0.No, 1.Yes</param>
+        /// <returns>FileListStruct[]</returns>
+        public static FileListStruct[] SearchFile(string access_token, string path, string keyword, int traversing = 1)
+        {
+            try
+            {
+                HttpHelper http = new HttpHelper();
+                HttpItem item = new HttpItem()
+                {
+                    URL = BaseURL + "file?method=search&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path) + "&wd=" + keyword + "&re=" + traversing,
+                    Encoding = Encoding.UTF8,
+                    Timeout = PCS.Timeout
+                };
+                string result = http.GetHtml(item).Html;
+                if (result.Contains("list"))
+                {
+                    var json = (JObject)JsonConvert.DeserializeObject(result);
+                    int listCount = json["list"].Count();
+                    FileListStruct[] fileListStruct = new FileListStruct[listCount];
+                    for (int i = 0; i < listCount; i++)
+                    {
+                        fileListStruct[i].fs_id = Convert.ToUInt64(json["list"][i]["fs_id"]);
+                        fileListStruct[i].path = json["list"][i]["path"].ToString();
+                        fileListStruct[i].ctime = Convert.ToUInt32(json["list"][i]["ctime"]);
+                        fileListStruct[i].mtime = Convert.ToUInt32(json["list"][i]["mtime"]);
+                        fileListStruct[i].md5 = json["list"][i]["md5"].ToString();
+                        fileListStruct[i].size = Convert.ToUInt64(json["list"][i]["size"]);
+                        fileListStruct[i].isdir = Convert.ToUInt32(json["list"][i]["isdir"]);
+                    }
+                    return fileListStruct;
+                }
+                else
+                {
+                    return new FileListStruct[1];
+                }
+            }catch(Exception ex)
+            {
+                LogHelper.WriteLog("PCS.SearchFile", ex);
+                return new FileListStruct[1];
+            }
+        }
+
+        /// <summary>
+        /// Search file in path with keyword use default access_token in App.config
+        /// </summary>
+        /// <param name="path">Floder path used to search file</param>
+        /// <param name="keyword">Keyword used to search file</param>
+        /// <param name="traversing">Traverse the folder:0.No, 1.Yes</param>
+        /// <returns>FileListStruct[]</returns>
+        public static FileListStruct[] SearchFile(string path, string keyword, int traversing = 1)
+        {
+            return SearchFile(Setting.Baidu_Access_Token, path, keyword, traversing);
+        }
+
+        /// <summary>
+        /// Download file from remoteFile and save it to localFile
+        /// </summary>
+        /// <param name="access_token">Baidu access token</param>
+        /// <param name="remoteFile">Remote full file path</param>
+        /// <param name="localFile">Local full file path</param>
+        /// <returns>Task</returns>
+        public static Task DownloadFile(string access_token, string remoteFile, string localFile)
+        {
+            return Task.Factory.StartNew(()=> {
+                try
+                {
+                    HttpHelper http = new HttpHelper();
+                    HttpItem item = new HttpItem()
+                    {
+                        URL = DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile),
+                        Encoding = Encoding.UTF8,
+                        Timeout = PCS.Timeout
+                    };
+                    var result = http.GetHtml(item);
+                    string[] location = result.Header.GetValues("location");
+
+                    WebClient web = new WebClient();
+                    web.DownloadProgressChanged += (object sender, DownloadProgressChangedEventArgs e) => {
+                        MainWindow.totalData.SingleFileSize = e.TotalBytesToReceive;
+                        MainWindow.totalData.SingleFileBytesReceived = e.BytesReceived;
+                        MainWindow.totalData.SingleFileProgressPercentage = e.ProgressPercentage;
+                    };
+                    web.DownloadFileCompleted += (object sender, System.ComponentModel.AsyncCompletedEventArgs e) => {
+                        MainWindow.totalData.SingleFileProgressPercentage = 100;
+                    };
+                    web.DownloadFileAsync(new Uri(location[0].Replace("\"", "")), localFile);
+                }catch(Exception ex)
+                {
+                    LogHelper.WriteLog("PCS.DownloadFile", ex);
+                }
+            });
         }
     }
 }

@@ -48,7 +48,7 @@
             <RowDefinition Height="60"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center" >
+        <WrapPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" >
             <Button Name="button_Login" Width="50"
                         Height="50"
                         Style="{DynamicResource MetroCircleButtonStyle}" Click="button_Login_Click" >

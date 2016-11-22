@@ -1,0 +1,17 @@
+﻿<Controls:MetroWindow x:Class="BaiduCloudSupport.Other.TestWindow"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BaiduCloudSupport.Other"
+        mc:Ignorable="d"
+        Title="TestWindow" Height="300" Width="300" Loaded="MetroWindow_Loaded">
+    <Grid Name="grid_Main">
+        <StackPanel>
+            <TextBlock Text="{Binding SingleFileSize}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding SingleFileBytesReceived}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding SingleFileProgressPercentage}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</Controls:MetroWindow>

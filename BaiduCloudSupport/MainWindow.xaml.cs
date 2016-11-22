@@ -3,6 +3,7 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -84,8 +85,6 @@ namespace BaiduCloudSupport
             AB.Owner = this;
             AB.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             AB.ShowDialog();
-            var fileList = API.PCS.SingleFileMeta(Setting.Baidu_Access_Token, "/test");
-            this.ShowMessageAsync("test", fileList.path);
         }
     }
 }
