@@ -23,6 +23,18 @@ namespace BaiduCloudSupport.API
         public ulong size { get; set; }
         public UInt32 isdir { get; set; }
         public UInt32 ifhassubdir { get; set; }
+        public UInt32 filenum { get; set; }
+    }
+
+    public class FileList
+    {
+        public ulong fs_id { get; set; }
+        public string path { get; set; }
+        public UInt32 ctime { get; set; }
+        public UInt32 mtime { get; set; }
+        public string md5 { get; set; }
+        public ulong size { get; set; }
+        public UInt32 isdir { get; set; }
     }
 
     public class EachFilePath
