@@ -55,5 +55,52 @@ namespace BaiduCloudSupport.API
                 return null;
             }
         }
+
+        /// <summary>
+        /// Get baidu cloud quota with default access_token in App.config
+        /// </summary>
+        /// <returns>[0]:quota, [1]:used</returns>
+        public static ulong[] Quota()
+        {
+            return Quota(Setting.Baidu_Access_Token);
+        }
+
+        public static FileMetaStruct SingleFileMeta(string access_token, FilePath filePath)
+        {
+            //string convertedPath = path.Replace("/", "%2F");
+            //if (convertedPath[0] != '%')
+            //{
+            //    convertedPath = string.Format("%2F{0}", convertedPath);
+            //}
+            string jsonPost = JsonConvert.SerializeObject(filePath);
+            jsonPost = jsonPost.Replace(@"/", @"\/");
+            HttpHelper http = new HttpHelper();
+            HttpItem item = new HttpItem() {
+                URL = BaseURL + "file?method=meta&access_token=" + access_token,
+                Method = "POST",
+                PostEncoding = Encoding.Default,
+                Postdata = jsonPost,
+                Encoding = Encoding.UTF8,
+                Timeout = PCS.Timeout
+            };
+            string result = http.GetHtml(item).Html;
+            if (result.Contains("list"))
+            {
+                var json = JsonConvert.DeserializeObject<FileMeta>(result);
+                return new FileMetaStruct() {
+                    fs_id = json.fs_id,
+                    path = json.path,
+                    ctime = json.ctime,
+                    mtime = json.mtime,
+                    block_list = json.block_list,
+                    size = json.size,
+                    isdir = json.isdir,
+                    ifhassubdir = json.ifhassubdir
+                };
+            }else
+            {
+                return new FileMetaStruct();
+            }
+        }
     }
 }

@@ -118,8 +118,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="API\DataStruct.cs" />
     <Compile Include="API\PCS.cs" />
-    <Compile Include="API\QuotaInfo.cs" />
+    <Compile Include="API\DataInfo.cs" />
     <Compile Include="Login\BaiduLogin.cs" />
     <Compile Include="Login\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>

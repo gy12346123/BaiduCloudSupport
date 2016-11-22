@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls;
+﻿using BaiduCloudSupport.API;
+using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -83,6 +84,12 @@ namespace BaiduCloudSupport
             AB.Owner = this;
             AB.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             AB.ShowDialog();
+            FilePath filePath = new FilePath();
+            filePath.list = new List<EachFilePath>() {
+                new EachFilePath() { path = "/share" },
+                new EachFilePath() { path = "/book" }
+            };
+            API.PCS.SingleFileMeta(Setting.Baidu_Access_Token, filePath);
         }
     }
 }
