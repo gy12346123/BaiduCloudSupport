@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace BaiduCloudSupport.API
 {
+    public struct SimpleUserInfoStruct
+    {
+        public ulong uid;
+        public string uname;
+        public string portrait;
+    }
+
     public struct FileMetaStruct
     {
         public ulong fs_id;

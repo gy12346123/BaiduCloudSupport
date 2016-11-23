@@ -17,9 +17,17 @@ namespace BaiduCloudSupport.API
         /// <summary>
         /// Baidu PCS api base URL
         /// </summary>
-        private static string BaseURL = "https://pcs.baidu.com/rest/2.0/pcs/";
+        private static string PCSBaseURL = "https://pcs.baidu.com/rest/2.0/pcs/";
 
+        /// <summary>
+        /// Baidu PCS download file api base URL
+        /// </summary>
         private static string DownloadBaseURL = "https://d.pcs.baidu.com/rest/2.0/pcs/";
+
+        /// <summary>
+        /// Baidu OpenAPI base URL
+        /// </summary>
+        private static string OpenAPIBaseURL = "https://openapi.baidu.com/rest/2.0/";
 
         /// <summary>
         /// Project base path
@@ -40,6 +48,11 @@ namespace BaiduCloudSupport.API
             Timeout = time;
         }
 
+        /// <summary>
+        /// Convert local path format to url format
+        /// </summary>
+        /// <param name="path">Local file path</param>
+        /// <returns>URL format</returns>
         private static string ConvertPath2URLFormat(string path)
         {
             string convertedPath = (PCS.BasePath + path).Replace("/", "%2F");
@@ -48,6 +61,73 @@ namespace BaiduCloudSupport.API
                 convertedPath = string.Format("%2F{0}", convertedPath);
             }
             return convertedPath;
+        }
+
+        /// <summary>
+        /// Get user simple info
+        /// </summary>
+        /// <param name="access_token">Baidu access token</param>
+        /// <returns>SimpleUserInfoStruct</returns>
+        public static SimpleUserInfoStruct SimpleUser(string access_token)
+        {
+            try
+            {
+                HttpHelper http = new HttpHelper();
+                HttpItem item = new HttpItem()
+                {
+                    URL = OpenAPIBaseURL + "passport/users/getLoggedInUser?access_token=" + access_token,
+                    Encoding = Encoding.UTF8,
+                    Timeout = PCS.Timeout
+                };
+                string result = http.GetHtml(item).Html;
+                if (result.Contains("uid"))
+                {
+                    var json = JsonConvert.DeserializeObject<SimpleUserInfo>(result);
+                    return new SimpleUserInfoStruct
+                    {
+                        uid = json.uid,
+                        uname = json.uname,
+                        portrait = json.portrait
+                    };
+                }
+                else
+                {
+                    return new SimpleUserInfoStruct();
+                }
+            }catch(Exception ex)
+            {
+                LogHelper.WriteLog("PCS.SimpleUser", ex);
+                return new SimpleUserInfoStruct();
+            }
+        }
+
+        /// <summary>
+        /// Get user simple info with default access_token in App.config
+        /// </summary>
+        /// <returns>SimpleUserInfoStruct</returns>
+        public static SimpleUserInfoStruct SimpleUser()
+        {
+            return SimpleUser(Setting.Baidu_Access_Token);
+        }
+
+        /// <summary>
+        /// Get small portrait url
+        /// </summary>
+        /// <param name="portrait">SimpleUserInfoStruct.portrait</param>
+        /// <returns>URL</returns>
+        public static string UserSmallPortrait(string portrait)
+        {
+            return string.Format("http://tb.himg.baidu.com/sys/portraitn/item/{0}", portrait);
+        }
+
+        /// <summary>
+        /// Get large portrait url
+        /// </summary>
+        /// <param name="portrait">SimpleUserInfoStruct.portrait</param>
+        /// <returns>URL</returns>
+        public static string UserLargePortrait(string portrait)
+        {
+            return string.Format("http://tb.himg.baidu.com/sys/portrait/item/{0}", portrait);
         }
 
         /// <summary>
@@ -62,7 +142,7 @@ namespace BaiduCloudSupport.API
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = BaseURL + "quota?method=info&access_token=" + access_token,
+                    URL = PCSBaseURL + "quota?method=info&access_token=" + access_token,
                     Encoding = Encoding.UTF8,
                     Timeout = PCS.Timeout
                 };
@@ -105,7 +185,7 @@ namespace BaiduCloudSupport.API
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = BaseURL + "file?method=meta&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
+                    URL = PCSBaseURL + "file?method=meta&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
                     Encoding = Encoding.UTF8,
                     Timeout = PCS.Timeout
                 };
@@ -161,7 +241,7 @@ namespace BaiduCloudSupport.API
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = BaseURL + "file?method=list&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
+                    URL = PCSBaseURL + "file?method=list&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
                     Encoding = Encoding.UTF8,
                     Timeout = PCS.Timeout
                 };
@@ -219,7 +299,7 @@ namespace BaiduCloudSupport.API
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = BaseURL + "file?method=search&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path) + "&wd=" + keyword + "&re=" + traversing,
+                    URL = PCSBaseURL + "file?method=search&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path) + "&wd=" + keyword + "&re=" + traversing,
                     Encoding = Encoding.UTF8,
                     Timeout = PCS.Timeout
                 };

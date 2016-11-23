@@ -1,4 +1,5 @@
 ﻿using BaiduCloudSupport.API;
+using BaiduCloudSupport.Other;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using System;

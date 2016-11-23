@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace BaiduCloudSupport.API
 {
+    public class SimpleUserInfo
+    {
+        public ulong uid { get; set; }
+        public string uname { get; set; }
+        public string portrait { get; set; }
+    }
+
+
     public class QuotaInfo
     {
         public ulong quota { get; set; }
