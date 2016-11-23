@@ -92,12 +92,12 @@ namespace BaiduCloudSupport.API
                 }
                 else
                 {
-                    return new SimpleUserInfoStruct();
+                    return new SimpleUserInfoStruct { uid = 0,uname = "", portrait = "" };
                 }
             }catch(Exception ex)
             {
                 LogHelper.WriteLog("PCS.SimpleUser", ex);
-                return new SimpleUserInfoStruct();
+                return new SimpleUserInfoStruct { uid = 0, uname = "", portrait = "" };
             }
         }
 

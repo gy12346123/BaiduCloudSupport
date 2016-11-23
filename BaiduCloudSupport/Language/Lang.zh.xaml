@@ -4,6 +4,7 @@
     <sys:String x:Key="MainWindow_Title">百度云不云</sys:String>
     <sys:String x:Key="LoginWindow_Title">登录账号</sys:String>
     <sys:String x:Key="CommonMessage_Result">结果</sys:String>
+    <sys:String x:Key="CommonTitle_Notice">通知</sys:String>
     <sys:String x:Key="LoginWindow_LoginSucceed">登录成功。</sys:String>
     <sys:String x:Key="LoginWindow_LoginFailed">登录失败，请尝试重新登录。</sys:String>
     <sys:String x:Key="TopBar_Setting">设置</sys:String>
@@ -13,4 +14,7 @@
     <sys:String x:Key="AboutWindow_TextBlock_Author">作者：GY</sys:String>
     <sys:String x:Key="AboutWindow_TextBlock_Mail">邮箱：wo@shi.gy</sys:String>
     <sys:String x:Key="AboutWindow_TextBlock_License">基于GPL协议。详情请查看LICENSE。</sys:String>
+    <sys:String x:Key="MainWindow_Quota_Total">总空间：{0}GB</sys:String>
+    <sys:String x:Key="MainWindow_Quota_Used">已使用：{0}GB</sys:String>
+    <sys:String x:Key="MainWindow_AutoLoginFailed">用户认证失败，请重新登录。</sys:String>
 </ResourceDictionary>

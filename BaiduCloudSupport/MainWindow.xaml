@@ -9,7 +9,7 @@
         WindowStartupLocation="Manual"
         NonActiveGlowBrush="#FFAEC9"
         GlowBrush="{DynamicResource AccentColorBrush}"
-        Title="{StaticResource MainWindow_Title}" Height="600" Width="800">
+        Title="{StaticResource MainWindow_Title}" Height="600" Width="800" Loaded="MetroWindow_Loaded">
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <Button Name="button_Setting">
@@ -43,11 +43,21 @@
         </Controls:WindowCommands>
     </Controls:MetroWindow.RightWindowCommands>
 
-    <Grid>
+    <Grid Name="grid_Main">
         <Grid.RowDefinitions>
             <RowDefinition Height="60"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
+        <WrapPanel Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0">
+            <Border BorderThickness="2" BorderBrush="LightBlue" CornerRadius="30" Height="50" Width="50">
+                <Border.Background>
+                    <ImageBrush ImageSource="{Binding UserPortrait}"/>
+                </Border.Background>
+            </Border>
+            <TextBlock Text="{Binding uname}" Margin="10,0,0,0" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding Quota_Total,StringFormat='{StaticResource MainWindow_Quota_Total}'}" Margin="10,0,0,0" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding Quota_Used,StringFormat='{StaticResource MainWindow_Quota_Used}'}" Margin="10,0,0,0" VerticalAlignment="Center" />
+        </WrapPanel>
         <WrapPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" >
             <Button Name="button_Login" Width="50"
                         Height="50"
@@ -61,5 +71,6 @@
                 </Rectangle>
             </Button>
         </WrapPanel>
+        <Controls:ProgressRing Grid.Row="0" Grid.RowSpan="2" Foreground="{DynamicResource AccentColorBrush}" IsActive="{Binding ProgressRing_IsActive}" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </Controls:MetroWindow>

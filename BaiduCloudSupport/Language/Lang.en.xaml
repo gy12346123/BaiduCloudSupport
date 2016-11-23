@@ -4,6 +4,7 @@
     <sys:String x:Key="MainWindow_Title">BaiduSupport</sys:String>
     <sys:String x:Key="LoginWindow_Title">Login</sys:String>
     <sys:String x:Key="CommonMessage_Result">Result</sys:String>
+    <sys:String x:Key="CommonTitle_Notice">Notice</sys:String>
     <sys:String x:Key="LoginWindow_LoginSucceed">Login succeed.</sys:String>
     <sys:String x:Key="LoginWindow_LoginFailed">Login failed.Please try again.</sys:String>
     <sys:String x:Key="TopBar_Setting">Setting</sys:String>
@@ -13,4 +14,7 @@
     <sys:String x:Key="AboutWindow_TextBlock_Author">Author: GY</sys:String>
     <sys:String x:Key="AboutWindow_TextBlock_Mail">Mail: wo@shi.gy</sys:String>
     <sys:String x:Key="AboutWindow_TextBlock_License">Under the GPL license.See the LICENSE file for more info.</sys:String>
+    <sys:String x:Key="MainWindow_Quota_Total">Total quota:{0}GB</sys:String>
+    <sys:String x:Key="MainWindow_Quota_Used">Used:{0}GB</sys:String>
+    <sys:String x:Key="MainWindow_AutoLoginFailed">User authentication failed, Please login again.</sys:String>
 </ResourceDictionary>

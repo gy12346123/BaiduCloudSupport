@@ -33,6 +33,18 @@ namespace BaiduCloudSupport
 
         public static string Baidu_Scope = ConfigurationManager.AppSettings["Baidu_Scope"];
 
+        public static string Baidu_uid = ConfigurationManager.AppSettings["Baidu_uid"];
+
+        public static string Baidu_uname = ConfigurationManager.AppSettings["Baidu_uname"];
+
+        public static string Baidu_portrait = ConfigurationManager.AppSettings["Baidu_portrait"];
+
+        public static string UserPortraitFilePath = ConfigurationManager.AppSettings["UserPortraitFilePath"];
+
+        public static string Baidu_Quota_Total = ConfigurationManager.AppSettings["Baidu_Quota_Total"];
+
+        public static string Baidu_Quota_Used = ConfigurationManager.AppSettings["Baidu_Quota_Used"];
+
         /// <summary>
         /// Reload setting data
         /// </summary>
@@ -47,6 +59,12 @@ namespace BaiduCloudSupport
             Baidu_Session_Secret = ConfigurationManager.AppSettings["Baidu_Session_Secret"];
             Baidu_Session_Key = ConfigurationManager.AppSettings["Baidu_Session_Key"];
             Baidu_Scope = ConfigurationManager.AppSettings["Baidu_Scope"];
+            Baidu_uid = ConfigurationManager.AppSettings["Baidu_uid"];
+            Baidu_uname = ConfigurationManager.AppSettings["Baidu_uname"];
+            Baidu_portrait = ConfigurationManager.AppSettings["Baidu_portrait"];
+            UserPortraitFilePath = ConfigurationManager.AppSettings["UserPortraitFilePath"];
+            Baidu_Quota_Total = ConfigurationManager.AppSettings["Baidu_Quota_Total"];
+            Baidu_Quota_Used = ConfigurationManager.AppSettings["Baidu_Quota_Used"];
         }
 
         /// <summary>
