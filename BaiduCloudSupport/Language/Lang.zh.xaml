@@ -17,4 +17,13 @@
     <sys:String x:Key="MainWindow_Quota_Total">总空间：{0}GB</sys:String>
     <sys:String x:Key="MainWindow_Quota_Used">已使用：{0}GB</sys:String>
     <sys:String x:Key="MainWindow_AutoLoginFailed">用户认证失败，请重新登录。</sys:String>
+    <sys:String x:Key="Flyout_Setting_Theme">主题</sys:String>
+    <sys:String x:Key="Flyout_Setting_Light">亮色</sys:String>
+    <sys:String x:Key="Flyout_Setting_Dark">暗色</sys:String>
+    <sys:String x:Key="Flyout_Setting_Color">配色</sys:String>
+    <sys:String x:Key="Flyout_Setting_Language">语言</sys:String>
+    <sys:String x:Key="Message_Done">完成</sys:String>
+    <sys:String x:Key="Message_Done_LanguageChanged">展示语言切换成功，请重新启动软件。</sys:String>
+    <sys:String x:Key="Message_Fail">失败</sys:String>
+    <sys:String x:Key="Message_Fail_SaceChange">设定未成功保存。</sys:String>
 </ResourceDictionary>

@@ -30,6 +30,17 @@ namespace BaiduCloudSupport
         /// All UI binding and necessary data
         /// </summary>
         public static TotalData totalData;
+
+        /// <summary>
+        /// Theme styles for change window style
+        /// </summary>
+        public enum ThemeStyle { BaseLight, BaseDark }
+
+        /// <summary>
+        /// Theme accents for change window color
+        /// </summary>
+        public enum ThemeAccent { Red, Green, Blue, Purple, Orange, Lime, Emerald, Teal, Cyan, Cobalt, Indigo, Violet, Pink, Magenta, Crimson, Amber, Yellow, Brown, Olive, Steel, Mauve, Taupe, Sienna }
+
         public MainWindow()
         {
             // Set default Language
@@ -200,6 +211,169 @@ namespace BaiduCloudSupport
             {
                 LogHelper.WriteLog("MainWindow.LoadUserPortraitFromFile", ex);
             }
+        }
+
+        /// <summary>
+        /// Change app accent
+        /// </summary>
+        /// <param name="accent">New accent</param>
+        /// <param name="theme">Theme</param>
+        public void ChangeAppStyle(ThemeAccent accent, MahApps.Metro.AppTheme theme)
+        {
+            // set the accent and theme to the window
+            MahApps.Metro.ThemeManager.ChangeAppStyle(Application.Current,
+                                        MahApps.Metro.ThemeManager.GetAccent(accent.ToString()),
+                                        MahApps.Metro.ThemeManager.GetAppTheme(theme.Name));
+        }
+
+        /// <summary>
+        /// Change app theme
+        /// </summary>
+        /// <param name="accent">Accent</param>
+        /// <param name="style">New theme</param>
+        public void ChangeAppStyle(MahApps.Metro.Accent accent, ThemeStyle style)
+        {
+            // set the accent and theme to the window
+            MahApps.Metro.ThemeManager.ChangeAppStyle(Application.Current,
+                                        MahApps.Metro.ThemeManager.GetAccent(accent.Name),
+                                        MahApps.Metro.ThemeManager.GetAppTheme(style.ToString()));
+        }
+
+        private async void splitButton_Setting_Language_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (splitButton_Setting_Language.SelectedItem != null && !splitButton_Setting_Language.SelectedItem.ToString().Equals(Setting.MainLanguage))
+            {
+                if (Setting.WriteAppSetting("MainLanguage", splitButton_Setting_Language.SelectedItem.ToString()))
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Done"), GlobalLanguage.FindText("Message_Done_LanguageChanged"));
+                }
+                else
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("Message_Fail_SaceChange"));
+                }
+            }
+        }
+
+        private void button_Setting_Click(object sender, RoutedEventArgs e)
+        {
+            // Accent color init
+            button_Setting_Color_Blue.Background = new SolidColorBrush(Color.FromRgb(112, 197, 233));
+            button_Setting_Color_Purple.Background = new SolidColorBrush(Color.FromRgb(131, 122, 229));
+            button_Setting_Color_Green.Background = new SolidColorBrush(Color.FromRgb(128, 186, 69));
+            button_Setting_Color_Pink.Background = new SolidColorBrush(Color.FromRgb(246, 142, 217));
+            button_Setting_Color_Teal.Background = new SolidColorBrush(Color.FromRgb(51, 188, 186));
+            button_Setting_Color_Orange.Background = new SolidColorBrush(Color.FromRgb(251, 134, 51));
+            button_Setting_Color_Cobalt.Background = new SolidColorBrush(Color.FromRgb(51, 115, 242));
+            button_Setting_Color_Red.Background = new SolidColorBrush(Color.FromRgb(234, 67, 51));
+            button_Setting_Color_Crimson.Background = new SolidColorBrush(Color.FromRgb(181, 51, 81));
+            button_Setting_Color_Mauve.Background = new SolidColorBrush(Color.FromRgb(145, 128, 161));
+            button_Setting_Color_Olive.Background = new SolidColorBrush(Color.FromRgb(138, 159, 131));
+            button_Setting_Color_Steel.Background = new SolidColorBrush(Color.FromRgb(131, 145, 159));
+
+            // Language list init
+            List<GlobalLanguage.LanguageList> langList = new List<GlobalLanguage.LanguageList>();
+            langList.Add(GlobalLanguage.LanguageList.en);
+            langList.Add(GlobalLanguage.LanguageList.zh);
+            splitButton_Setting_Language.ItemsSource = langList;
+            // read setting and show default language selected.
+            switch (Setting.MainLanguage)
+            {
+                case "en":
+                    splitButton_Setting_Language.SelectedItem = GlobalLanguage.LanguageList.en;
+                    break;
+                case "zh":
+                    splitButton_Setting_Language.SelectedItem = GlobalLanguage.LanguageList.zh;
+                    break;
+                default:
+                    splitButton_Setting_Language.SelectedItem = GlobalLanguage.LanguageList.en;
+                    break;
+            }
+
+            ToggleFlyout(0);
+        }
+
+        private void button_Setting_Theme_Light_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(appStyle.Item2, ThemeStyle.BaseLight);
+        }
+
+        private void button_Setting_Theme_Dark_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(appStyle.Item2, ThemeStyle.BaseDark);
+        }
+
+        private void button_Setting_Color_Blue_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Blue, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Purple_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Purple, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Green_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Green, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Pink_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Pink, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Teal_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Teal, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Orange_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Orange, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Cobalt_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Cobalt, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Red_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Red, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Crimson_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Crimson, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Mauve_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Mauve, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Olive_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Olive, appStyle.Item1);
+        }
+
+        private void button_Setting_Color_Steel_Click(object sender, RoutedEventArgs e)
+        {
+            Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
+            ChangeAppStyle(ThemeAccent.Steel, appStyle.Item1);
         }
     }
 }

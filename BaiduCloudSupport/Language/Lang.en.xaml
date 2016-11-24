@@ -17,4 +17,13 @@
     <sys:String x:Key="MainWindow_Quota_Total">Total quota:{0}GB</sys:String>
     <sys:String x:Key="MainWindow_Quota_Used">Used:{0}GB</sys:String>
     <sys:String x:Key="MainWindow_AutoLoginFailed">User authentication failed, Please login again.</sys:String>
+    <sys:String x:Key="Flyout_Setting_Theme">Theme</sys:String>
+    <sys:String x:Key="Flyout_Setting_Light">Light</sys:String>
+    <sys:String x:Key="Flyout_Setting_Dark">Dark</sys:String>
+    <sys:String x:Key="Flyout_Setting_Color">Accent</sys:String>
+    <sys:String x:Key="Flyout_Setting_Language">Language</sys:String>
+    <sys:String x:Key="Message_Done">Done</sys:String>
+    <sys:String x:Key="Message_Done_LanguageChanged">Change language setting succeed,please reboot the program.</sys:String>
+    <sys:String x:Key="Message_Fail">Fail</sys:String>
+    <sys:String x:Key="Message_Fail_SaceChange">Save change failed.</sys:String>
 </ResourceDictionary>

@@ -12,7 +12,7 @@
         Title="{StaticResource MainWindow_Title}" Height="600" Width="800" Loaded="MetroWindow_Loaded">
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
-            <Button Name="button_Setting">
+            <Button Name="button_Setting" Click="button_Setting_Click">
                 <StackPanel Orientation="Horizontal">
                     <Rectangle Width="17"
                     Height="17"
@@ -42,6 +42,43 @@
             </Button>
         </Controls:WindowCommands>
     </Controls:MetroWindow.RightWindowCommands>
+
+    <Controls:MetroWindow.Flyouts>
+        <Controls:FlyoutsControl Name="flyoutsControl">
+            <Controls:Flyout Header="{StaticResource TopBar_Setting}" Position="Right" Width="400" Theme="Inverse">
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto" >
+                    <StackPanel>
+                        <TextBlock Text="{StaticResource Flyout_Setting_Theme}" FontSize="20" FontWeight="Bold" Margin="10" />
+                        <Button Name="button_Setting_Theme_Light" Content="{StaticResource Flyout_Setting_Light}" Width="70" Height="25" Margin="100,0,0,0" HorizontalAlignment="Left" Style="{StaticResource AccentedSquareButtonStyle}" Click="button_Setting_Theme_Light_Click" />
+                        <Button Name="button_Setting_Theme_Dark" Content="{StaticResource Flyout_Setting_Dark}" Width="70" Height="25" Margin="240,-25,0,0" HorizontalAlignment="Left" Style="{StaticResource AccentedSquareButtonStyle}" Click="button_Setting_Theme_Dark_Click" />
+                        <TextBlock Text="{StaticResource Flyout_Setting_Color}" FontSize="20" FontWeight="Bold" Margin="10" />
+                        <Button Name="button_Setting_Color_Blue" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="30,0,0,0" Click="button_Setting_Color_Blue_Click" />
+                        <Button Name="button_Setting_Color_Purple" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="90,-40,0,0" Click="button_Setting_Color_Purple_Click" />
+                        <Button Name="button_Setting_Color_Green" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="150,-40,0,0" Click="button_Setting_Color_Green_Click" />
+                        <Button Name="button_Setting_Color_Pink" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="210,-40,0,0" Click="button_Setting_Color_Pink_Click" />
+                        <Button Name="button_Setting_Color_Teal" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="270,-40,0,0" Click="button_Setting_Color_Teal_Click" />
+                        <Button Name="button_Setting_Color_Orange" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="330,-40,0,0" Click="button_Setting_Color_Orange_Click" />
+                        <Button Name="button_Setting_Color_Cobalt" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="30,10,0,0" Click="button_Setting_Color_Cobalt_Click" />
+                        <Button Name="button_Setting_Color_Red" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="90,-40,0,0" Click="button_Setting_Color_Red_Click" />
+                        <Button Name="button_Setting_Color_Crimson" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="150,-40,0,0" Click="button_Setting_Color_Crimson_Click" />
+                        <Button Name="button_Setting_Color_Mauve" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="210,-40,0,0" Click="button_Setting_Color_Mauve_Click" />
+                        <Button Name="button_Setting_Color_Olive" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="270,-40,0,0" Click="button_Setting_Color_Olive_Click" />
+                        <Button Name="button_Setting_Color_Steel" Height="40" Width="40" Style="{DynamicResource MetroCircleButtonStyle}" HorizontalAlignment="Left" Margin="330,-40,0,0" Click="button_Setting_Color_Steel_Click" />
+                        <TextBlock Text="{StaticResource Flyout_Setting_Language}" FontSize="20" FontWeight="Bold" Margin="10" />
+                        <Controls:SplitButton 
+                            Name="splitButton_Setting_Language"
+                            Icon="{DynamicResource appbar_book_open}"
+                            HorizontalContentAlignment="Left"
+                            HorizontalAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Width="120"
+                            VerticalAlignment="Center" 
+                            SelectionChanged="splitButton_Setting_Language_SelectionChanged" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Controls:Flyout>
+        </Controls:FlyoutsControl>
+    </Controls:MetroWindow.Flyouts>
 
     <Grid Name="grid_Main">
         <Grid.RowDefinitions>

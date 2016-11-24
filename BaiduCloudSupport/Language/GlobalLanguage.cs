@@ -15,7 +15,7 @@ namespace BaiduCloudSupport
         /// <summary>
         /// Language list, add new language need create new file in Language file with Lang.*.xaml named
         /// </summary>
-        public enum LanguageList { en, jp, zh };
+        public enum LanguageList { en, zh };
 
         /// <summary>
         /// Read language data
