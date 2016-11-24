@@ -55,10 +55,14 @@ namespace BaiduCloudSupport.API
         /// <returns>URL format</returns>
         private static string ConvertPath2URLFormat(string path)
         {
-            string convertedPath = (PCS.BasePath + path).Replace("/", "%2F");
-            if (convertedPath[0] != '%')
+            string convertedPath;
+            if (path.StartsWith(BasePath))
             {
-                convertedPath = string.Format("%2F{0}", convertedPath);
+                convertedPath = path.Replace("/", "%2F");
+            }
+            else
+            {
+                convertedPath = (PCS.BasePath + path).Replace("/", "%2F");
             }
             return convertedPath;
         }
@@ -265,12 +269,14 @@ namespace BaiduCloudSupport.API
                 }
                 else
                 {
-                    return new FileListStruct[1];
+                    throw new ErrorCodeException();
+                    //return new FileListStruct[1];
                 }
             }catch(Exception ex)
             {
                 LogHelper.WriteLog("PCS.SingleFloder", ex);
-                return new FileListStruct[1];
+                //return new FileListStruct[1];
+                throw new Exception("PCS.SingleFloder", ex);
             }
         }
 

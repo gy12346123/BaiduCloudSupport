@@ -122,6 +122,7 @@
     <Compile Include="API\DataStruct.cs" />
     <Compile Include="API\PCS.cs" />
     <Compile Include="API\DataInfo.cs" />
+    <Compile Include="API\PCSException.cs" />
     <Compile Include="Login\BaiduLogin.cs" />
     <Compile Include="Login\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
@@ -134,6 +135,7 @@
     <Compile Include="Other\TestWindow.xaml.cs">
       <DependentUpon>TestWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Other\Tools.cs" />
     <Compile Include="TotalData.cs" />
     <Page Include="Language\Lang.en.xaml">
       <SubType>Designer</SubType>
@@ -207,7 +209,9 @@
     <Resource Include="Resources\Entypo.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\WindowsIcons-license.txt" />
@@ -222,6 +226,24 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\About-Author.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icon\NormalFolder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icon\Image.png" />
+    <Resource Include="Images\Icon\Zip.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icon\BT.png" />
+    <Resource Include="Images\Icon\music.png" />
+    <Resource Include="Images\Icon\Unknown.png" />
+    <Resource Include="Images\Icon\Video.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icon\Exe.png" />
+    <Resource Include="Images\Icon\Iso.png" />
+    <Resource Include="Images\Icon\Txt.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets')" />

@@ -26,4 +26,12 @@
     <sys:String x:Key="Message_Done_LanguageChanged">展示语言切换成功，请重新启动软件。</sys:String>
     <sys:String x:Key="Message_Fail">失败</sys:String>
     <sys:String x:Key="Message_Fail_SaceChange">设定未成功保存。</sys:String>
+    <sys:String x:Key="TabItem_FileList">文件列表</sys:String>
+    <sys:String x:Key="TabItem_DownloadList">下载列表</sys:String>
+    <sys:String x:Key="DataGrid_FileList_IsSelected">选中</sys:String>
+    <sys:String x:Key="DataGrid_FileList_File">文件</sys:String>
+    <sys:String x:Key="DataGrid_FileList_Size">大小</sys:String>
+    <sys:String x:Key="DataGrid_FileList_ModifiedTime">修改时间</sys:String>
+    <sys:String x:Key="MainWindow_LoadFolderInfoFailed">加载文件信息失败。</sys:String>
+    <sys:String x:Key="MainWindow_DataGrid_SelectedNull">未选中文件或文件夹。</sys:String>
 </ResourceDictionary>

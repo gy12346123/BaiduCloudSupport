@@ -41,6 +41,26 @@ namespace BaiduCloudSupport
         /// </summary>
         public enum ThemeAccent { Red, Green, Blue, Purple, Orange, Lime, Emerald, Teal, Cyan, Cobalt, Indigo, Violet, Pink, Magenta, Crimson, Amber, Yellow, Brown, Olive, Steel, Mauve, Taupe, Sienna }
 
+        private BitmapImage Icon_NormalFolder = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/NormalFolder.png"));
+
+        private BitmapImage Icon_BT = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/BT.png"));
+
+        private BitmapImage Icon_Exe = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/Exe.png"));
+
+        private BitmapImage Icon_Image = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/Image.png"));
+
+        private BitmapImage Icon_Iso = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/Iso.png"));
+
+        private BitmapImage Icon_Music = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/Music.png"));
+
+        private BitmapImage Icon_Txt = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/Txt.png"));
+
+        private BitmapImage Icon_Unknown = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/Unknown.png"));
+
+        private BitmapImage Icon_Video = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/Video.png"));
+
+        private BitmapImage Icon_Zip = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/Zip.png"));
+
         public MainWindow()
         {
             // Set default Language
@@ -115,11 +135,10 @@ namespace BaiduCloudSupport
             grid_Main.DataContext = totalData;
             if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
             {
+                totalData.ProgressRing_IsActive = true;
                 if (Setting.Baidu_uname.Equals("") || Setting.UserPortraitFilePath.Equals(""))
                 {
-                    totalData.ProgressRing_IsActive = true;
                     var result = await ReloadSimpleUserInfo();
-                    totalData.ProgressRing_IsActive = false;
                     if (!result)
                     {
                         await Task.Factory.StartNew(() => {
@@ -129,7 +148,6 @@ namespace BaiduCloudSupport
                     }
                 }else
                 {
-                    totalData.ProgressRing_IsActive = true;
                     totalData.uname = Setting.Baidu_uname;
                     if (!Setting.Baidu_Quota_Total.Equals(""))
                     {
@@ -142,18 +160,21 @@ namespace BaiduCloudSupport
                     await Task.Factory.StartNew(() => {
                         LoadUserPortraitFromFile(Setting.UserPortraitFilePath);
                     });
-                    totalData.ProgressRing_IsActive = false;
                 }
-            }else
+                var floderResult = await LoadFloder("");
+                if (floderResult == null)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                }
+                totalData.FileListDataItems = floderResult;
+                totalData.ProgressRing_IsActive = false;
+            }
+            else
             {
                 await Task.Factory.StartNew(() => {
                     LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
                 });
             }
-            //LoadUserPortraitFromFile(Setting.BasePath + "8.jpg");
-            //totalData.uname = "gy12346123";
-            //totalData.Quota_Total = 123;
-            //totalData.Quota_Used = 3;
         }
 
         public Task<bool> ReloadSimpleUserInfo()
@@ -194,6 +215,127 @@ namespace BaiduCloudSupport
                 }
                 return true;
             });
+        }
+
+        public Task<List<FileListDataItem>> LoadFloder(string path)
+        {
+            return Task.Factory.StartNew(()=> {
+                FileListStruct[] fileListStruct = PCS.SingleFloder(path);
+                if (fileListStruct == null)
+                {
+                    return null;
+                }
+                List<FileListDataItem> fileList = new List<FileListDataItem>();
+                foreach(FileListStruct FS in fileListStruct)
+                {
+                    string[] files = FS.path.Split('/');
+                    string convertedSize = "-";
+                    if (FS.isdir == 0)
+                    {
+                        convertedSize = ConvertFileSize(FS.size);
+                    }
+
+                    fileList.Add(new FileListDataItem() {
+                        fs_id = FS.fs_id,
+                        path = FS.path,
+                        file = files[files.Count() - 1],
+                        mtime = Tools.TimeStamp2DateTime(FS.mtime.ToString()),
+                        md5 = FS.md5,
+                        size = convertedSize,
+                        isdir = FS.isdir,
+                        isSelected = false,
+                        Icon = GetFileIcon(files[files.Count() - 1], Convert.ToInt32(FS.isdir))
+                    });
+                }
+                return fileList;
+            });
+        }
+
+        private BitmapImage GetFileIcon(string fileName, int isdir)
+        {
+            if (isdir == 0)
+            {
+                // File
+                string[] extension = fileName.Split('.');
+                if (extension.Count() > 1)
+                {
+                    switch (extension[extension.Count() - 1])
+                    {
+                        case "torrent":
+                            return Icon_BT;
+                        case "exe":
+                            return Icon_Exe;
+                        case "jpg":
+                        case "png":
+                        case "bmp":
+                        case "gif":
+                        case "tiff":
+                        case "exif":
+                        case "svg":
+                        case "psd":
+                        case "eps":
+                            return Icon_Image;
+                        case "iso":
+                            return Icon_Iso;
+                        case "mp3":
+                        case "cue":
+                        case "flac":
+                        case "mac":
+                        case "ape":
+                        case "m4a":
+                        case "aac":
+                        case "wav":
+                        case "wma":
+                            return Icon_Music;
+                        case "txt":
+                            return Icon_Txt;
+                        case "mp4":
+                        case "rm":
+                        case "rmvb":
+                        case "wmv":
+                        case "avi":
+                        case "3gp":
+                        case "mkv":
+                        case "flv":
+                            return Icon_Video;
+                        case "zip":
+                        case "7z":
+                        case "rar":
+                            return Icon_Zip;
+                        default:
+                            return Icon_Unknown;
+                    }
+                }
+                else
+                {
+                    return Icon_Unknown;
+                }
+            }
+            else
+            {
+                // Folder
+                return Icon_NormalFolder;
+            }
+        }
+
+        private string ConvertFileSize(ulong size)
+        {
+            if (size < 1024ul)
+            {
+                return string.Format("{0}B", size);
+            }else if (size >= 1024ul && size < 1024ul * 1024ul)
+            {
+                return string.Format("{0}K", Math.Round(Convert.ToDouble(size / 1024ul), 1));
+            }else if (size >= 1024ul * 1024ul && size < 1024ul * 1024ul * 1024ul)
+            {
+                return string.Format("{0}M", Math.Round(Convert.ToDouble(size / 1024ul / 1024ul), 1));
+            }else if (size >= 1024ul * 1024ul * 1024ul && size < 1024ul * 1024ul * 1024ul * 1024ul)
+            {
+                return string.Format("{0}G", Math.Round(Convert.ToDouble(size / 1024ul / 1024ul / 1024ul), 2));
+            }else
+            {
+                return string.Format("{0}T", Math.Round(Convert.ToDouble(size / 1024ul / 1024ul / 1024ul / 1024ul), 3));
+            }
         }
 
         private void LoadUserPortraitFromFile(string filePath)
@@ -374,6 +516,32 @@ namespace BaiduCloudSupport
         {
             Tuple<MahApps.Metro.AppTheme, MahApps.Metro.Accent> appStyle = MahApps.Metro.ThemeManager.DetectAppStyle(Application.Current);
             ChangeAppStyle(ThemeAccent.Steel, appStyle.Item1);
+        }
+
+        private async void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
+            if (item != null)
+            {
+                if (item.isdir == 0)
+                {
+                    // File
+                }else
+                {
+                    // Floder
+                    totalData.ProgressRing_IsActive = true;
+                    var floderResult = await LoadFloder(item.path);
+                    if (floderResult == null)
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                    }
+                    totalData.FileListDataItems = floderResult;
+                    totalData.ProgressRing_IsActive = false;
+                }
+            }else
+            {
+                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+            }
         }
     }
 }

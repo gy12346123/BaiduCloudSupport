@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace BaiduCloudSupport.API
 {
@@ -53,5 +54,18 @@ namespace BaiduCloudSupport.API
     public class FilePath
     {
         public List<EachFilePath> list;
+    }
+
+    public class FileListDataItem
+    {
+        public ulong fs_id { get; set; }
+        public string path { get; set; }
+        public string file { get; set; }
+        public DateTime mtime { get; set; }
+        public string md5 { get; set; }
+        public string size { get; set; }
+        public UInt32 isdir { get; set; }
+        public bool isSelected { get; set; }
+        public BitmapImage Icon { get; set; }
     }
 }

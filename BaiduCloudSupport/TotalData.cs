@@ -306,5 +306,22 @@ namespace BaiduCloudSupport
                 }
             }
         }
+
+        private List<API.FileListDataItem> _FileListDataItems;
+        public List<API.FileListDataItem> FileListDataItems
+        {
+            get { return _FileListDataItems; }
+            set
+            {
+                if (_FileListDataItems != value)
+                {
+                    _FileListDataItems = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("FileListDataItems"));
+                    }
+                }
+            }
+        }
     }
 }

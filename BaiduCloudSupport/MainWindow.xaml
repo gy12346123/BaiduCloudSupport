@@ -86,7 +86,7 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <WrapPanel Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0">
-            <Border BorderThickness="2" BorderBrush="LightBlue" CornerRadius="30" Height="50" Width="50">
+            <Border BorderThickness="2" BorderBrush="{DynamicResource AccentColorBrush}" CornerRadius="30" Height="50" Width="50">
                 <Border.Background>
                     <ImageBrush ImageSource="{Binding UserPortrait}"/>
                 </Border.Background>
@@ -108,6 +108,36 @@
                 </Rectangle>
             </Button>
         </WrapPanel>
+
+        <TabControl Grid.Row="1" Name="tabControl" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5" >
+            <TabItem Header="{StaticResource TabItem_FileList}">
+                <Viewbox>
+                    <DataGrid Name="dataGrid_FileList" ItemsSource="{Binding FileListDataItems}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="DataGrid_MouseDoubleClick">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                        EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                        Header="{StaticResource DataGrid_FileList_IsSelected}"
+                                        Binding="{Binding isSelected,Mode=TwoWay}"
+                                        IsReadOnly="False"
+                                        />
+                            <DataGridTemplateColumn Header="" Width="25">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Height="20" Source="{Binding Icon}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_File}" Width="500" Binding="{Binding file}"/>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_Size}" Width="50" Binding="{Binding size}"/>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_ModifiedTime}" Width="140" Binding="{Binding mtime}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Viewbox>
+            </TabItem>
+            <TabItem Header="{StaticResource TabItem_DownloadList}">
+                
+            </TabItem>
+        </TabControl>
         <Controls:ProgressRing Grid.Row="0" Grid.RowSpan="2" Foreground="{DynamicResource AccentColorBrush}" IsActive="{Binding ProgressRing_IsActive}" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </Controls:MetroWindow>
