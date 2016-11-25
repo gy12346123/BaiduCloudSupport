@@ -31,7 +31,7 @@ namespace BaiduCloudSupport.Other
         private async void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
             grid_Main.DataContext = MainWindow.totalData;
-            await PCS.DownloadFile(Setting.Baidu_Access_Token, "/test/[zhaofuli.net]专用手机攻击器.rar", "1.rar");
+            //await PCS.DownloadFile(Setting.Baidu_Access_Token, "/test/[zhaofuli.net]专用手机攻击器.rar", "1.rar");
         }
     }
 }

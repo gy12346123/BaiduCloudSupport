@@ -323,5 +323,40 @@ namespace BaiduCloudSupport
                 }
             }
         }
+
+        private List<API.DownloadListDataItem> _DownloadListDataItems;
+        public List<API.DownloadListDataItem> DownloadListDataItems
+        {
+            get { return _DownloadListDataItems; }
+            set
+            {
+                if (_DownloadListDataItems != value)
+                {
+                    _DownloadListDataItems = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("DownloadListDataItems"));
+                    }
+                }
+            }
+        }
+
+        private string _DownloadDefaultFolderPath;
+        public string DownloadDefaultFolderPath
+        {
+            get { return _DownloadDefaultFolderPath; }
+            set
+            {
+                if (_DownloadDefaultFolderPath != value)
+                {
+                    _DownloadDefaultFolderPath = value;
+                    Setting.WriteAppSetting("DownloadPath", value, true);
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("DownloadDefaultFolderPath"));
+                    }
+                }
+            }
+        }
     }
 }

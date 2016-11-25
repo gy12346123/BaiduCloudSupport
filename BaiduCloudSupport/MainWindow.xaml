@@ -74,6 +74,11 @@
                             Width="120"
                             VerticalAlignment="Center" 
                             SelectionChanged="splitButton_Setting_Language_SelectionChanged" />
+                        <TextBlock Text="{StaticResource Flyout_Setting_DownloadPath}" FontSize="20" FontWeight="Bold" Margin="10" />
+                        <WrapPanel Margin="70,0,0,0">
+                            <TextBox Width="200" Text="{Binding DownloadDefaultFolderPath}" IsReadOnly="True" />
+                            <Button Name="button_LoadDownloadPath" Content="{StaticResource Flyout_Setting_Button_DownloadPath}" Width="70" Height="25" Style="{StaticResource AccentedSquareButtonStyle}" Click="button_LoadDownloadPath_Click" />
+                        </WrapPanel>
                     </StackPanel>
                 </ScrollViewer>
             </Controls:Flyout>
@@ -96,8 +101,10 @@
             <TextBlock Text="{Binding Quota_Used,StringFormat='{StaticResource MainWindow_Quota_Used}'}" Margin="10,0,0,0" VerticalAlignment="Center" />
         </WrapPanel>
         <WrapPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" >
-            <Button Name="button_Login" Width="50"
+            <Button Name="button_Login"
+                        Width="50"
                         Height="50"
+                        ToolTip="{StaticResource MainWindow_Button_Login_ToolTip}"
                         Style="{DynamicResource MetroCircleButtonStyle}" Click="button_Login_Click" >
                 <Rectangle Width="20"
                                Height="20"
@@ -108,11 +115,55 @@
                 </Rectangle>
             </Button>
         </WrapPanel>
-
         <TabControl Grid.Row="1" Name="tabControl" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5" >
             <TabItem Header="{StaticResource TabItem_FileList}">
+                <StackPanel>
+                    <WrapPanel>
+                        <Controls:WindowCommands Grid.Row="1" Height="20" Width="500" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
+                            <WrapPanel Name="wrapPanel_Navigation" />
+                        </Controls:WindowCommands>
+                        <Button Name="button_GetDownloadURLSelected" Content="{StaticResource MainWindow_Button_GetDownloadURLSelected}" Height="20" Width="70" Margin="5" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="{StaticResource MainWindow_Button_GetDownloadURLSelected_ToolTip}" Click="button_GetDownloadURLSelected_Click" />
+                    </WrapPanel>
+                    <Viewbox>
+                        <DataGrid Name="dataGrid_FileList" ItemsSource="{Binding FileListDataItems}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="DataGrid_MouseDoubleClick" >
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                        EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                        Header="{StaticResource DataGrid_FileList_IsSelected}"
+                                        Binding="{Binding IsSelected, Mode=TwoWay}"
+                                        IsReadOnly="False"
+                                        >
+                                    <DataGridCheckBoxColumn.CellStyle>
+                                        <Style>
+                                            <EventSetter Event="CheckBox.Checked" Handler="DataGridCheckBox_Checked" />
+                                            <EventSetter Event="CheckBox.Unchecked" Handler="DataGridUncheckBox_Checked" />
+                                        </Style>
+                                    </DataGridCheckBoxColumn.CellStyle>
+                                </DataGridCheckBoxColumn>
+                                <DataGridTemplateColumn Header="" Width="25">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Height="20" Source="{Binding Icon}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="{StaticResource DataGrid_FileList_File}" Width="500" Binding="{Binding file}"/>
+                                <DataGridTextColumn Header="{StaticResource DataGrid_FileList_Size}" Width="50" Binding="{Binding size}"/>
+                                <DataGridTextColumn Header="{StaticResource DataGrid_FileList_ModifiedTime}" Width="140" Binding="{Binding mtime}"/>
+                            </DataGrid.Columns>
+                            <DataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_GetURL}" Click="MenuItem_GetURL_Click" />
+                                    <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_Download}" Click="MenuItem_Download_Click" />
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
+                        </DataGrid>
+                    </Viewbox>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="{StaticResource TabItem_DownloadList}">
                 <Viewbox>
-                    <DataGrid Name="dataGrid_FileList" ItemsSource="{Binding FileListDataItems}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="DataGrid_MouseDoubleClick">
+                    <DataGrid Name="dataGrid_FileDownloadList" ItemsSource="{Binding DownloadListDataItems}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" >
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
                                         EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
@@ -120,22 +171,14 @@
                                         Binding="{Binding isSelected,Mode=TwoWay}"
                                         IsReadOnly="False"
                                         />
-                            <DataGridTemplateColumn Header="" Width="25">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Image Height="20" Source="{Binding Icon}"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_File}" Width="500" Binding="{Binding file}"/>
-                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_Size}" Width="50" Binding="{Binding size}"/>
-                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_ModifiedTime}" Width="140" Binding="{Binding mtime}"/>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_File}" Width="300" Binding="{Binding file}"/>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_Size}" Width="70" Binding="{Binding size}"/>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_received}" Width="70" Binding="{Binding received}"/>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_Percentage}" Width="50" Binding="{Binding percentage,StringFormat='{StaticResource DataGrid_DownloadList_Percentage_Format}'}"/>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_StartTime}" Width="140" Binding="{Binding startTime}"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Viewbox>
-            </TabItem>
-            <TabItem Header="{StaticResource TabItem_DownloadList}">
-                
             </TabItem>
         </TabControl>
         <Controls:ProgressRing Grid.Row="0" Grid.RowSpan="2" Foreground="{DynamicResource AccentColorBrush}" IsActive="{Binding ProgressRing_IsActive}" HorizontalAlignment="Center" VerticalAlignment="Center" />

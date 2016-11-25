@@ -45,6 +45,8 @@ namespace BaiduCloudSupport
 
         public static string Baidu_Quota_Used = ConfigurationManager.AppSettings["Baidu_Quota_Used"];
 
+        public static string DownloadPath = ConfigurationManager.AppSettings["DownloadPath"];
+
         /// <summary>
         /// Reload setting data
         /// </summary>
@@ -65,6 +67,7 @@ namespace BaiduCloudSupport
             UserPortraitFilePath = ConfigurationManager.AppSettings["UserPortraitFilePath"];
             Baidu_Quota_Total = ConfigurationManager.AppSettings["Baidu_Quota_Total"];
             Baidu_Quota_Used = ConfigurationManager.AppSettings["Baidu_Quota_Used"];
+            DownloadPath = ConfigurationManager.AppSettings["DownloadPath"];
         }
 
         /// <summary>

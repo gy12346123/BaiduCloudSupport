@@ -13,7 +13,7 @@
     <sys:String x:Key="AboutWindow_TextBlock_Version">版本：{0}</sys:String>
     <sys:String x:Key="AboutWindow_TextBlock_Author">作者：GY</sys:String>
     <sys:String x:Key="AboutWindow_TextBlock_Mail">邮箱：wo@shi.gy</sys:String>
-    <sys:String x:Key="AboutWindow_TextBlock_License">基于GPL协议。详情请查看LICENSE。</sys:String>
+    <sys:String x:Key="AboutWindow_TextBlock_License">基于GPL协议。详情请查看LICENSE。如有侵权请联系作者邮箱。如有任何意见也可通过以上方式联系作者。</sys:String>
     <sys:String x:Key="MainWindow_Quota_Total">总空间：{0}GB</sys:String>
     <sys:String x:Key="MainWindow_Quota_Used">已使用：{0}GB</sys:String>
     <sys:String x:Key="MainWindow_AutoLoginFailed">用户认证失败，请重新登录。</sys:String>
@@ -34,4 +34,21 @@
     <sys:String x:Key="DataGrid_FileList_ModifiedTime">修改时间</sys:String>
     <sys:String x:Key="MainWindow_LoadFolderInfoFailed">加载文件信息失败。</sys:String>
     <sys:String x:Key="MainWindow_DataGrid_SelectedNull">未选中文件或文件夹。</sys:String>
+    <sys:String x:Key="MainWindow_DataGrid_FileTooBig">文件过大，不适合使用本软件自带下载功能下载，请使用其他工具下载。下载链接将复制至剪切板。</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_received">已下载</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_Percentage">完成</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_Percentage_Format">{0}%</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_StartTime">开始于</sys:String>
+    <sys:String x:Key="Flyout_Setting_DownloadPath">下载文件夹</sys:String>
+    <sys:String x:Key="Flyout_Setting_Button_DownloadPath">设置</sys:String>
+    <sys:String x:Key="MainWindow_LoadDownloadPath_Title">选择文件夹</sys:String>
+    <sys:String x:Key="DataGrid_FileList_ContextMenu_GetURL">获取下载链接</sys:String>
+    <sys:String x:Key="DataGrid_FileList_ContextMenu_Download">下载文件</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_GetURL_Done">下载链接已复制至剪切板。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_Download_NotSupportFolderNow">暂不支持遍历下载。</sys:String>
+    <sys:String x:Key="MainWindow_Button_GetDownloadURLSelected">下载链接</sys:String>
+    <sys:String x:Key="MainWindow_Button_GetDownloadURLSelected_NoSelect">未发现选中项，请先将对应项打勾再按此按钮。</sys:String>
+    <sys:String x:Key="MainWindow_Button_GetDownloadURLSelected_Done">已将所选项下载地址存入txt文件中：{0}</sys:String>
+    <sys:String x:Key="MainWindow_Button_Login_ToolTip">登录百度账号获取Access token。</sys:String>
+    <sys:String x:Key="MainWindow_Button_GetDownloadURLSelected_ToolTip">在选好文件后点击此处可获取下载链接并保存到txt文档中。</sys:String>
 </ResourceDictionary>

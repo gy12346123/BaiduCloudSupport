@@ -68,4 +68,15 @@ namespace BaiduCloudSupport.API
         public bool isSelected { get; set; }
         public BitmapImage Icon { get; set; }
     }
+
+    public class DownloadListDataItem
+    {
+        public ulong fs_id { get; set; }
+        public string file { get; set; }
+        public long size { get; set; }
+        public long received { get; set; }
+        public double percentage { get; set; }
+        public DateTime startTime { get; set; }
+        public bool isSelected { get; set; }
+    }
 }

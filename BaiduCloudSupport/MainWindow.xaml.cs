@@ -61,6 +61,8 @@ namespace BaiduCloudSupport
 
         private BitmapImage Icon_Zip = new BitmapImage(new Uri("pack://application:,,,/Images/Icon/Zip.png"));
 
+        private static object _DownloadListChangeLock = new object();
+
         public MainWindow()
         {
             // Set default Language
@@ -99,26 +101,40 @@ namespace BaiduCloudSupport
 
         private async void button_Login_Click(object sender, RoutedEventArgs e)
         {
-            Login.LoginWindow LW = new Login.LoginWindow();
-            LW.Owner = this;
-            LW.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            if ((bool)LW.ShowDialog())
+            try
             {
-                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("LoginWindow_LoginSucceed"));
-                totalData.ProgressRing_IsActive = true;
-                var result = await ReloadSimpleUserInfo();
-                totalData.ProgressRing_IsActive = false;
-                if (!result)
+                Login.LoginWindow LW = new Login.LoginWindow();
+                LW.Owner = this;
+                LW.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                if ((bool)LW.ShowDialog())
                 {
-                    await Task.Factory.StartNew(() => {
-                        LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
-                    });
-                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_AutoLoginFailed"));
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("LoginWindow_LoginSucceed"));
+                    totalData.ProgressRing_IsActive = true;
+                    var result = await ReloadSimpleUserInfo();
+                    if (!result)
+                    {
+                        await Task.Factory.StartNew(() => {
+                            LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
+                        });
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_AutoLoginFailed"));
+                    }
+                    var floderResult = await LoadFloder("");
+                    if (floderResult == null)
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                    }
+                    totalData.FileListDataItems = floderResult;
                 }
-            }
-            else
+                else
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("LoginWindow_LoginFailed"));
+                }
+            }catch (Exception ex)
             {
-                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("LoginWindow_LoginFailed"));
+                LogHelper.WriteLog("MainWindow.button_Login_Click", ex);
+            }finally
+            {
+                totalData.ProgressRing_IsActive = false;
             }
         }
 
@@ -133,87 +149,107 @@ namespace BaiduCloudSupport
         private async void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
             grid_Main.DataContext = totalData;
-            if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
+            flyoutsControl.DataContext = totalData;
+
+            try
             {
-                totalData.ProgressRing_IsActive = true;
-                if (Setting.Baidu_uname.Equals("") || Setting.UserPortraitFilePath.Equals(""))
+                if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
                 {
-                    var result = await ReloadSimpleUserInfo();
-                    if (!result)
+                    totalData.ProgressRing_IsActive = true;
+                    if (Setting.Baidu_uname.Equals("") || Setting.UserPortraitFilePath.Equals(""))
                     {
+                        var result = await ReloadSimpleUserInfo();
+                        if (!result)
+                        {
+                            await Task.Factory.StartNew(() => {
+                                LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
+                            });
+                            await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_AutoLoginFailed"));
+                        }
+                    }
+                    else
+                    {
+                        totalData.uname = Setting.Baidu_uname;
+                        if (!Setting.Baidu_Quota_Total.Equals(""))
+                        {
+                            totalData.Quota_Total = Convert.ToUInt64(Setting.Baidu_Quota_Total);
+                        }
+                        if (!Setting.Baidu_Quota_Used.Equals(""))
+                        {
+                            totalData.Quota_Used = Convert.ToUInt64(Setting.Baidu_Quota_Used);
+                        }
                         await Task.Factory.StartNew(() => {
-                            LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
+                            LoadUserPortraitFromFile(Setting.UserPortraitFilePath);
                         });
-                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_AutoLoginFailed"));
                     }
-                }else
+                    var floderResult = await LoadFloder("");
+                    if (floderResult == null)
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                    }
+                    totalData.FileListDataItems = floderResult;
+                }
+                else
                 {
-                    totalData.uname = Setting.Baidu_uname;
-                    if (!Setting.Baidu_Quota_Total.Equals(""))
-                    {
-                        totalData.Quota_Total = Convert.ToUInt64(Setting.Baidu_Quota_Total);
-                    }
-                    if (!Setting.Baidu_Quota_Used.Equals(""))
-                    {
-                        totalData.Quota_Used = Convert.ToUInt64(Setting.Baidu_Quota_Used);
-                    }
                     await Task.Factory.StartNew(() => {
-                        LoadUserPortraitFromFile(Setting.UserPortraitFilePath);
+                        LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
                     });
                 }
-                var floderResult = await LoadFloder("");
-                if (floderResult == null)
-                {
-                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
-                }
-                totalData.FileListDataItems = floderResult;
-                totalData.ProgressRing_IsActive = false;
-            }
-            else
+            }catch (Exception ex)
             {
-                await Task.Factory.StartNew(() => {
-                    LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
-                });
+                LogHelper.WriteLog("MainWindow.MetroWindow_Loaded", ex);
+            }finally
+            {
+                totalData.ProgressRing_IsActive = false;
             }
         }
 
         public Task<bool> ReloadSimpleUserInfo()
         {
             return Task<bool>.Factory.StartNew(() => {
-                ulong[] quota = PCS.Quota();
-                if (quota != null && quota.Count() == 2)
+                try
                 {
-                    totalData.Quota_Total = quota[0];
-                    totalData.Quota_Used = quota[1];
-                }else
-                {
-                    return false;
-                }
-                SimpleUserInfoStruct userInfo = PCS.SimpleUser();
-                if (userInfo.uid != 0)
-                {
-                    totalData.uid = userInfo.uid;
-                    totalData.uname = userInfo.uname;
-                    if (!Setting.Baidu_portrait.Equals(userInfo.portrait))
+                    ulong[] quota = PCS.Quota();
+                    if (quota != null && quota.Count() == 2)
                     {
-                        string imagePath = Setting.BasePath + @"Images\UserInfo\";
-                        string imageFile = imagePath + userInfo.uid + ".jpg";
-                        if (!Directory.Exists(imagePath))
-                        {
-                            Directory.CreateDirectory(imagePath);
-                        }
-                        WebClient web = new WebClient();
-                        web.DownloadFile(new Uri(PCS.UserSmallPortrait(userInfo.portrait)), imageFile);
-                        totalData.portrait = userInfo.portrait;
-                        Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
-                        LoadUserPortraitFromFile(imageFile);
+                        totalData.Quota_Total = quota[0];
+                        totalData.Quota_Used = quota[1];
                     }
+                    else
+                    {
+                        return false;
+                    }
+                    SimpleUserInfoStruct userInfo = PCS.SimpleUser();
+                    if (userInfo.uid != 0)
+                    {
+                        totalData.uid = userInfo.uid;
+                        totalData.uname = userInfo.uname;
+                        if (!Setting.Baidu_portrait.Equals(userInfo.portrait))
+                        {
+                            string imagePath = Setting.BasePath + @"Images\UserInfo\";
+                            string imageFile = imagePath + userInfo.uid + ".jpg";
+                            if (!Directory.Exists(imagePath))
+                            {
+                                Directory.CreateDirectory(imagePath);
+                            }
+                            WebClient web = new WebClient();
+                            web.DownloadFile(new Uri(PCS.UserSmallPortrait(userInfo.portrait)), imageFile);
+                            totalData.portrait = userInfo.portrait;
+                            Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
+                            LoadUserPortraitFromFile(imageFile);
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    return true;
                 }
-                else
+                catch (Exception ex)
                 {
+                    LogHelper.WriteLog("MainWindow.ReloadSimpleUserInfo", ex);
                     return false;
                 }
-                return true;
             });
         }
 
@@ -417,6 +453,7 @@ namespace BaiduCloudSupport
             langList.Add(GlobalLanguage.LanguageList.en);
             langList.Add(GlobalLanguage.LanguageList.zh);
             splitButton_Setting_Language.ItemsSource = langList;
+            totalData.DownloadDefaultFolderPath = Setting.DownloadPath;
             // read setting and show default language selected.
             switch (Setting.MainLanguage)
             {
@@ -526,21 +563,313 @@ namespace BaiduCloudSupport
                 if (item.isdir == 0)
                 {
                     // File
+                    DownloadFile(item);
                 }else
                 {
                     // Floder
-                    totalData.ProgressRing_IsActive = true;
-                    var floderResult = await LoadFloder(item.path);
-                    if (floderResult == null)
-                    {
-                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
-                    }
-                    totalData.FileListDataItems = floderResult;
-                    totalData.ProgressRing_IsActive = false;
+                    TransferPage(item.path);
                 }
             }else
             {
                 await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+            }
+        }
+
+        private void ChangeNavigation(string path)
+        {
+            wrapPanel_Navigation.Children.Clear();
+            if (path.Replace(PCS.BasePath, "").Equals("/"))
+            {
+                return;
+            }
+            string[] eachFolder = path.Replace(PCS.BasePath,"").Split('/');
+            string basePath = PCS.BasePath;
+            if (eachFolder == null)
+            {
+                return;
+            }
+            foreach (string folder in eachFolder)
+            {
+                basePath += basePath.EndsWith("/") ? folder : string.Format("/{0}", folder);
+                Button button = new Button()
+                {
+                    Content = folder == "" ? "root> " : folder + "> ",
+                    ToolTip = basePath,
+                    Foreground = Brushes.Blue,
+                    FontSize = 15d,
+                };
+                button.Click += Button_Navigation_Template_Click;
+                wrapPanel_Navigation.Children.Add(button);
+            }
+        }
+
+        private void Button_Navigation_Template_Click(object sender, RoutedEventArgs e)
+        {
+            TransferPage(((Button)sender).ToolTip.ToString());
+        }
+
+        public async void DownloadFile(FileListDataItem item)
+        {
+            try
+            {
+                if (item.size.Contains("G") || item.size.Contains("T"))
+                {
+                    // File too big
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_FileTooBig"));
+                    string url = await PCS.DownloadURL(Setting.Baidu_Access_Token, item.path);
+                    Clipboard.SetText(url);
+                }
+                else
+                {
+                    // Download
+                    DownloadListDataItem dataItem = new DownloadListDataItem
+                    {
+                        fs_id = item.fs_id,
+                        file = item.file,
+                        size = 0L,
+                        received = 0L,
+                        percentage = 0d,
+                        startTime = DateTime.Now,
+                        isSelected = false
+                    };
+
+                    if (totalData.DownloadListDataItems != null && totalData.DownloadListDataItems.Count() != 0)
+                    {
+                        DownloadListAddItem(totalData.DownloadListDataItems, dataItem);
+                    }
+                    else
+                    {
+                        List<DownloadListDataItem> list = new List<DownloadListDataItem>();
+                        list.Add(dataItem);
+                        totalData.DownloadListDataItems = list;
+                    }
+                    CheckDownloadFolder();
+                    PCS.DownloadFile(Setting.Baidu_Access_Token, item.fs_id, item.path, Setting.DownloadPath + item.file);
+                }
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.DownloadFile", ex);
+            }
+        }
+
+        public static void CheckDownloadFolder()
+        {
+            if (Setting.DownloadPath == null || Setting.DownloadPath.Equals(""))
+            {
+                string defaultFolder = Setting.BasePath + @"Download\";
+                if (!Directory.Exists(defaultFolder))
+                {
+                    Directory.CreateDirectory(defaultFolder);
+                }
+                totalData.DownloadDefaultFolderPath = defaultFolder;
+            }else
+            {
+                if (!Setting.DownloadPath.EndsWith(@"\"))
+                {
+                    totalData.DownloadDefaultFolderPath = string.Format("{0}\\", Setting.DownloadPath);
+                }
+            }
+        }
+
+        private async void TransferPage(string path)
+        {
+            try
+            {
+                totalData.ProgressRing_IsActive = true;
+                var floderResult = await LoadFloder(path);
+                if (floderResult == null)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                }
+                totalData.FileListDataItems = floderResult;
+                ChangeNavigation(path);
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.TransferPage", ex);
+            }finally
+            {
+                totalData.ProgressRing_IsActive = false;
+            }
+        }
+
+        public static void DownloadListAddItem(List<DownloadListDataItem> list, DownloadListDataItem dataItem)
+        {
+            List<DownloadListDataItem> newList = new List<DownloadListDataItem>();
+            foreach (DownloadListDataItem file in list)
+            {
+                newList.Add(new DownloadListDataItem {
+                    fs_id = file.fs_id,
+                    file = file.file,
+                    size = file.size,
+                    received = file.received,
+                    percentage = file.percentage,
+                    startTime = file.startTime,
+                    isSelected = file.isSelected
+                });
+            }
+            newList.Add(dataItem);
+            totalData.DownloadListDataItems = newList;
+        }
+
+        public static void DownloadListChangeItems(ulong fs_id, long size, long received, double percentage)
+        {
+            lock (_DownloadListChangeLock)
+            {
+                List<DownloadListDataItem> newList = new List<DownloadListDataItem>();
+                foreach (DownloadListDataItem file in totalData.DownloadListDataItems)
+                {
+                    if (file.fs_id == fs_id)
+                    {
+                        newList.Add(new DownloadListDataItem {
+                            fs_id = file.fs_id,
+                            file = file.file,
+                            size = size,
+                            received = received,
+                            percentage = percentage,
+                            startTime = file.startTime,
+                            isSelected = file.isSelected
+                        });
+                    }else
+                    {
+                        newList.Add(file);
+                    }
+                }
+                totalData.DownloadListDataItems = newList;
+            }
+        }
+
+        private void button_LoadDownloadPath_Click(object sender, RoutedEventArgs e)
+        {
+            string result = Tools.GetFolder(GlobalLanguage.FindText("MainWindow_LoadDownloadPath_Title"), true);
+            if (result != string.Empty)
+            {
+                totalData.DownloadDefaultFolderPath = result;
+            }
+        }
+
+        private async void MenuItem_GetURL_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
+                if (item == null)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+                    return;
+                }
+                if (item.isdir == 0)
+                {
+                    totalData.ProgressRing_IsActive = true;
+                    string result = await PCS.DownloadURL(Setting.Baidu_Access_Token, item.path);
+                    Clipboard.SetText(result);
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Done"), GlobalLanguage.FindText("MainWindow_MenuItem_GetURL_Done"));
+                }
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.MenuItem_GetURL_Click", ex);
+            }finally
+            {
+                totalData.ProgressRing_IsActive = false;
+            }
+        }
+
+        private async void MenuItem_Download_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
+                if (item != null)
+                {
+                    if (item.isdir == 0)
+                    {
+                        // File
+                        DownloadFile(item);
+                    }
+                    else
+                    {
+                        // Folder
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_MenuItem_Download_NotSupportFolderNow"));
+                    }
+                }
+                else
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+                }
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.MenuItem_GetURL_Click", ex);
+            }
+        }
+
+        private async void button_GetDownloadURLSelected_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (totalData.FileListDataItems == null)
+                {
+                    return;
+                }
+                totalData.ProgressRing_IsActive = true;
+                int count = 0;
+                List<string> downloadURLList = new List<string>();
+                foreach (var file in totalData.FileListDataItems)
+                {
+                    if (file.isSelected && file.isdir == 0)
+                    {
+                        string URL = await PCS.DownloadURL(Setting.Baidu_Access_Token, file.path);
+                        downloadURLList.Add(URL);
+                        count++;
+                    }
+                }
+                if (count == 0)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_Button_GetDownloadURLSelected_NoSelect"));
+                    return;
+                }
+                CheckDownloadFolder();
+                string filePath = string.Format("{0}DownloadURL_{1}.txt", Setting.DownloadPath, Tools.GetTimeStamp());
+                using (StreamWriter SW = new StreamWriter(new FileStream(filePath, FileMode.Create)))
+                {
+                    foreach (string url in downloadURLList)
+                    {
+                        await SW.WriteLineAsync(url);
+                    }
+                    await SW.FlushAsync();
+                }
+                await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Done"), string.Format(GlobalLanguage.FindText("MainWindow_Button_GetDownloadURLSelected_Done"), filePath));
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.button_GetDownloadURLSelected_Click", ex);
+            }finally
+            {
+                totalData.ProgressRing_IsActive = false;
+            }
+
+        }
+
+        private void DataGridCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
+            foreach (var file in totalData.FileListDataItems)
+            {
+                if (file.fs_id == item.fs_id)
+                {
+                    file.isSelected = true;
+                    break;
+                }
+            }
+        }
+
+        private void DataGridUncheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
+            foreach (var file in totalData.FileListDataItems)
+            {
+                if (file.fs_id == item.fs_id)
+                {
+                    file.isSelected = false;
+                    break;
+                }
             }
         }
     }

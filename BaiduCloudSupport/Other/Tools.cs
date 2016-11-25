@@ -48,5 +48,62 @@ namespace BaiduCloudSupport.Other
             TimeSpan toNow = new TimeSpan(lTime);
             return dateTimeStart.Add(toNow);
         }
+
+        /// <summary>
+        /// Get Path and File name which user selectd.
+        /// </summary>
+        /// <param name="title">Dialog title</param>
+        /// <param name="filter">Example:Output.log|*.log|Output.txt|*.txt</param>
+        /// <param name="initDir">Default path</param>
+        /// <param name="multiSelect">Multi file</param>
+        /// <param name="checkPath">Check path if not exist will show the error message</param>
+        /// <param name="checkFile">Check file if not exist will show the error message</param>
+        /// <returns>File name with full path,if select one file,return string[0]</returns>
+        public static string[] GetPath(string title, string filter, string initDir, bool multiSelect = false, bool checkPath = false, bool checkFile = false)
+        {
+            System.Windows.Forms.OpenFileDialog OFD = new System.Windows.Forms.OpenFileDialog();
+            OFD.Title = title;
+            OFD.Filter = filter;
+            OFD.InitialDirectory = initDir;
+            OFD.Multiselect = multiSelect;
+            OFD.CheckPathExists = checkPath;
+            OFD.CheckFileExists = checkFile;
+            if (OFD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                if (multiSelect)
+                {
+                    return OFD.FileNames;
+                }
+                else
+                {
+                    return new string[1] { OFD.FileName };
+                }
+
+            }
+            else
+            {
+                return new string[1] { String.Empty };
+            }
+        }
+
+        /// <summary>
+        /// Get folder which user selected or created
+        /// </summary>
+        /// <param name="description">Dialog title</param>
+        /// <param name="showNewFolderButton">Show create folder button</param>
+        /// <param name="rootFolder">Start up path</param>
+        /// <returns>SelectedPath</returns>
+        public static string GetFolder(string description, bool showNewFolderButton, Environment.SpecialFolder rootFolder = Environment.SpecialFolder.Desktop)
+        {
+            System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog();
+            dialog.Description = description;
+            dialog.ShowNewFolderButton = showNewFolderButton;
+            dialog.RootFolder = rootFolder;
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                return dialog.SelectedPath;
+            }
+            return string.Empty;
+        }
     }
 }

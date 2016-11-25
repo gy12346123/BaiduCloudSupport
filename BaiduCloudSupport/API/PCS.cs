@@ -32,7 +32,7 @@ namespace BaiduCloudSupport.API
         /// <summary>
         /// Project base path
         /// </summary>
-        private static string BasePath = "/apps/wp2pcs";
+        public static string BasePath = "/apps/wp2pcs";
 
         /// <summary>
         /// Http time out
@@ -96,12 +96,14 @@ namespace BaiduCloudSupport.API
                 }
                 else
                 {
-                    return new SimpleUserInfoStruct { uid = 0,uname = "", portrait = "" };
+                    //return new SimpleUserInfoStruct { uid = 0,uname = "", portrait = "" };
+                    throw new ErrorCodeException();
                 }
             }catch(Exception ex)
             {
                 LogHelper.WriteLog("PCS.SimpleUser", ex);
-                return new SimpleUserInfoStruct { uid = 0, uname = "", portrait = "" };
+                //return new SimpleUserInfoStruct { uid = 0, uname = "", portrait = "" };
+                throw new Exception("PCS.SimpleUser", ex);
             }
         }
 
@@ -158,12 +160,12 @@ namespace BaiduCloudSupport.API
                 }
                 else
                 {
-                    return null;
+                    throw new ErrorCodeException();
                 }
             }catch(Exception ex)
             {
                 LogHelper.WriteLog("PCS.Quota", ex);
-                return null;
+                throw new Exception("PCS.Quota", ex);
             }
         }
 
@@ -212,13 +214,13 @@ namespace BaiduCloudSupport.API
                 }
                 else
                 {
-                    return new FileMetaStruct();
+                    throw new ErrorCodeException();
                 }
             }
             catch (Exception ex)
             {
                 LogHelper.WriteLog("PCS.SingleFileMeta", ex);
-                return new FileMetaStruct();
+                throw new Exception("PCS.SingleFileMeta", ex);
             }
         }
 
@@ -329,12 +331,12 @@ namespace BaiduCloudSupport.API
                 }
                 else
                 {
-                    return new FileListStruct[1];
+                    throw new ErrorCodeException();
                 }
             }catch(Exception ex)
             {
                 LogHelper.WriteLog("PCS.SearchFile", ex);
-                return new FileListStruct[1];
+                throw new Exception("PCS.SearchFile", ex);
             }
         }
 
@@ -357,7 +359,7 @@ namespace BaiduCloudSupport.API
         /// <param name="remoteFile">Remote full file path</param>
         /// <param name="localFile">Local full file path</param>
         /// <returns>Task</returns>
-        public static Task DownloadFile(string access_token, string remoteFile, string localFile)
+        public static Task DownloadFile(string access_token, ulong fs_id, string remoteFile, string localFile)
         {
             return Task.Factory.StartNew(()=> {
                 try
@@ -371,20 +373,54 @@ namespace BaiduCloudSupport.API
                     };
                     var result = http.GetHtml(item);
                     string[] location = result.Header.GetValues("location");
-
-                    WebClient web = new WebClient();
-                    web.DownloadProgressChanged += (object sender, DownloadProgressChangedEventArgs e) => {
-                        MainWindow.totalData.SingleFileSize = e.TotalBytesToReceive;
-                        MainWindow.totalData.SingleFileBytesReceived = e.BytesReceived;
-                        MainWindow.totalData.SingleFileProgressPercentage = e.ProgressPercentage;
-                    };
-                    web.DownloadFileCompleted += (object sender, System.ComponentModel.AsyncCompletedEventArgs e) => {
-                        MainWindow.totalData.SingleFileProgressPercentage = 100;
-                    };
-                    web.DownloadFileAsync(new Uri(location[0].Replace("\"", "")), localFile);
+                    using (WebClient web = new WebClient())
+                    {
+                        web.DownloadProgressChanged += (object sender, DownloadProgressChangedEventArgs e) => {
+                            //MainWindow.totalData.SingleFileSize = e.TotalBytesToReceive;
+                            //MainWindow.totalData.SingleFileBytesReceived = e.BytesReceived;
+                            //MainWindow.totalData.SingleFileProgressPercentage = e.ProgressPercentage;
+                            double percent = Math.Round(Convert.ToDouble(e.BytesReceived) / Convert.ToDouble(e.TotalBytesToReceive) * 100, 1);
+                            MainWindow.DownloadListChangeItems(fs_id, e.TotalBytesToReceive, e.BytesReceived, percent);
+                        };
+                        web.DownloadFileCompleted += (object sender, System.ComponentModel.AsyncCompletedEventArgs e) => {
+                            //MainWindow.totalData.SingleFileProgressPercentage = 100;
+                        };
+                        web.DownloadFileAsync(new Uri(location[0].Replace("\"", "")), localFile);
+                    }
                 }catch(Exception ex)
                 {
                     LogHelper.WriteLog("PCS.DownloadFile", ex);
+                    throw new Exception("PCS.DownloadFile", ex);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Get download url use remoteFile
+        /// </summary>
+        /// <param name="access_token">Baidu access token</param>
+        /// <param name="remoteFile">Remote full file path</param>
+        /// <returns>Task<string></returns>
+        public static Task<string> DownloadURL(string access_token, string remoteFile)
+        {
+            return Task.Factory.StartNew(()=> {
+                try
+                {
+                    HttpHelper http = new HttpHelper();
+                    HttpItem item = new HttpItem()
+                    {
+                        URL = DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile),
+                        Encoding = Encoding.UTF8,
+                        Timeout = PCS.Timeout
+                    };
+                    var result = http.GetHtml(item);
+                    string[] location = result.Header.GetValues("location");
+                    return location[0].Replace("\"", "");
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.WriteLog("PCS.DownloadURL", ex);
+                    throw new Exception("PCS.DownloadURL", ex);
                 }
             });
         }
