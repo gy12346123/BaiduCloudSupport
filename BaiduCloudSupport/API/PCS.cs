@@ -64,6 +64,14 @@ namespace BaiduCloudSupport.API
             {
                 convertedPath = (PCS.BasePath + path).Replace("/", "%2F");
             }
+            if (convertedPath.Contains("#"))
+            {
+                convertedPath = convertedPath.Replace("#", "%23");
+            }
+            if (convertedPath.Contains("+"))
+            {
+                convertedPath = convertedPath.Replace("+", "%2B");
+            }
             return convertedPath;
         }
 
