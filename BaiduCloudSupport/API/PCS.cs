@@ -432,5 +432,32 @@ namespace BaiduCloudSupport.API
                 }
             });
         }
+
+        /// <summary>
+        /// Get download url use remoteFile
+        /// </summary>
+        /// <param name="remoteFile">Remote full file path</param>
+        /// <returns>string URL</returns>
+        public static string DownloadURL(string remoteFile)
+        {
+            try
+            {
+                HttpHelper http = new HttpHelper();
+                HttpItem item = new HttpItem()
+                {
+                    URL = DownloadBaseURL + "file?method=download&access_token=" + Setting.Baidu_Access_Token + "&path=" + ConvertPath2URLFormat(remoteFile),
+                    Encoding = Encoding.UTF8,
+                    Timeout = PCS.Timeout
+                };
+                var result = http.GetHtml(item);
+                string[] location = result.Header.GetValues("location");
+                return location[0].Replace("\"", "");
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WriteLog("PCS.DownloadURL", ex);
+                throw new Exception("PCS.DownloadURL", ex);
+            }
+        }
     }
 }

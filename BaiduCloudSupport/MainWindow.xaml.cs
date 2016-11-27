@@ -3,6 +3,7 @@ using BaiduCloudSupport.Other;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -811,16 +812,29 @@ namespace BaiduCloudSupport
                 }
                 totalData.ProgressRing_IsActive = true;
                 int count = 0;
-                List<string> downloadURLList = new List<string>();
-                foreach (var file in totalData.FileListDataItems)
-                {
-                    if (file.isSelected && file.isdir == 0)
-                    {
-                        string URL = await PCS.DownloadURL(Setting.Baidu_Access_Token, file.path);
-                        downloadURLList.Add(URL);
-                        count++;
-                    }
-                }
+                //List<string> downloadURLList = new List<string>();
+                //foreach (var file in totalData.FileListDataItems)
+                //{
+                //    if (file.isSelected && file.isdir == 0)
+                //    {
+                //        string URL = await PCS.DownloadURL(Setting.Baidu_Access_Token, file.path);
+                //        downloadURLList.Add(URL);
+                //        count++;
+                //    }
+                //}
+
+                ConcurrentBag<string> bag = new ConcurrentBag<string>();
+                await Task.Factory.StartNew(()=> {
+                    Parallel.ForEach(totalData.FileListDataItems, new ParallelOptions { MaxDegreeOfParallelism = 3 }, (file) => {
+                        if (file.isSelected && file.isdir == 0)
+                        {
+                            string URL = PCS.DownloadURL(file.path);
+                            bag.Add(URL);
+                            count++;
+                        }
+                    });
+                });
+
                 if (count == 0)
                 {
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_Button_GetDownloadURLSelected_NoSelect"));
@@ -830,7 +844,7 @@ namespace BaiduCloudSupport
                 string filePath = string.Format("{0}DownloadURL_{1}.txt", Setting.DownloadPath, Tools.GetTimeStamp());
                 using (StreamWriter SW = new StreamWriter(new FileStream(filePath, FileMode.Create)))
                 {
-                    foreach (string url in downloadURLList)
+                    foreach (string url in bag)
                     {
                         await SW.WriteLineAsync(url);
                     }
@@ -850,27 +864,41 @@ namespace BaiduCloudSupport
         private void DataGridCheckBox_Checked(object sender, RoutedEventArgs e)
         {
             FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
-            foreach (var file in totalData.FileListDataItems)
-            {
+            //foreach (var file in totalData.FileListDataItems)
+            //{
+            //    if (file.fs_id == item.fs_id)
+            //    {
+            //        file.isSelected = true;
+            //        break;
+            //    }
+            //}
+            Parallel.ForEach(totalData.FileListDataItems, (file,state)=>{
                 if (file.fs_id == item.fs_id)
                 {
                     file.isSelected = true;
-                    break;
+                    state.Break();
                 }
-            }
+            });
         }
 
         private void DataGridUncheckBox_Checked(object sender, RoutedEventArgs e)
         {
             FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
-            foreach (var file in totalData.FileListDataItems)
-            {
+            //foreach (var file in totalData.FileListDataItems)
+            //{
+            //    if (file.fs_id == item.fs_id)
+            //    {
+            //        file.isSelected = false;
+            //        break;
+            //    }
+            //}
+            Parallel.ForEach(totalData.FileListDataItems, (file, state) => {
                 if (file.fs_id == item.fs_id)
                 {
                     file.isSelected = false;
-                    break;
+                    state.Break();
                 }
-            }
+            });
         }
     }
 }
