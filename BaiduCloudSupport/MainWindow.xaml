@@ -9,7 +9,7 @@
         WindowStartupLocation="Manual"
         NonActiveGlowBrush="#FFAEC9"
         GlowBrush="{DynamicResource AccentColorBrush}"
-        Title="{StaticResource MainWindow_Title}" Height="600" Width="800" Loaded="MetroWindow_Loaded">
+        Title="{StaticResource MainWindow_Title}" Height="600" Width="800" Loaded="MetroWindow_Loaded" SizeChanged="MetroWindow_SizeChanged">
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <Button Name="button_Setting" Click="button_Setting_Click">
@@ -89,6 +89,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="60"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <WrapPanel Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0">
             <Border BorderThickness="2" BorderBrush="{DynamicResource AccentColorBrush}" CornerRadius="30" Height="50" Width="50">
@@ -124,61 +125,57 @@
                         </Controls:WindowCommands>
                         <Button Name="button_GetDownloadURLSelected" Content="{StaticResource MainWindow_Button_GetDownloadURLSelected}" Height="20" Width="70" Margin="5" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="{StaticResource MainWindow_Button_GetDownloadURLSelected_ToolTip}" Click="button_GetDownloadURLSelected_Click" />
                     </WrapPanel>
-                    <Viewbox>
-                        <DataGrid Name="dataGrid_FileList" ItemsSource="{Binding FileListDataItems}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="DataGrid_MouseDoubleClick" >
-                            <DataGrid.Columns>
-                                <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                    <DataGrid Name="dataGrid_FileList" ItemsSource="{Binding FileListDataItems}" Width="auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="DataGrid_MouseDoubleClick" >
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
                                         EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
                                         Header="{StaticResource DataGrid_FileList_IsSelected}"
                                         Binding="{Binding IsSelected, Mode=TwoWay}"
                                         IsReadOnly="False"
                                         >
-                                    <DataGridCheckBoxColumn.CellStyle>
-                                        <Style>
-                                            <EventSetter Event="CheckBox.Checked" Handler="DataGridCheckBox_Checked" />
-                                            <EventSetter Event="CheckBox.Unchecked" Handler="DataGridUncheckBox_Checked" />
-                                        </Style>
-                                    </DataGridCheckBoxColumn.CellStyle>
-                                </DataGridCheckBoxColumn>
-                                <DataGridTemplateColumn Header="" Width="25">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Image Height="20" Source="{Binding Icon}"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="{StaticResource DataGrid_FileList_File}" Width="500" Binding="{Binding file}"/>
-                                <DataGridTextColumn Header="{StaticResource DataGrid_FileList_Size}" Width="50" Binding="{Binding size}"/>
-                                <DataGridTextColumn Header="{StaticResource DataGrid_FileList_ModifiedTime}" Width="140" Binding="{Binding mtime}"/>
-                            </DataGrid.Columns>
-                            <DataGrid.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_GetURL}" Click="MenuItem_GetURL_Click" />
-                                    <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_Download}" Click="MenuItem_Download_Click" />
-                                </ContextMenu>
-                            </DataGrid.ContextMenu>
-                        </DataGrid>
-                    </Viewbox>
+                                <DataGridCheckBoxColumn.CellStyle>
+                                    <Style>
+                                        <EventSetter Event="CheckBox.Checked" Handler="DataGridCheckBox_Checked" />
+                                        <EventSetter Event="CheckBox.Unchecked" Handler="DataGridUncheckBox_Checked" />
+                                    </Style>
+                                </DataGridCheckBoxColumn.CellStyle>
+                            </DataGridCheckBoxColumn>
+                            <DataGridTemplateColumn Header="" Width="25">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Height="20" Source="{Binding Icon}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_File}" Width="6*" Binding="{Binding file}"/>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_Size}" Width="auto" Binding="{Binding size}"/>
+                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_ModifiedTime}" Width="2*" Binding="{Binding mtime}"/>
+                        </DataGrid.Columns>
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_GetURL}" Click="MenuItem_GetURL_Click" />
+                                <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_Download}" Click="MenuItem_Download_Click" />
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+                    </DataGrid>
                 </StackPanel>
             </TabItem>
             <TabItem Header="{StaticResource TabItem_DownloadList}">
-                <Viewbox>
-                    <DataGrid Name="dataGrid_FileDownloadList" ItemsSource="{Binding DownloadListDataItems}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" >
-                        <DataGrid.Columns>
-                            <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                <DataGrid Name="dataGrid_FileDownloadList" ItemsSource="{Binding DownloadListDataItems}" Width="auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" >
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
                                         EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
                                         Header="{StaticResource DataGrid_FileList_IsSelected}"
                                         Binding="{Binding isSelected,Mode=TwoWay}"
                                         IsReadOnly="False"
                                         />
-                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_File}" Width="300" Binding="{Binding file}"/>
-                            <DataGridTextColumn Header="{StaticResource DataGrid_FileList_Size}" Width="70" Binding="{Binding size}"/>
-                            <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_received}" Width="70" Binding="{Binding received}"/>
-                            <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_Percentage}" Width="50" Binding="{Binding percentage,StringFormat='{StaticResource DataGrid_DownloadList_Percentage_Format}'}"/>
-                            <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_StartTime}" Width="140" Binding="{Binding startTime}"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Viewbox>
+                        <DataGridTextColumn Header="{StaticResource DataGrid_FileList_File}" Width="auto" Binding="{Binding file}"/>
+                        <DataGridTextColumn Header="{StaticResource DataGrid_FileList_Size}" Width="2*" Binding="{Binding size}"/>
+                        <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_received}" Width="2*" Binding="{Binding received}"/>
+                        <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_Percentage}" Width="1*" Binding="{Binding percentage,StringFormat='{StaticResource DataGrid_DownloadList_Percentage_Format}'}"/>
+                        <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_StartTime}" Width="2*" Binding="{Binding startTime}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
             </TabItem>
         </TabControl>
         <Controls:ProgressRing Grid.Row="0" Grid.RowSpan="2" Foreground="{DynamicResource AccentColorBrush}" IsActive="{Binding ProgressRing_IsActive}" HorizontalAlignment="Center" VerticalAlignment="Center" />

@@ -876,7 +876,7 @@ namespace BaiduCloudSupport
                 if (file.fs_id == item.fs_id)
                 {
                     file.isSelected = true;
-                    state.Break();
+                    state.Stop();
                 }
             });
         }
@@ -896,9 +896,15 @@ namespace BaiduCloudSupport
                 if (file.fs_id == item.fs_id)
                 {
                     file.isSelected = false;
-                    state.Break();
+                    state.Stop();
                 }
             });
+        }
+
+        private void MetroWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            dataGrid_FileList.Height = e.NewSize.Height - 200d;
+            dataGrid_FileDownloadList.Height = e.NewSize.Height - 200d;
         }
     }
 }
