@@ -645,7 +645,8 @@ namespace BaiduCloudSupport
                         totalData.DownloadListDataItems = list;
                     }
                     CheckDownloadFolder();
-                    PCS.DownloadFile(Setting.Baidu_Access_Token, item.fs_id, item.path, Setting.DownloadPath + item.file);
+                    //PCS.DownloadFile(Setting.Baidu_Access_Token, item.fs_id, item.path, Setting.DownloadPath + item.file);
+                    PCS.DownloadFileSegment(Setting.Baidu_Access_Token, item.fs_id, item.path, Setting.DownloadPath + item.file);
                 }
             }catch (Exception ex)
             {

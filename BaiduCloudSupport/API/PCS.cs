@@ -1,4 +1,6 @@
 ﻿using DotNet4.Utilities;
+using MyDownloader.Core;
+using MyDownloader.Extension.Protocols;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -24,6 +26,8 @@ namespace BaiduCloudSupport.API
         /// </summary>
         private static string DownloadBaseURL = "https://d.pcs.baidu.com/rest/2.0/pcs/";
 
+        private static string DownloadOldURL = "https://pcs.baidu.com/rest/2.0/pcs/";
+
         /// <summary>
         /// Baidu OpenAPI base URL
         /// </summary>
@@ -38,6 +42,8 @@ namespace BaiduCloudSupport.API
         /// Http time out
         /// </summary>
         private static int Timeout = 30000;
+
+        private static bool ForFirst = true;
 
         /// <summary>
         /// Set http Get or Post timeout value
@@ -401,6 +407,43 @@ namespace BaiduCloudSupport.API
                     throw new Exception("PCS.DownloadFile", ex);
                 }
             });
+        }
+
+        public static void DownloadFileSegment(string access_token, ulong fs_id, string remoteFile, string localFile)
+        {
+            if (ForFirst)
+            {
+                ProtocolProviderFactory.RegisterProtocolHandler("http", typeof(MyDownloader.Extension.Protocols.HttpProtocolProvider));
+                ProtocolProviderFactory.RegisterProtocolHandler("https", typeof(MyDownloader.Extension.Protocols.HttpProtocolProvider));
+                ProtocolProviderFactory.RegisterProtocolHandler("ftp", typeof(MyDownloader.Extension.Protocols.FtpProtocolProvider));
+                new HttpFtpProtocolExtension();
+                ForFirst = false;
+            }
+            DownloadManager.Instance.DownloadAdded += (object sender, DownloaderEventArgs e) =>
+            {
+            };
+
+            DownloadManager.Instance.DownloadEnded += (object sender, DownloaderEventArgs e) =>
+            {
+            };
+            Downloader downloader = DownloadManager.Instance.Add(
+                ResourceLocation.FromURL(DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile)),
+                new ResourceLocation[] { },
+                localFile,
+                5,
+                true,
+                fs_id);
+            downloader.InfoReceived += (object sender, EventArgs e) =>
+            {
+                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize, ((Downloader)sender).Transfered, ((Downloader)sender).Progress);
+            };
+            downloader.Ending += (object sender, EventArgs e) =>
+            {
+                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize, ((Downloader)sender).Transfered, 100);
+            };
+            downloader.DataReceived += (object sender, EventArgs e) => {
+                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize, ((Downloader)sender).Transfered, ((Downloader)sender).Progress);
+            };
         }
 
         /// <summary>
