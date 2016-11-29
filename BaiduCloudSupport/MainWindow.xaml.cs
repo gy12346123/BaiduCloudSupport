@@ -931,5 +931,26 @@ namespace BaiduCloudSupport
             });
         }
 
+        private async void button_ClearAccountSetting_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Setting.WriteAppSetting("Baidu_Access_Token", "", false);
+                Setting.WriteAppSetting("Baidu_Expires_In", "", false);
+                Setting.WriteAppSetting("Baidu_Session_Secret", "", false);
+                Setting.WriteAppSetting("Baidu_Session_Key", "", false);
+                Setting.WriteAppSetting("Baidu_Scope", "", false);
+                Setting.WriteAppSetting("Baidu_uid", "", false);
+                Setting.WriteAppSetting("Baidu_uname", "", false);
+                Setting.WriteAppSetting("Baidu_portrait", "", false);
+                Setting.WriteAppSetting("UserPortraitFilePath", "", false);
+                Setting.WriteAppSetting("Baidu_Quota_Total", "", false);
+                Setting.WriteAppSetting("Baidu_Quota_Used", "", true);
+                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("Message_Done"));
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.button_ClearAccountSetting_Click", ex);
+            }
+        }
     }
 }
