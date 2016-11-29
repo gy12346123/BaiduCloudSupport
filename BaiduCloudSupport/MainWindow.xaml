@@ -170,10 +170,11 @@
                                         IsReadOnly="False"
                                         />
                         <DataGridTextColumn Header="{StaticResource DataGrid_FileList_File}" Width="auto" Binding="{Binding file}"/>
-                        <DataGridTextColumn Header="{StaticResource DataGrid_FileList_Size}" Width="2*" Binding="{Binding size}"/>
-                        <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_received}" Width="2*" Binding="{Binding received}"/>
+                        <DataGridTextColumn Header="{StaticResource DataGrid_FileList_Size}" Width="1*" Binding="{Binding size,StringFormat='{StaticResource DataGrid_DownloadList_Size_Format}'}"/>
+                        <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_received}" Width="1*" Binding="{Binding received,StringFormat='{StaticResource DataGrid_DownloadList_received_Format}'}"/>
                         <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_Percentage}" Width="1*" Binding="{Binding percentage,StringFormat='{StaticResource DataGrid_DownloadList_Percentage_Format}'}"/>
-                        <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_StartTime}" Width="2*" Binding="{Binding startTime}"/>
+                        <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_Rate}" Width="2*" Binding="{Binding rate,StringFormat='{StaticResource DataGrid_DownloadList_Rate_Format}'}" />
+                        <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_StartTime}" Width="3*" Binding="{Binding startTime}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>

@@ -630,6 +630,7 @@ namespace BaiduCloudSupport
                         size = 0L,
                         received = 0L,
                         percentage = 0d,
+                        rate = 0d,
                         startTime = DateTime.Now,
                         isSelected = false
                     };
@@ -705,6 +706,7 @@ namespace BaiduCloudSupport
                     size = file.size,
                     received = file.received,
                     percentage = file.percentage,
+                    rate = file.rate,
                     startTime = file.startTime,
                     isSelected = file.isSelected
                 });
@@ -713,7 +715,7 @@ namespace BaiduCloudSupport
             totalData.DownloadListDataItems = newList;
         }
 
-        public static void DownloadListChangeItems(ulong fs_id, long size, long received, double percentage)
+        public static void DownloadListChangeItems(ulong fs_id, long size, long received, double percentage, double rate)
         {
             lock (_DownloadListChangeLock)
             {
@@ -728,6 +730,7 @@ namespace BaiduCloudSupport
                             size = size,
                             received = received,
                             percentage = percentage,
+                            rate = rate,
                             startTime = file.startTime,
                             isSelected = file.isSelected
                         });

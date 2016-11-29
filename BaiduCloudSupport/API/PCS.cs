@@ -373,6 +373,7 @@ namespace BaiduCloudSupport.API
         /// <param name="remoteFile">Remote full file path</param>
         /// <param name="localFile">Local full file path</param>
         /// <returns>Task</returns>
+        [Obsolete]
         public static Task DownloadFile(string access_token, ulong fs_id, string remoteFile, string localFile)
         {
             return Task.Factory.StartNew(()=> {
@@ -394,7 +395,7 @@ namespace BaiduCloudSupport.API
                             //MainWindow.totalData.SingleFileBytesReceived = e.BytesReceived;
                             //MainWindow.totalData.SingleFileProgressPercentage = e.ProgressPercentage;
                             double percent = Math.Round(Convert.ToDouble(e.BytesReceived) / Convert.ToDouble(e.TotalBytesToReceive) * 100, 1);
-                            MainWindow.DownloadListChangeItems(fs_id, e.TotalBytesToReceive, e.BytesReceived, percent);
+                            MainWindow.DownloadListChangeItems(fs_id, e.TotalBytesToReceive, e.BytesReceived, percent, 0d);
                         };
                         web.DownloadFileCompleted += (object sender, System.ComponentModel.AsyncCompletedEventArgs e) => {
                             //MainWindow.totalData.SingleFileProgressPercentage = 100;
@@ -430,19 +431,24 @@ namespace BaiduCloudSupport.API
                 ResourceLocation.FromURL(DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile)),
                 new ResourceLocation[] { },
                 localFile,
-                5,
+                Convert.ToInt32(Setting.DownloadSegment),
                 true,
                 fs_id);
+            double lastProgress = 0d;
             downloader.InfoReceived += (object sender, EventArgs e) =>
             {
-                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize, ((Downloader)sender).Transfered, ((Downloader)sender).Progress);
+                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, 0L, 0d, 0d);
             };
             downloader.Ending += (object sender, EventArgs e) =>
             {
-                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize, ((Downloader)sender).Transfered, 100);
+                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, 100d, 0d);
             };
-            downloader.DataReceived += (object sender, EventArgs e) => {
-                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize, ((Downloader)sender).Transfered, ((Downloader)sender).Progress);
+            downloader.DataReceived += (object sender, DownloaderEventArgs e) => {
+                if (e.Downloader.Progress - lastProgress > 1d)
+                {
+                    MainWindow.DownloadListChangeItems(fs_id, e.Downloader.FileSize / 1048576L, e.Downloader.Transfered / 1048576L, Math.Round(e.Downloader.Progress, 1), Math.Round(e.Downloader.Rate / 1000d, 1));
+                    lastProgress = e.Downloader.Progress;
+                }
             };
         }
 

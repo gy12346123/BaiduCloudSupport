@@ -51,4 +51,8 @@
     <sys:String x:Key="MainWindow_Button_GetDownloadURLSelected_Done">已将所选项下载地址存入txt文件中：{0}</sys:String>
     <sys:String x:Key="MainWindow_Button_Login_ToolTip">登录百度账号获取Access token。</sys:String>
     <sys:String x:Key="MainWindow_Button_GetDownloadURLSelected_ToolTip">在选好文件后点击此处可获取下载链接并保存到txt文档中。</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_Rate">速率</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_Rate_Format">{0}kb/s</sys:String>
+    <sys:String x:Key="DataGrid_FileList_Size_Format">{0}M</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_received_Format">{0}M</sys:String>
 </ResourceDictionary>

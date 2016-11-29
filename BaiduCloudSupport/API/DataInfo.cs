@@ -76,6 +76,7 @@ namespace BaiduCloudSupport.API
         public long size { get; set; }
         public long received { get; set; }
         public double percentage { get; set; }
+        public double rate { get; set; }
         public DateTime startTime { get; set; }
         public bool isSelected { get; set; }
     }

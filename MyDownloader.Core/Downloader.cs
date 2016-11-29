@@ -122,7 +122,7 @@ namespace MyDownloader.Core
 
         public event EventHandler StateChanged;
 
-        public event EventHandler DataReceived;
+        public event EventHandler<DownloaderEventArgs> DataReceived;
 
         public event EventHandler<SegmentEventArgs> RestartingSegment;
 
@@ -422,11 +422,11 @@ namespace MyDownloader.Core
             }
         }
 
-        protected virtual void OnDataReceived()
+        protected virtual void OnDataReceived(Downloader downloader)
         {
             if (DataReceived != null)
             {
-                DataReceived(this, EventArgs.Empty);
+                DataReceived(this, new DownloaderEventArgs(downloader));
             }
         }
 
@@ -937,7 +937,7 @@ namespace MyDownloader.Core
                                 break;
                             }
                         }
-                        OnDataReceived();
+                        OnDataReceived(this);
                         // locks the stream to avoid that other threads changes
                         // the position of stream while this thread is writing into the stream
                         lock (segment.OutputStream)
