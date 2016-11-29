@@ -56,7 +56,7 @@ namespace MyDownloader.Extension.Protocols
         public virtual Stream CreateStream(ResourceLocation rl, long initialPosition, long endPosition)
         {
             HttpWebRequest request = (HttpWebRequest)GetRequest(rl);
-
+            request.Timeout = 10000;
             FillCredentials(request, rl);
 
             if (initialPosition != 0)
@@ -72,8 +72,9 @@ namespace MyDownloader.Extension.Protocols
             }
 
             WebResponse response = request.GetResponse();
-            
-            return response.GetResponseStream();
+            Stream stream = response.GetResponseStream();
+            stream.ReadTimeout = 10000;
+            return stream;
         }
 
         public virtual RemoteFileInfo GetFileInfo(ResourceLocation rl, out Stream stream)

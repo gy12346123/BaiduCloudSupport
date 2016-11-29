@@ -1,4 +1,5 @@
-﻿using CefSharp;
+﻿using BaiduCloudSupport.Login;
+using CefSharp;
 using CefSharp.Wpf;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -16,7 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace BaiduCloudSupport.Login
+namespace BaiduCloudSupport.Window
 {
     /// <summary>
     /// LoginWindow.xaml 的交互逻辑

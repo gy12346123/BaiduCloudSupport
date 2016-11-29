@@ -132,15 +132,18 @@
     <Compile Include="API\DataInfo.cs" />
     <Compile Include="API\PCSException.cs" />
     <Compile Include="Login\BaiduLogin.cs" />
-    <Compile Include="Login\LoginWindow.xaml.cs">
+    <Compile Include="Window\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Other\AboutWindow.xaml.cs">
+    <Compile Include="Window\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Other\HttpHelper.cs" />
     <Compile Include="Other\Imaging.cs" />
-    <Compile Include="Other\TestWindow.xaml.cs">
+    <Compile Include="Window\NewDownloadTaskWindow.xaml.cs">
+      <DependentUpon>NewDownloadTaskWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Window\TestWindow.xaml.cs">
       <DependentUpon>TestWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Other\Tools.cs" />
@@ -153,7 +156,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Login\LoginWindow.xaml">
+    <Page Include="Window\LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -170,11 +173,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Other\AboutWindow.xaml">
+    <Page Include="Window\AboutWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Other\TestWindow.xaml">
+    <Page Include="Window\NewDownloadTaskWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Window\TestWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -15,7 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace BaiduCloudSupport.Other
+namespace BaiduCloudSupport.Window
 {
     /// <summary>
     /// TestWindow.xaml 的交互逻辑

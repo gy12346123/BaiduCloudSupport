@@ -105,5 +105,19 @@ namespace BaiduCloudSupport.Other
             }
             return string.Empty;
         }
+
+        public static long GetHardDiskFreeSpace(string str_HardDiskName)
+        {
+            long freeSpace = new long();
+            System.IO.DriveInfo[] drives = System.IO.DriveInfo.GetDrives();
+            foreach (System.IO.DriveInfo drive in drives)
+            {
+                if (drive.Name == str_HardDiskName)
+                {
+                    freeSpace = drive.TotalFreeSpace / (1024 * 1024 * 1024);
+                }
+            }
+            return freeSpace;
+        }
     }
 }

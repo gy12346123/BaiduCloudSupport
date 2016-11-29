@@ -69,4 +69,8 @@
     <sys:String x:Key="MainWindow_TextBlock_TotalRate">{0}kb/s</sys:String>
     <sys:String x:Key="DataGrid_DownloadList_MenuItem_Stop">Stop</sys:String>
     <sys:String x:Key="DataGrid_DownloadList_MenuItem_Start">Start</sys:String>
+    <sys:String x:Key="NewDownloadTaskWindow_Title">NewDownloadTask</sys:String>
+    <sys:String x:Key="NewDownloadTaskWindow_DownloadURL">URL</sys:String>
+    <sys:String x:Key="NewDownloadTaskWindow_Button_Download">Download</sys:String>
+    <sys:String x:Key="NewDownloadTaskWindow_TextBlock_Space_Format">Space:{0}GB</sys:String>
 </ResourceDictionary>

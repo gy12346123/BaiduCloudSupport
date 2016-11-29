@@ -463,6 +463,8 @@ namespace BaiduCloudSupport.API
             downloader.StateChanged += (object sender, EventArgs e) => {
                 MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, Math.Round(((Downloader)sender).Progress, 1), Math.Round(((Downloader)sender).Rate / 1000d, 1));
             };
+            //downloader.SegmentFailed += (object sender, SegmentEventArgs e) => {
+            //};
         }
 
         private static void GetDownloadInfo()

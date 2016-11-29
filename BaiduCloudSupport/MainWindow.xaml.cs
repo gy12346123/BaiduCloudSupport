@@ -109,7 +109,7 @@ namespace BaiduCloudSupport
         {
             try
             {
-                Login.LoginWindow LW = new Login.LoginWindow();
+                Window.LoginWindow LW = new Window.LoginWindow();
                 LW.Owner = this;
                 LW.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 if ((bool)LW.ShowDialog())
@@ -146,7 +146,7 @@ namespace BaiduCloudSupport
 
         private void button_About_Click(object sender, RoutedEventArgs e)
         {
-            AboutWindow AB = new AboutWindow();
+            Window.AboutWindow AB = new Window.AboutWindow();
             AB.Owner = this;
             AB.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             AB.ShowDialog();

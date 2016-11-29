@@ -18,7 +18,7 @@ namespace MyDownloader.Extension.Protocols
         protected WebRequest GetRequest(ResourceLocation location)
         {
             WebRequest request = WebRequest.Create(location.URL);
-            request.Timeout = 30000;
+            request.Timeout = 10000;
             SetProxy(request);
             return request;
         }
