@@ -258,10 +258,11 @@ namespace BaiduCloudSupport
         {
             return Task.Factory.StartNew(()=> {
                 FileListStruct[] fileListStruct = PCS.SingleFloder(path);
-                if (fileListStruct == null)
-                {
-                    return null;
-                }
+                //if (fileListStruct == null)
+                //{
+                //    return null;
+                //}
+
                 //List<FileListDataItem> fileList = new List<FileListDataItem>();
                 //foreach(FileListStruct FS in fileListStruct)
                 //{
@@ -285,31 +286,63 @@ namespace BaiduCloudSupport
                 //    });
                 //}
 
-                ConcurrentBag<FileListDataItem> bag = new ConcurrentBag<FileListDataItem>();
-                Parallel.ForEach(fileListStruct, (FS)=> {
-                    string[] files = FS.path.Split('/');
-                    string convertedSize = "-";
-                    if (FS.isdir == 0)
-                    {
-                        convertedSize = ConvertFileSize(FS.size);
-                    }
+                //ConcurrentBag<FileListDataItem> bag = new ConcurrentBag<FileListDataItem>();
+                //Parallel.ForEach(fileListStruct, (FS)=> {
+                //    string[] files = FS.path.Split('/');
+                //    string convertedSize = "-";
+                //    if (FS.isdir == 0)
+                //    {
+                //        convertedSize = ConvertFileSize(FS.size);
+                //    }
 
-                    bag.Add(new FileListDataItem()
-                    {
-                        fs_id = FS.fs_id,
-                        path = FS.path,
-                        file = files[files.Count() - 1],
-                        mtime = Tools.TimeStamp2DateTime(FS.mtime.ToString()),
-                        md5 = FS.md5,
-                        size = convertedSize,
-                        isdir = FS.isdir,
-                        isSelected = false,
-                        Icon = GetFileIcon(files[files.Count() - 1], Convert.ToInt32(FS.isdir))
-                    });
-                });
-                var q = bag.OrderByDescending(x => x.isdir);
-                return q.ToList();
+                //    bag.Add(new FileListDataItem()
+                //    {
+                //        fs_id = FS.fs_id,
+                //        path = FS.path,
+                //        file = files[files.Count() - 1],
+                //        mtime = Tools.TimeStamp2DateTime(FS.mtime.ToString()),
+                //        md5 = FS.md5,
+                //        size = convertedSize,
+                //        isdir = FS.isdir,
+                //        isSelected = false,
+                //        Icon = GetFileIcon(files[files.Count() - 1], Convert.ToInt32(FS.isdir))
+                //    });
+                //});
+                //var q = bag.OrderByDescending(x => x.isdir);
+                return FileListStruct2FileListDataItem(ref fileListStruct);
             });
+        }
+
+        private List<FileListDataItem> FileListStruct2FileListDataItem(ref FileListStruct[] fileListStruct)
+        {
+            if (fileListStruct == null)
+            {
+                return null;
+            }
+            ConcurrentBag<FileListDataItem> bag = new ConcurrentBag<FileListDataItem>();
+            Parallel.ForEach(fileListStruct, (FS) => {
+                string[] files = FS.path.Split('/');
+                string convertedSize = "-";
+                if (FS.isdir == 0)
+                {
+                    convertedSize = ConvertFileSize(FS.size);
+                }
+
+                bag.Add(new FileListDataItem()
+                {
+                    fs_id = FS.fs_id,
+                    path = FS.path,
+                    file = files[files.Count() - 1],
+                    mtime = Tools.TimeStamp2DateTime(FS.mtime.ToString()),
+                    md5 = FS.md5,
+                    size = convertedSize,
+                    isdir = FS.isdir,
+                    isSelected = false,
+                    Icon = GetFileIcon(files[files.Count() - 1], Convert.ToInt32(FS.isdir))
+                });
+            });
+            var q = bag.OrderByDescending(x => x.isdir);
+            return q.ToList();
         }
 
         private BitmapImage GetFileIcon(string fileName, int isdir)
@@ -950,6 +983,32 @@ namespace BaiduCloudSupport
             }catch (Exception ex)
             {
                 LogHelper.WriteLog("MainWindow.button_ClearAccountSetting_Click", ex);
+            }
+        }
+
+        private async void button_SearchFile_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                totalData.ProgressRing_IsActive = true;
+                string keyword = await this.ShowInputAsync(GlobalLanguage.FindText("MainWindow_Button_SearchFile_Title"), GlobalLanguage.FindText("MainWindow_Button_SearchFile_Message"));
+                FileListStruct[] fileList = await PCS.SearchFile("/", keyword);
+
+                var floderResult = FileListStruct2FileListDataItem(ref fileList);
+                if (floderResult == null)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                    return;
+                }
+                totalData.FileListDataItems = floderResult;
+                ChangeNavigation(fileList[0].path);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.button_SearchFile_Click", ex);
+            }finally
+            {
+                totalData.ProgressRing_IsActive = false;
             }
         }
     }

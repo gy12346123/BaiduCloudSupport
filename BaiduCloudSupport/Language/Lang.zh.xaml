@@ -58,4 +58,8 @@
     <sys:String x:Key="DataGrid_FileList_SelectAll">全选</sys:String>
     <sys:String x:Key="Flyout_Setting_ClearConfigData">清理痕迹</sys:String>
     <sys:String x:Key="MainWindow_Button_ClearAccountSetting">账户信息</sys:String>
+    <sys:String x:Key="MainWindow_Button_SearchFile">搜索</sys:String>
+    <sys:String x:Key="MainWindow_Button_SearchFile_ToolTip">在百度云应用数据对应目录中搜索包含关键字的文件。</sys:String>
+    <sys:String x:Key="MainWindow_Button_SearchFile_Title">文件搜索</sys:String>
+    <sys:String x:Key="MainWindow_Button_SearchFile_Message">请输入关键字检索文件。</sys:String>
 </ResourceDictionary>

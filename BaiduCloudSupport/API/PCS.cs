@@ -313,45 +313,48 @@ namespace BaiduCloudSupport.API
         /// <param name="path">Floder path used to search file</param>
         /// <param name="keyword">Keyword used to search file</param>
         /// <param name="traversing">Traverse the folder:0.No, 1.Yes</param>
-        /// <returns>FileListStruct[]</returns>
-        public static FileListStruct[] SearchFile(string access_token, string path, string keyword, int traversing = 1)
+        /// <returns>Task<FileListStruct[]></returns>
+        public static Task<FileListStruct[]> SearchFile(string access_token, string path, string keyword, int traversing = 1)
         {
-            try
-            {
-                HttpHelper http = new HttpHelper();
-                HttpItem item = new HttpItem()
+            return Task.Factory.StartNew(() => {
+                try
                 {
-                    URL = PCSBaseURL + "file?method=search&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path) + "&wd=" + keyword + "&re=" + traversing,
-                    Encoding = Encoding.UTF8,
-                    Timeout = PCS.Timeout
-                };
-                string result = http.GetHtml(item).Html;
-                if (result.Contains("list"))
-                {
-                    var json = (JObject)JsonConvert.DeserializeObject(result);
-                    int listCount = json["list"].Count();
-                    FileListStruct[] fileListStruct = new FileListStruct[listCount];
-                    for (int i = 0; i < listCount; i++)
+                    HttpHelper http = new HttpHelper();
+                    HttpItem item = new HttpItem()
                     {
-                        fileListStruct[i].fs_id = Convert.ToUInt64(json["list"][i]["fs_id"]);
-                        fileListStruct[i].path = json["list"][i]["path"].ToString();
-                        fileListStruct[i].ctime = Convert.ToUInt32(json["list"][i]["ctime"]);
-                        fileListStruct[i].mtime = Convert.ToUInt32(json["list"][i]["mtime"]);
-                        fileListStruct[i].md5 = json["list"][i]["md5"].ToString();
-                        fileListStruct[i].size = Convert.ToUInt64(json["list"][i]["size"]);
-                        fileListStruct[i].isdir = Convert.ToUInt32(json["list"][i]["isdir"]);
+                        URL = PCSBaseURL + "file?method=search&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path) + "&wd=" + keyword + "&re=" + traversing,
+                        Encoding = Encoding.UTF8,
+                        Timeout = PCS.Timeout
+                    };
+                    string result = http.GetHtml(item).Html;
+                    if (result.Contains("list"))
+                    {
+                        var json = (JObject)JsonConvert.DeserializeObject(result);
+                        int listCount = json["list"].Count();
+                        FileListStruct[] fileListStruct = new FileListStruct[listCount];
+                        for (int i = 0; i < listCount; i++)
+                        {
+                            fileListStruct[i].fs_id = Convert.ToUInt64(json["list"][i]["fs_id"]);
+                            fileListStruct[i].path = json["list"][i]["path"].ToString();
+                            fileListStruct[i].ctime = Convert.ToUInt32(json["list"][i]["ctime"]);
+                            fileListStruct[i].mtime = Convert.ToUInt32(json["list"][i]["mtime"]);
+                            fileListStruct[i].md5 = json["list"][i]["md5"].ToString();
+                            fileListStruct[i].size = Convert.ToUInt64(json["list"][i]["size"]);
+                            fileListStruct[i].isdir = Convert.ToUInt32(json["list"][i]["isdir"]);
+                        }
+                        return fileListStruct;
                     }
-                    return fileListStruct;
+                    else
+                    {
+                        throw new ErrorCodeException();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    throw new ErrorCodeException();
+                    LogHelper.WriteLog("PCS.SearchFile", ex);
+                    throw new Exception("PCS.SearchFile", ex);
                 }
-            }catch(Exception ex)
-            {
-                LogHelper.WriteLog("PCS.SearchFile", ex);
-                throw new Exception("PCS.SearchFile", ex);
-            }
+            });
         }
 
         /// <summary>
@@ -360,8 +363,8 @@ namespace BaiduCloudSupport.API
         /// <param name="path">Floder path used to search file</param>
         /// <param name="keyword">Keyword used to search file</param>
         /// <param name="traversing">Traverse the folder:0.No, 1.Yes</param>
-        /// <returns>FileListStruct[]</returns>
-        public static FileListStruct[] SearchFile(string path, string keyword, int traversing = 1)
+        /// <returns>Task<FileListStruct[]></returns>
+        public static Task<FileListStruct[]> SearchFile(string path, string keyword, int traversing = 1)
         {
             return SearchFile(Setting.Baidu_Access_Token, path, keyword, traversing);
         }

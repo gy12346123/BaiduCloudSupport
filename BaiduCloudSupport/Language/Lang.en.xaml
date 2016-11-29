@@ -58,4 +58,8 @@
     <sys:String x:Key="DataGrid_FileList_SelectAll">SelectAll</sys:String>
     <sys:String x:Key="Flyout_Setting_ClearConfigData">Clear traces</sys:String>
     <sys:String x:Key="MainWindow_Button_ClearAccountSetting">Account</sys:String>
+    <sys:String x:Key="MainWindow_Button_SearchFile">Search</sys:String>
+    <sys:String x:Key="MainWindow_Button_SearchFile_ToolTip">Search file in your Baidu cloud.</sys:String>
+    <sys:String x:Key="MainWindow_Button_SearchFile_Title">Search File</sys:String>
+    <sys:String x:Key="MainWindow_Button_SearchFile_Message">Enter the keywords to search files.</sys:String>
 </ResourceDictionary>
