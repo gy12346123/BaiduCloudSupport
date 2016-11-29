@@ -62,4 +62,11 @@
     <sys:String x:Key="MainWindow_Button_SearchFile_ToolTip">在百度云应用数据对应目录中搜索包含关键字的文件。</sys:String>
     <sys:String x:Key="MainWindow_Button_SearchFile_Title">文件搜索</sys:String>
     <sys:String x:Key="MainWindow_Button_SearchFile_Message">请输入关键字检索文件。</sys:String>
+    <sys:String x:Key="NotifyIcon_Close">关闭程序</sys:String>
+    <sys:String x:Key="NotifyIcon_StartAll">开启下载</sys:String>
+    <sys:String x:Key="NotifyIcon_StopAll">停止下载</sys:String>
+    <sys:String x:Key="MainWindow_TextBlock_TotalDownload">总下载：{0}</sys:String>
+    <sys:String x:Key="MainWindow_TextBlock_TotalRate">{0}kb/s</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_MenuItem_Stop">停止</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_MenuItem_Start">开始</sys:String>
 </ResourceDictionary>

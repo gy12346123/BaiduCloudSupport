@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    <sys:String x:Key="MainWindow_Title">BaiduSupport</sys:String>
+    <sys:String x:Key="MainWindow_Title">BaiduCloudSupport</sys:String>
     <sys:String x:Key="LoginWindow_Title">Login</sys:String>
     <sys:String x:Key="CommonMessage_Result">Result</sys:String>
     <sys:String x:Key="CommonTitle_Notice">Notice</sys:String>
@@ -62,4 +62,11 @@
     <sys:String x:Key="MainWindow_Button_SearchFile_ToolTip">Search file in your Baidu cloud.</sys:String>
     <sys:String x:Key="MainWindow_Button_SearchFile_Title">Search File</sys:String>
     <sys:String x:Key="MainWindow_Button_SearchFile_Message">Enter the keywords to search files.</sys:String>
+    <sys:String x:Key="NotifyIcon_Close">Close</sys:String>
+    <sys:String x:Key="NotifyIcon_StartAll">StartAll</sys:String>
+    <sys:String x:Key="NotifyIcon_StopAll">StopAll</sys:String>
+    <sys:String x:Key="MainWindow_TextBlock_TotalDownload">TotalDownload:{0}</sys:String>
+    <sys:String x:Key="MainWindow_TextBlock_TotalRate">{0}kb/s</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_MenuItem_Stop">Stop</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_MenuItem_Start">Start</sys:String>
 </ResourceDictionary>

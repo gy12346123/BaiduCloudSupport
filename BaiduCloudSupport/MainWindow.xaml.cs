@@ -2,6 +2,7 @@
 using BaiduCloudSupport.Other;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using MyDownloader.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -64,12 +65,16 @@ namespace BaiduCloudSupport
 
         private static object _DownloadListChangeLock = new object();
 
+        private System.Windows.Forms.NotifyIcon notifyIcon;
+
         public MainWindow()
         {
             // Set default Language
             GlobalLanguage.SetLanguage(Setting.MainLanguage);
             InitializeComponent();
             totalData = new TotalData();
+            removeIcon();
+            startIcon();
         }
 
         private System.Windows.Input.ICommand openFirstFlyoutCommand;
@@ -202,6 +207,73 @@ namespace BaiduCloudSupport
             }finally
             {
                 totalData.ProgressRing_IsActive = false;
+            }
+        }
+
+        private void MetroWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            removeIcon();
+        }
+
+        private void startIcon()
+        {
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon();
+            this.notifyIcon.Text = GlobalLanguage.FindText("MainWindow_Title");
+            this.notifyIcon.Icon = new System.Drawing.Icon(@"Images\Icon\16.ico");
+            this.notifyIcon.Visible = true;
+            //Handle mouse double click event
+            this.notifyIcon.MouseDoubleClick += OnNotifyIconDoubleClick;
+            //Context menu
+            System.Windows.Forms.ContextMenu menu = new System.Windows.Forms.ContextMenu();
+            System.Windows.Forms.MenuItem menuItem_Close = new System.Windows.Forms.MenuItem();
+            menuItem_Close.Text = GlobalLanguage.FindText("NotifyIcon_Close");
+            menuItem_Close.Click += new EventHandler(delegate {
+                this.Close();
+            });
+            System.Windows.Forms.MenuItem menuItem_StartAll = new System.Windows.Forms.MenuItem();
+            menuItem_StartAll.Text = GlobalLanguage.FindText("NotifyIcon_StartAll");
+            menuItem_StartAll.Click += (object sender, EventArgs e) => {
+                foreach (var downloader in DownloadManager.Instance.Downloads)
+                {
+                    downloader.Start();
+                }
+            };
+            System.Windows.Forms.MenuItem menuItem_StopAll = new System.Windows.Forms.MenuItem();
+            menuItem_StopAll.Text = GlobalLanguage.FindText("NotifyIcon_StopAll");
+            menuItem_StopAll.Click += (object sender, EventArgs e) => {
+                Task.Factory.StartNew(()=> {
+                    DownloadManager.Instance.PauseAll();
+                });
+            };
+            menu.MenuItems.Add(menuItem_StartAll);
+            menu.MenuItems.Add(menuItem_StopAll);
+            menu.MenuItems.Add(menuItem_Close);
+            this.notifyIcon.ContextMenu = menu;
+        }
+
+        private void removeIcon()
+        {
+            if (this.notifyIcon != null)
+            {
+                this.notifyIcon.Visible = false;
+                this.notifyIcon.Dispose();
+                this.notifyIcon = null;
+            }
+        }
+
+        private void OnNotifyIconDoubleClick(object sender, EventArgs e)
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                //Show window
+                this.Show();
+                WindowState = WindowState.Normal;
+            }
+            else if (WindowState == WindowState.Normal)
+            {
+                //Hide window
+                this.Hide();
+                WindowState = WindowState.Minimized;
             }
         }
 
@@ -1009,6 +1081,59 @@ namespace BaiduCloudSupport
             }finally
             {
                 totalData.ProgressRing_IsActive = false;
+            }
+        }
+
+        private async void MenuItem_Stop_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
+                if (item == null)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+                    return;
+                }
+                await Task.Factory.StartNew(() => {
+                    foreach (var downloader in DownloadManager.Instance.Downloads)
+                    {
+                        if (downloader.fs_id == item.fs_id)
+                        {
+                            downloader.Pause();
+                            break;
+                        }
+                    }
+                });
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.MenuItem_Stop_Click", ex);
+            }
+        }
+
+        private async void MenuItem_Start_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
+                if (item == null)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+                    return;
+                }
+                await Task.Factory.StartNew(() => {
+                    foreach (var downloader in DownloadManager.Instance.Downloads)
+                    {
+                        if (downloader.fs_id == item.fs_id)
+                        {
+                            downloader.Start();
+                            break;
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.MenuItem_Start_Click", ex);
             }
         }
     }

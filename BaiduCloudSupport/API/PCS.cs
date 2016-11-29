@@ -425,10 +425,16 @@ namespace BaiduCloudSupport.API
             }
             DownloadManager.Instance.DownloadAdded += (object sender, DownloaderEventArgs e) =>
             {
+                DownloadManager.Instance.ClearEnded();
+                MainWindow.totalData.TotalDownload = DownloadManager.Instance.Downloads.Count();
+                GetDownloadInfo();
             };
 
             DownloadManager.Instance.DownloadEnded += (object sender, DownloaderEventArgs e) =>
             {
+                DownloadManager.Instance.ClearEnded();
+                MainWindow.totalData.TotalDownload = DownloadManager.Instance.Downloads.Count();
+                GetDownloadInfo();
             };
             Downloader downloader = DownloadManager.Instance.Add(
                 ResourceLocation.FromURL(DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile)),
@@ -451,8 +457,17 @@ namespace BaiduCloudSupport.API
                 {
                     MainWindow.DownloadListChangeItems(fs_id, e.Downloader.FileSize / 1048576L, e.Downloader.Transfered / 1048576L, Math.Round(e.Downloader.Progress, 1), Math.Round(e.Downloader.Rate / 1000d, 1));
                     lastProgress = e.Downloader.Progress;
+                    GetDownloadInfo();
                 }
             };
+            downloader.StateChanged += (object sender, EventArgs e) => {
+                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, Math.Round(((Downloader)sender).Progress, 1), Math.Round(((Downloader)sender).Rate / 1000d, 1));
+            };
+        }
+
+        private static void GetDownloadInfo()
+        {
+            MainWindow.totalData.TotalRate = Math.Round(DownloadManager.Instance.TotalDownloadRate / 1000d, 1);
         }
 
         /// <summary>

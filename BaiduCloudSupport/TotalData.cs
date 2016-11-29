@@ -358,5 +358,39 @@ namespace BaiduCloudSupport
                 }
             }
         }
+
+        private int _TotalDownload;
+        public int TotalDownload
+        {
+            get { return _TotalDownload; }
+            set
+            {
+                if (_TotalDownload != value)
+                {
+                    _TotalDownload = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("TotalDownload"));
+                    }
+                }
+            }
+        }
+
+        private double _TotalRate;
+        public double TotalRate
+        {
+            get { return _TotalRate; }
+            set
+            {
+                if (_TotalRate != value)
+                {
+                    _TotalRate = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("TotalRate"));
+                    }
+                }
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@
         WindowStartupLocation="Manual"
         NonActiveGlowBrush="#FFAEC9"
         GlowBrush="{DynamicResource AccentColorBrush}"
-        Title="{StaticResource MainWindow_Title}" Height="600" Width="800" Loaded="MetroWindow_Loaded" SizeChanged="MetroWindow_SizeChanged">
+        Title="{StaticResource MainWindow_Title}" Height="600" Width="800" Loaded="MetroWindow_Loaded" SizeChanged="MetroWindow_SizeChanged" Closing="MetroWindow_Closing">
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <Button Name="button_Setting" Click="button_Setting_Click">
@@ -128,19 +128,19 @@
                         <Button Name="button_GetDownloadURLSelected" Content="{StaticResource MainWindow_Button_GetDownloadURLSelected}" Height="20" Width="70" Margin="5" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="{StaticResource MainWindow_Button_GetDownloadURLSelected_ToolTip}" Click="button_GetDownloadURLSelected_Click" />
                         <Button Name="button_SearchFile" Content="{StaticResource MainWindow_Button_SearchFile}" Height="20" Width="70" Margin="5" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="{StaticResource MainWindow_Button_SearchFile_ToolTip}" Click="button_SearchFile_Click"/>
                     </WrapPanel>
-                    <DataGrid Name="dataGrid_FileList" ItemsSource="{Binding FileListDataItems}" Width="auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="DataGrid_MouseDoubleClick" >
+                    <DataGrid x:Name="dataGrid_FileList" ItemsSource="{Binding FileListDataItems}" Width="auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="DataGrid_MouseDoubleClick" >
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn 
                                         ElementStyle="{DynamicResource MetroDataGridCheckBox}"
                                         EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
                                         Header="{StaticResource DataGrid_FileList_IsSelected}"
-                                        Binding="{Binding Path=isSelected, Mode=TwoWay}"
+                                        Binding="{Binding isSelected, Mode=TwoWay}"
                                         IsReadOnly="False"
                                         >
                                 <DataGridCheckBoxColumn.CellStyle>
                                     <Style>
-                                        <EventSetter Event="CheckBox.Checked" Handler="DataGridCheckBox_Checked" />
-                                        <EventSetter Event="CheckBox.Unchecked" Handler="DataGridUncheckBox_Checked" />
+                                        <EventSetter Event="ToggleButton.Checked" Handler="DataGridCheckBox_Checked" />
+                                        <EventSetter Event="ToggleButton.Unchecked" Handler="DataGridUncheckBox_Checked" />
                                     </Style>
                                 </DataGridCheckBoxColumn.CellStyle>
                             </DataGridCheckBoxColumn>
@@ -182,9 +182,25 @@
                         <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_Rate}" Width="2*" Binding="{Binding rate,StringFormat='{StaticResource DataGrid_DownloadList_Rate_Format}'}" />
                         <DataGridTextColumn Header="{StaticResource DataGrid_DownloadList_StartTime}" Width="3*" Binding="{Binding startTime}"/>
                     </DataGrid.Columns>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{StaticResource DataGrid_DownloadList_MenuItem_Start}" Click="MenuItem_Start_Click" />
+                            <MenuItem Header="{StaticResource DataGrid_DownloadList_MenuItem_Stop}" Click="MenuItem_Stop_Click" />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
                 </DataGrid>
             </TabItem>
         </TabControl>
+        <WrapPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5">
+            <TextBlock Text="{Binding TotalDownload, StringFormat='{StaticResource MainWindow_TextBlock_TotalDownload}'}" FontSize="15" Margin="0,0,0,0" />
+            <Rectangle Width="10" Height="15" Margin="10,0,0,0">
+                <Rectangle.Fill>
+                    <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_arrow_down}" />
+                </Rectangle.Fill>
+            </Rectangle>
+            <TextBlock Text="{Binding TotalRate, StringFormat='{StaticResource MainWindow_TextBlock_TotalRate}'}" FontSize="15" Margin="2,0,0,0" />
+        </WrapPanel>
+
         <Controls:ProgressRing Grid.Row="0" Grid.RowSpan="2" Foreground="{DynamicResource AccentColorBrush}" IsActive="{Binding ProgressRing_IsActive}" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </Controls:MetroWindow>
