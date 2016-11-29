@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,8 +57,9 @@ namespace BaiduCloudSupport.API
         public List<EachFilePath> list;
     }
 
-    public class FileListDataItem
+    public class FileListDataItem : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
         public ulong fs_id { get; set; }
         public string path { get; set; }
         public string file { get; set; }
@@ -65,8 +67,26 @@ namespace BaiduCloudSupport.API
         public string md5 { get; set; }
         public string size { get; set; }
         public UInt32 isdir { get; set; }
-        public bool isSelected { get; set; }
+        private bool _isSelected = false;
+        public bool isSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("isSelected"));
+                    }
+                }
+            }
+
+        }
         public BitmapImage Icon { get; set; }
+
+
     }
 
     public class DownloadListDataItem

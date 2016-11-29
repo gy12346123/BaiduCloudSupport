@@ -127,10 +127,11 @@
                     </WrapPanel>
                     <DataGrid Name="dataGrid_FileList" ItemsSource="{Binding FileListDataItems}" Width="auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="DataGrid_MouseDoubleClick" >
                         <DataGrid.Columns>
-                            <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                            <DataGridCheckBoxColumn 
+                                        ElementStyle="{DynamicResource MetroDataGridCheckBox}"
                                         EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
                                         Header="{StaticResource DataGrid_FileList_IsSelected}"
-                                        Binding="{Binding IsSelected, Mode=TwoWay}"
+                                        Binding="{Binding Path=isSelected, Mode=TwoWay}"
                                         IsReadOnly="False"
                                         >
                                 <DataGridCheckBoxColumn.CellStyle>
@@ -153,6 +154,8 @@
                         </DataGrid.Columns>
                         <DataGrid.ContextMenu>
                             <ContextMenu>
+                                <MenuItem Header="{StaticResource DataGrid_FileList_SelectAll}" Click="MenuItem_SelectAll_Click" />
+                                <Separator />
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_GetURL}" Click="MenuItem_GetURL_Click" />
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_Download}" Click="MenuItem_Download_Click" />
                             </ContextMenu>

@@ -262,9 +262,31 @@ namespace BaiduCloudSupport
                 {
                     return null;
                 }
-                List<FileListDataItem> fileList = new List<FileListDataItem>();
-                foreach(FileListStruct FS in fileListStruct)
-                {
+                //List<FileListDataItem> fileList = new List<FileListDataItem>();
+                //foreach(FileListStruct FS in fileListStruct)
+                //{
+                //    string[] files = FS.path.Split('/');
+                //    string convertedSize = "-";
+                //    if (FS.isdir == 0)
+                //    {
+                //        convertedSize = ConvertFileSize(FS.size);
+                //    }
+
+                //    fileList.Add(new FileListDataItem() {
+                //        fs_id = FS.fs_id,
+                //        path = FS.path,
+                //        file = files[files.Count() - 1],
+                //        mtime = Tools.TimeStamp2DateTime(FS.mtime.ToString()),
+                //        md5 = FS.md5,
+                //        size = convertedSize,
+                //        isdir = FS.isdir,
+                //        isSelected = false,
+                //        Icon = GetFileIcon(files[files.Count() - 1], Convert.ToInt32(FS.isdir))
+                //    });
+                //}
+
+                ConcurrentBag<FileListDataItem> bag = new ConcurrentBag<FileListDataItem>();
+                Parallel.ForEach(fileListStruct, (FS)=> {
                     string[] files = FS.path.Split('/');
                     string convertedSize = "-";
                     if (FS.isdir == 0)
@@ -272,7 +294,8 @@ namespace BaiduCloudSupport
                         convertedSize = ConvertFileSize(FS.size);
                     }
 
-                    fileList.Add(new FileListDataItem() {
+                    bag.Add(new FileListDataItem()
+                    {
                         fs_id = FS.fs_id,
                         path = FS.path,
                         file = files[files.Count() - 1],
@@ -283,8 +306,9 @@ namespace BaiduCloudSupport
                         isSelected = false,
                         Icon = GetFileIcon(files[files.Count() - 1], Convert.ToInt32(FS.isdir))
                     });
-                }
-                return fileList;
+                });
+                var q = bag.OrderByDescending(x => x.isdir);
+                return q.ToList();
             });
         }
 
@@ -868,15 +892,9 @@ namespace BaiduCloudSupport
         private void DataGridCheckBox_Checked(object sender, RoutedEventArgs e)
         {
             FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
-            //foreach (var file in totalData.FileListDataItems)
-            //{
-            //    if (file.fs_id == item.fs_id)
-            //    {
-            //        file.isSelected = true;
-            //        break;
-            //    }
-            //}
-            Parallel.ForEach(totalData.FileListDataItems, (file,state)=>{
+
+            Parallel.ForEach(totalData.FileListDataItems, (file, state) =>
+            {
                 if (file.fs_id == item.fs_id)
                 {
                     file.isSelected = true;
@@ -888,14 +906,7 @@ namespace BaiduCloudSupport
         private void DataGridUncheckBox_Checked(object sender, RoutedEventArgs e)
         {
             FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
-            //foreach (var file in totalData.FileListDataItems)
-            //{
-            //    if (file.fs_id == item.fs_id)
-            //    {
-            //        file.isSelected = false;
-            //        break;
-            //    }
-            //}
+
             Parallel.ForEach(totalData.FileListDataItems, (file, state) => {
                 if (file.fs_id == item.fs_id)
                 {
@@ -910,5 +921,15 @@ namespace BaiduCloudSupport
             dataGrid_FileList.Height = e.NewSize.Height - 200d;
             dataGrid_FileDownloadList.Height = e.NewSize.Height - 200d;
         }
+
+        private void MenuItem_SelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            bool isSelected = totalData.FileListDataItems[0].isSelected;
+            Parallel.ForEach(totalData.FileListDataItems, (file) =>
+            {
+                file.isSelected = !isSelected;
+            });
+        }
+
     }
 }

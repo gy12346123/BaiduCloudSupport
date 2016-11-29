@@ -55,4 +55,5 @@
     <sys:String x:Key="DataGrid_DownloadList_Rate_Format">{0}kb/s</sys:String>
     <sys:String x:Key="DataGrid_DownloadList_Size_Format">{0}M</sys:String>
     <sys:String x:Key="DataGrid_DownloadList_received_Format">{0}M</sys:String>
+    <sys:String x:Key="DataGrid_FileList_SelectAll">SelectAll</sys:String>
 </ResourceDictionary>
