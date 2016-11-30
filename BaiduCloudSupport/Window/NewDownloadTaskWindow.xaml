@@ -20,16 +20,16 @@
         <StackPanel Grid.Row="0" Width="auto" Margin="5">
             <TextBlock Text="{StaticResource NewDownloadTaskWindow_Title}" HorizontalAlignment="Center" />
             <TextBlock Text="{StaticResource NewDownloadTaskWindow_DownloadURL}" Margin="0,0,0,5"/>
-            <RichTextBox Height="150"/>
+            <TextBox Name="textBox_URL" Text="{Binding DownloadURL, Mode=TwoWay}" Height="150" />
         </StackPanel>
         <StackPanel Grid.Row="1">
             <WrapPanel HorizontalAlignment="Center" Margin="5">
-                <TextBox Name="textBox_LoadDownloadPath" Width="300" Height="25" Text="{Binding DownloadDefaultFolderPath}" Margin="0,0,5,0" />
-                <Button Name="button_LoadDownloadPath" Content="{StaticResource Flyout_Setting_Button_DownloadPath}" Width="70" Height="25" Style="{StaticResource AccentedSquareButtonStyle}" />
+                <TextBox Name="textBox_LoadDownloadPath" Width="300" Height="25" Text="{Binding DownloadDefaultFolderPath, Mode=TwoWay}" Margin="0,0,5,0" />
+                <Button Name="button_LoadDownloadPath" Content="{StaticResource Flyout_Setting_Button_DownloadPath}" Width="70" Height="25" Style="{StaticResource AccentedSquareButtonStyle}" Click="button_LoadDownloadPath_Click" />
             </WrapPanel>
             <WrapPanel HorizontalAlignment="Right" Margin="5,20,5,0">
                 <TextBlock Name="textBlock_Space" Text="{Binding Space, StringFormat='{StaticResource NewDownloadTaskWindow_TextBlock_Space_Format}'}" Width="150" Margin="0,0,120,0" VerticalAlignment="Center" />
-                <Button Name="button_Download" Content="{StaticResource NewDownloadTaskWindow_Button_Download}" Width="70" Height="25" Margin="0,0,20,0" Style="{StaticResource AccentedSquareButtonStyle}" />
+                <Button Name="button_Download" Content="{StaticResource NewDownloadTaskWindow_Button_Download}" Width="70" Height="25" Margin="0,0,20,0" Style="{StaticResource AccentedSquareButtonStyle}" Click="button_Download_Click" />
             </WrapPanel>
 
         </StackPanel>

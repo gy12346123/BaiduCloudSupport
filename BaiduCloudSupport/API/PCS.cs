@@ -436,8 +436,17 @@ namespace BaiduCloudSupport.API
                 MainWindow.totalData.TotalDownload = DownloadManager.Instance.Downloads.Count();
                 GetDownloadInfo();
             };
+            string URL;
+            if (remoteFile.Contains("http://") || remoteFile.Contains("https://"))
+            {
+                URL = remoteFile;
+            }else
+            {
+                URL = DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile);
+            }
+
             Downloader downloader = DownloadManager.Instance.Add(
-                ResourceLocation.FromURL(DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile)),
+                ResourceLocation.FromURL(URL),
                 new ResourceLocation[] { },
                 localFile,
                 Convert.ToInt32(Setting.DownloadSegment),
