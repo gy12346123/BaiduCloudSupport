@@ -1074,12 +1074,21 @@ namespace BaiduCloudSupport
             {
                 totalData.ProgressRing_IsActive = true;
                 string keyword = await this.ShowInputAsync(GlobalLanguage.FindText("MainWindow_Button_SearchFile_Title"), GlobalLanguage.FindText("MainWindow_Button_SearchFile_Message"));
+                if (keyword == null || keyword.Equals(""))
+                {
+                    return;
+                }
                 FileListStruct[] fileList = await PCS.SearchFile("/", keyword);
 
                 var floderResult = FileListStruct2FileListDataItem(ref fileList);
                 if (floderResult == null)
                 {
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                    return;
+                }
+                if (floderResult.Count() == 0)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Done"), GlobalLanguage.FindText("MainWindow_Button_SearchFile_NoResult"));
                     return;
                 }
                 totalData.FileListDataItems = floderResult;

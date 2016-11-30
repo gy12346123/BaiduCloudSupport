@@ -73,4 +73,5 @@
     <sys:String x:Key="NewDownloadTaskWindow_DownloadURL">下载链接</sys:String>
     <sys:String x:Key="NewDownloadTaskWindow_Button_Download">下载</sys:String>
     <sys:String x:Key="NewDownloadTaskWindow_TextBlock_Space_Format">剩余空间：{0}GB</sys:String>
+    <sys:String x:Key="MainWindow_Button_SearchFile_NoResult">未查询到结果。</sys:String>
 </ResourceDictionary>
