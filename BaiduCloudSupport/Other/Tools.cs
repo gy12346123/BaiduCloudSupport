@@ -119,5 +119,15 @@ namespace BaiduCloudSupport.Other
             }
             return freeSpace;
         }
+
+        public static string URLEncoding(string content, Encoding e)
+        {
+            return System.Web.HttpUtility.UrlEncode(content, e);
+        }
+
+        public static string URLDecoding(string content, Encoding e)
+        {
+            return System.Web.HttpUtility.UrlDecode(content, e);
+        }
     }
 }

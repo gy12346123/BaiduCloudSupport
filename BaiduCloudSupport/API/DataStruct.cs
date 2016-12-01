@@ -56,4 +56,17 @@ namespace BaiduCloudSupport.API
         public string[] thumbs;
         public UInt32 unlist;
     }
+
+    public struct DBCCopyStruct
+    {
+        public string path;
+        public string dest;
+        public string newname;
+    }
+
+    public struct DBCFolderListStruct
+    {
+        public int dir_empty;
+        public string path;
+    }
 }

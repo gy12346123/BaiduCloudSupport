@@ -89,6 +89,8 @@ namespace BaiduCloudSupport.Window
             if (path != string.Empty)
             {
                 MainWindow.totalData.DownloadDefaultFolderPath = path;
+                DirectoryInfo info = new DirectoryInfo(path);
+                Space = Other.Tools.GetHardDiskFreeSpace(info.Root.FullName);
             }
         }
 

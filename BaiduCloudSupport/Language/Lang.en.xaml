@@ -80,4 +80,9 @@
     <sys:String x:Key="Flyout_Setting_APIMode">API mode</sys:String>
     <sys:String x:Key="Flyout_Setting_RadioButton_APIMode_PCS">PCS</sys:String>
     <sys:String x:Key="Flyout_Setting_RadioButton_APIMode_BDC">BDC</sys:String>
+    <sys:String x:Key="DataGrid_FileList_ContextMenu_CopyTo">CopyTo</sys:String>
+    <sys:String x:Key="FolderListWindow_Button_OK">OK</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_CopyTo_DestError">The copy to folder is error, please try to select it again.</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_CopyTo_Error">Copy file or folder faild.</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_CopyTo_Succeed">Copy file or folder succeed.</sys:String>
 </ResourceDictionary>

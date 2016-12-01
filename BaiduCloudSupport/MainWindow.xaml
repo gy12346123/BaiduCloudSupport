@@ -179,6 +179,8 @@
                             <ContextMenu>
                                 <MenuItem Header="{StaticResource DataGrid_FileList_SelectAll}" Click="MenuItem_SelectAll_Click" />
                                 <Separator />
+                                <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_CopyTo}" Click="MenuItem_CopyTo_Click" />
+                                <Separator />
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_GetURL}" Click="MenuItem_GetURL_Click" />
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_Download}" Click="MenuItem_Download_Click" />
                             </ContextMenu>

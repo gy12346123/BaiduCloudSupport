@@ -80,4 +80,9 @@
     <sys:String x:Key="Flyout_Setting_APIMode">API模式</sys:String>
     <sys:String x:Key="Flyout_Setting_RadioButton_APIMode_PCS">PCS</sys:String>
     <sys:String x:Key="Flyout_Setting_RadioButton_APIMode_BDC">BDC</sys:String>
+    <sys:String x:Key="DataGrid_FileList_ContextMenu_CopyTo">复制到</sys:String>
+    <sys:String x:Key="FolderListWindow_Button_OK">确定</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_CopyTo_DestError">未成功获取到新目录，请重新选择。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_CopyTo_Error">复制文件或目录失败。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_CopyTo_Succeed">成功将文件或文件夹复制到指定目录下。</sys:String>
 </ResourceDictionary>

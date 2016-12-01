@@ -371,6 +371,10 @@ namespace BaiduCloudSupport
         public Task<List<FileListDataItem>> LoadFolder(string path, int page = 1)
         {
             return Task.Factory.StartNew(()=> {
+                if (path == null || path.Equals(""))
+                {
+                    path = "/";
+                }
                 FileListStruct[] fileListStruct;
                 switch (Setting.APIMode)
                 {
@@ -378,7 +382,7 @@ namespace BaiduCloudSupport
                         fileListStruct = PCS.SingleFloder(path);
                         break;
                     case Setting.APIMODE.BDC:
-                        fileListStruct = BDC.SingleFloder(path, page);
+                        fileListStruct = BDC.SingleFolder(path, page);
                         break;
                     default:
                         fileListStruct = PCS.SingleFloder(path);
@@ -723,24 +727,31 @@ namespace BaiduCloudSupport
         private void ChangeNavigation(string path)
         {
             wrapPanel_Navigation.Children.Clear();
-            if (path.Replace(PCS.BasePath, "").Equals("/"))
-            {
-                return;
-            }
             string basePath;
+            string[] eachFolder;
             switch (Setting.APIMode)
             {
                 case Setting.APIMODE.PCS:
+                    if (path.Replace(PCS.BasePath, "").Equals("/"))
+                    {
+                        return;
+                    }
                     basePath = PCS.BasePath;
+                    eachFolder = path.Replace(PCS.BasePath, "").Split('/');
                     break;
                 case Setting.APIMODE.BDC:
+                    if (path.Equals("/"))
+                    {
+                        return;
+                    }
                     basePath = "/";
+                    eachFolder = path.Split('/');
                     break;
                 default:
                     basePath = PCS.BasePath;
+                    eachFolder = path.Replace(PCS.BasePath, "").Split('/');
                     break;
             }
-            string[] eachFolder = path.Replace(PCS.BasePath,"").Split('/');
             //string basePath = PCS.BasePath;
             if (eachFolder == null)
             {
@@ -771,7 +782,7 @@ namespace BaiduCloudSupport
             try
             {
                 totalData.ProgressRing_IsActive = true;
-                if (item.size.Contains("G") || item.size.Contains("T"))
+                if (item.size.Contains("T"))
                 {
                     // File too big
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_FileTooBig"));
@@ -1253,6 +1264,59 @@ namespace BaiduCloudSupport
                 {
                     totalData.ProgressRing_IsActive = false;
                 }
+            }
+        }
+
+        private async void MenuItem_CopyTo_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (Setting.APIMode == Setting.APIMODE.PCS)
+                {
+                    return;
+                }
+                if (dataGrid_FileList.SelectedItems.Count == 0)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+                    return;
+                }
+                totalData.ProgressRing_IsActive = true;
+                Window.FolderListWindow FLW = new Window.FolderListWindow(GlobalLanguage.FindText("DataGrid_FileList_ContextMenu_CopyTo"));
+                FLW.Owner = this;
+                string dest = "";
+                if ((bool)FLW.ShowDialog())
+                {
+                    dest = FLW.SelectedPath;
+                }
+                else
+                {
+                    return;
+                }
+
+                if (!dest.Equals(""))
+                {
+                    List<DBCCopyStruct> copyList = new List<DBCCopyStruct>();
+                    foreach (FileListDataItem file in dataGrid_FileList.SelectedItems)
+                    {
+                        copyList.Add(new DBCCopyStruct { path = file.path, dest = dest, newname = file.file });
+                    }
+                    if (await BDC.CopyTo(copyList))
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("MainWindow_MenuItem_CopyTo_Succeed"));
+                    }else
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("MainWindow_MenuItem_CopyTo_Error"));
+                    }
+                }else
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_MenuItem_CopyTo_DestError"));
+                }
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.MenuItem_CopyTo_Click", ex);
+            }finally
+            {
+                totalData.ProgressRing_IsActive = false;
             }
         }
     }
