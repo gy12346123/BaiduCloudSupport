@@ -127,6 +127,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="API\BDC.cs" />
     <Compile Include="API\DataStruct.cs" />
     <Compile Include="API\PCS.cs" />
     <Compile Include="API\DataInfo.cs" />

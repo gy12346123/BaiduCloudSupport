@@ -77,4 +77,7 @@
     <sys:String x:Key="MainWindow_Button_AdvanceLogin_ToolTip">登录百度账号获取Cookies，使用高级权限。</sys:String>
     <sys:String x:Key="MainWindow_Button_AdvanceLogin_CookieExisted">Cookie文件已存在，是否覆盖？</sys:String>
     <sys:String x:Key="MainWindow_Button_AdvanceLogin_CookieSaveSucceed">Cookies保存成功。</sys:String>
+    <sys:String x:Key="Flyout_Setting_APIMode">API模式</sys:String>
+    <sys:String x:Key="Flyout_Setting_RadioButton_APIMode_PCS">PCS</sys:String>
+    <sys:String x:Key="Flyout_Setting_RadioButton_APIMode_BDC">BDC</sys:String>
 </ResourceDictionary>

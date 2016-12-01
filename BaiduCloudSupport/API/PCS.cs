@@ -62,7 +62,7 @@ namespace BaiduCloudSupport.API
         private static string ConvertPath2URLFormat(string path)
         {
             string convertedPath;
-            if (path.StartsWith(BasePath))
+            if (path.StartsWith(PCS.BasePath))
             {
                 convertedPath = path.Replace("/", "%2F");
             }
@@ -198,7 +198,7 @@ namespace BaiduCloudSupport.API
         /// <param name="access_token">Baidu access token</param>
         /// <param name="path">File or floder path</param>
         /// <returns>FileMetaStruct</returns>
-        public static FileMetaStruct SingleFileMeta(string access_token, string path)
+        public static PCSFileMetaStruct SingleFileMeta(string access_token, string path)
         {
             try
             {
@@ -213,7 +213,7 @@ namespace BaiduCloudSupport.API
                 if (result.Contains("list"))
                 {
                     var json = (JObject)JsonConvert.DeserializeObject(result);
-                    FileMetaStruct fileMetaStruct = new FileMetaStruct();
+                    PCSFileMetaStruct fileMetaStruct = new PCSFileMetaStruct();
                     fileMetaStruct.fs_id = Convert.ToUInt64(json["list"][0]["fs_id"]);
                     fileMetaStruct.path = json["list"][0]["path"].ToString();
                     fileMetaStruct.ctime = Convert.ToUInt32(json["list"][0]["ctime"]);
@@ -243,7 +243,7 @@ namespace BaiduCloudSupport.API
         /// </summary>
         /// <param name="path">File or floder path</param>
         /// <returns>FileMetaStruct</returns>
-        public static FileMetaStruct SingleFileMeta(string path)
+        public static PCSFileMetaStruct SingleFileMeta(string path)
         {
             return SingleFileMeta(Setting.Baidu_Access_Token, path);
         }
@@ -256,43 +256,34 @@ namespace BaiduCloudSupport.API
         /// <returns>FileListStruct[]</returns>
         public static FileListStruct[] SingleFloder(string access_token, string path)
         {
-            try
+            HttpHelper http = new HttpHelper();
+            HttpItem item = new HttpItem()
             {
-                HttpHelper http = new HttpHelper();
-                HttpItem item = new HttpItem()
-                {
-                    URL = PCSBaseURL + "file?method=list&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
-                    Encoding = Encoding.UTF8,
-                    Timeout = PCS.Timeout
-                };
-                string result = http.GetHtml(item).Html;
-                if (result.Contains("list"))
-                {
-                    var json = (JObject)JsonConvert.DeserializeObject(result);
-                    int listCount = json["list"].Count();
-                    FileListStruct[] fileListStruct = new FileListStruct[listCount];
-                    for (int i = 0; i < listCount; i++)
-                    {
-                        fileListStruct[i].fs_id = Convert.ToUInt64(json["list"][i]["fs_id"]);
-                        fileListStruct[i].path = json["list"][i]["path"].ToString();
-                        fileListStruct[i].ctime = Convert.ToUInt32(json["list"][i]["ctime"]);
-                        fileListStruct[i].mtime = Convert.ToUInt32(json["list"][i]["mtime"]);
-                        fileListStruct[i].md5 = json["list"][i]["md5"].ToString();
-                        fileListStruct[i].size = Convert.ToUInt64(json["list"][i]["size"]);
-                        fileListStruct[i].isdir = Convert.ToUInt32(json["list"][i]["isdir"]);
-                    }
-                    return fileListStruct;
-                }
-                else
-                {
-                    throw new ErrorCodeException();
-                    //return new FileListStruct[1];
-                }
-            }catch(Exception ex)
+                URL = PCSBaseURL + "file?method=list&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
+                Encoding = Encoding.UTF8,
+                Timeout = PCS.Timeout
+            };
+            string result = http.GetHtml(item).Html;
+            if (result.Contains("list"))
             {
-                LogHelper.WriteLog("PCS.SingleFloder", ex);
-                //return new FileListStruct[1];
-                throw new Exception("PCS.SingleFloder", ex);
+                var json = (JObject)JsonConvert.DeserializeObject(result);
+                int listCount = json["list"].Count();
+                FileListStruct[] fileListStruct = new FileListStruct[listCount];
+                for (int i = 0; i < listCount; i++)
+                {
+                    fileListStruct[i].fs_id = Convert.ToUInt64(json["list"][i]["fs_id"]);
+                    fileListStruct[i].path = json["list"][i]["path"].ToString();
+                    fileListStruct[i].ctime = Convert.ToUInt32(json["list"][i]["ctime"]);
+                    fileListStruct[i].mtime = Convert.ToUInt32(json["list"][i]["mtime"]);
+                    fileListStruct[i].md5 = json["list"][i]["md5"].ToString();
+                    fileListStruct[i].size = Convert.ToUInt64(json["list"][i]["size"]);
+                    fileListStruct[i].isdir = Convert.ToUInt32(json["list"][i]["isdir"]);
+                }
+                return fileListStruct;
+            }
+            else
+            {
+                throw new ErrorCodeException();
             }
         }
 

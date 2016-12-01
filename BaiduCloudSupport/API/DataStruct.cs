@@ -13,7 +13,7 @@ namespace BaiduCloudSupport.API
         public string portrait;
     }
 
-    public struct FileMetaStruct
+    public struct PCSFileMetaStruct
     {
         public ulong fs_id;
         public string path;
@@ -35,5 +35,25 @@ namespace BaiduCloudSupport.API
         public string md5;
         public ulong size;
         public UInt32 isdir;
+    }
+
+    public struct DBCFileMetaStruct
+    {
+        public UInt32 category;
+        public UInt32 dir_empty;
+        public UInt32 empty;
+        public ulong fs_id;
+        public UInt32 isdir;
+        public UInt32 local_ctime;
+        public UInt32 local_mtime;
+        public string md5;
+        public UInt32 oper_id;
+        public string path;
+        public UInt32 server_ctime;
+        public string server_filename;
+        public UInt32 server_mtime;
+        public ulong size;
+        public string[] thumbs;
+        public UInt32 unlist;
     }
 }

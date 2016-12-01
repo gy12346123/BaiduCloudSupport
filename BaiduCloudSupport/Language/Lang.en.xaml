@@ -77,4 +77,7 @@
     <sys:String x:Key="MainWindow_Button_AdvanceLogin_ToolTip">Login baidu account to get cookies and use Advance Permissions.</sys:String>
     <sys:String x:Key="MainWindow_Button_AdvanceLogin_CookieExisted">Cookie existed, overwrite it?</sys:String>
     <sys:String x:Key="MainWindow_Button_AdvanceLogin_CookieSaveSucceed">Cookies save succeed.</sys:String>
+    <sys:String x:Key="Flyout_Setting_APIMode">API mode</sys:String>
+    <sys:String x:Key="Flyout_Setting_RadioButton_APIMode_PCS">PCS</sys:String>
+    <sys:String x:Key="Flyout_Setting_RadioButton_APIMode_BDC">BDC</sys:String>
 </ResourceDictionary>

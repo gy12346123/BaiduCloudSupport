@@ -14,6 +14,15 @@ namespace BaiduCloudSupport
         /// </summary>
         public static readonly string BasePath = System.AppDomain.CurrentDomain.BaseDirectory;
 
+        public static readonly string Baidu_CookiePath = BasePath + @"Cookie\BaiduCloud.txt";
+
+        public enum APIMODE { PCS, BDC };
+
+        /// <summary>
+        /// API mode selector, 0:PCS, 1:BDC
+        /// </summary>
+        public static APIMODE APIMode = APIMODE.PCS;
+
         /// <summary>
         /// Program text language
         /// </summary>

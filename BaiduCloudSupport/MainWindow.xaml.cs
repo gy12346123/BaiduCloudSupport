@@ -124,7 +124,7 @@ namespace BaiduCloudSupport
                         });
                         await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_AutoLoginFailed"));
                     }
-                    var floderResult = await LoadFloder("");
+                    var floderResult = await LoadFolder("");
                     if (floderResult == null)
                     {
                         await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
@@ -146,7 +146,7 @@ namespace BaiduCloudSupport
 
         private async void button_AdvanceLogin_Click(object sender, RoutedEventArgs e)
         {
-            FileInfo file = new FileInfo(Setting.BasePath + @"Cookie\BaiduCloud.txt");
+            FileInfo file = new FileInfo(Setting.Baidu_CookiePath);
             if (file.Exists)
             {
                 // Cookie existed
@@ -188,7 +188,6 @@ namespace BaiduCloudSupport
         {
             grid_Main.DataContext = totalData;
             flyoutsControl.DataContext = totalData;
-
             try
             {
                 if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
@@ -220,12 +219,23 @@ namespace BaiduCloudSupport
                             LoadUserPortraitFromFile(Setting.UserPortraitFilePath);
                         });
                     }
-                    var floderResult = await LoadFloder("");
-                    if (floderResult == null)
+
+                    // Check Cookie and set API mode
+                    await Task.Factory.StartNew(()=> {
+                        if (BDC.IsCookieFileExist(Setting.Baidu_CookiePath))
+                        {
+                            BDC.LoadCookie(Setting.Baidu_CookiePath);
+                            Setting.APIMode = Setting.APIMODE.BDC;
+                        }
+                    });
+
+                    // Load folder
+                    var folderResult = await LoadFolder("");
+                    if (folderResult == null)
                     {
                         await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
                     }
-                    totalData.FileListDataItems = floderResult;
+                    totalData.FileListDataItems = folderResult;
                 }
                 else
                 {
@@ -358,61 +368,22 @@ namespace BaiduCloudSupport
             });
         }
 
-        public Task<List<FileListDataItem>> LoadFloder(string path)
+        public Task<List<FileListDataItem>> LoadFolder(string path, int page = 1)
         {
             return Task.Factory.StartNew(()=> {
-                FileListStruct[] fileListStruct = PCS.SingleFloder(path);
-                //if (fileListStruct == null)
-                //{
-                //    return null;
-                //}
-
-                //List<FileListDataItem> fileList = new List<FileListDataItem>();
-                //foreach(FileListStruct FS in fileListStruct)
-                //{
-                //    string[] files = FS.path.Split('/');
-                //    string convertedSize = "-";
-                //    if (FS.isdir == 0)
-                //    {
-                //        convertedSize = ConvertFileSize(FS.size);
-                //    }
-
-                //    fileList.Add(new FileListDataItem() {
-                //        fs_id = FS.fs_id,
-                //        path = FS.path,
-                //        file = files[files.Count() - 1],
-                //        mtime = Tools.TimeStamp2DateTime(FS.mtime.ToString()),
-                //        md5 = FS.md5,
-                //        size = convertedSize,
-                //        isdir = FS.isdir,
-                //        isSelected = false,
-                //        Icon = GetFileIcon(files[files.Count() - 1], Convert.ToInt32(FS.isdir))
-                //    });
-                //}
-
-                //ConcurrentBag<FileListDataItem> bag = new ConcurrentBag<FileListDataItem>();
-                //Parallel.ForEach(fileListStruct, (FS)=> {
-                //    string[] files = FS.path.Split('/');
-                //    string convertedSize = "-";
-                //    if (FS.isdir == 0)
-                //    {
-                //        convertedSize = ConvertFileSize(FS.size);
-                //    }
-
-                //    bag.Add(new FileListDataItem()
-                //    {
-                //        fs_id = FS.fs_id,
-                //        path = FS.path,
-                //        file = files[files.Count() - 1],
-                //        mtime = Tools.TimeStamp2DateTime(FS.mtime.ToString()),
-                //        md5 = FS.md5,
-                //        size = convertedSize,
-                //        isdir = FS.isdir,
-                //        isSelected = false,
-                //        Icon = GetFileIcon(files[files.Count() - 1], Convert.ToInt32(FS.isdir))
-                //    });
-                //});
-                //var q = bag.OrderByDescending(x => x.isdir);
+                FileListStruct[] fileListStruct;
+                switch (Setting.APIMode)
+                {
+                    case Setting.APIMODE.PCS:
+                        fileListStruct = PCS.SingleFloder(path);
+                        break;
+                    case Setting.APIMODE.BDC:
+                        fileListStruct = BDC.SingleFloder(path, page);
+                        break;
+                    default:
+                        fileListStruct = PCS.SingleFloder(path);
+                        break;
+                }
                 return FileListStruct2FileListDataItem(ref fileListStruct);
             });
         }
@@ -630,6 +601,18 @@ namespace BaiduCloudSupport
                     break;
             }
 
+            switch(Setting.APIMode)
+            {
+                case Setting.APIMODE.PCS:
+                    radioButton_PCS.IsChecked = true;
+                    radioButton_BDC.IsChecked = false;
+                    break;
+                case Setting.APIMODE.BDC:
+                    radioButton_PCS.IsChecked = false;
+                    radioButton_BDC.IsChecked = true;
+                    break;
+            }
+
             ToggleFlyout(0);
         }
 
@@ -744,8 +727,21 @@ namespace BaiduCloudSupport
             {
                 return;
             }
+            string basePath;
+            switch (Setting.APIMode)
+            {
+                case Setting.APIMODE.PCS:
+                    basePath = PCS.BasePath;
+                    break;
+                case Setting.APIMODE.BDC:
+                    basePath = "/";
+                    break;
+                default:
+                    basePath = PCS.BasePath;
+                    break;
+            }
             string[] eachFolder = path.Replace(PCS.BasePath,"").Split('/');
-            string basePath = PCS.BasePath;
+            //string basePath = PCS.BasePath;
             if (eachFolder == null)
             {
                 return;
@@ -850,7 +846,7 @@ namespace BaiduCloudSupport
             try
             {
                 totalData.ProgressRing_IsActive = true;
-                var floderResult = await LoadFloder(path);
+                var floderResult = await LoadFolder(path);
                 if (floderResult == null)
                 {
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
@@ -1185,6 +1181,66 @@ namespace BaiduCloudSupport
             catch (Exception ex)
             {
                 LogHelper.WriteLog("MainWindow.MenuItem_Start_Click", ex);
+            }
+        }
+
+        private async void radioButton_PCS_Checked(object sender, RoutedEventArgs e)
+        {
+            if (Setting.APIMode != Setting.APIMODE.PCS)
+            {
+                Setting.APIMode = Setting.APIMODE.PCS;
+                if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
+                {
+                    try
+                    {
+                        totalData.ProgressRing_IsActive = true;
+                        var folderResult = await LoadFolder("");
+                        if (folderResult == null)
+                        {
+                            await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                        }
+                        totalData.FileListDataItems = folderResult;
+                    }catch (Exception ex)
+                    {
+                        LogHelper.WriteLog("MainWindow.radioButton_PCS_Checked", ex);
+                    }finally
+                    {
+                        totalData.ProgressRing_IsActive = false;
+                    }
+                }
+            }
+        }
+
+        private async void radioButton_BDC_Checked(object sender, RoutedEventArgs e)
+        {
+            if (Setting.APIMode != Setting.APIMODE.BDC)
+            {
+                Setting.APIMode = Setting.APIMODE.BDC;
+                try
+                {
+                    totalData.ProgressRing_IsActive = true;
+                    await Task.Factory.StartNew(() => {
+                        if (BDC.IsCookieFileExist(Setting.Baidu_CookiePath))
+                        {
+                            BDC.LoadCookie(Setting.Baidu_CookiePath);
+                            Setting.APIMode = Setting.APIMODE.BDC;
+                        }
+                    });
+
+                    var folderResult = await LoadFolder("");
+                    if (folderResult == null)
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                    }
+                    totalData.FileListDataItems = folderResult;
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.WriteLog("MainWindow.radioButton_BDC_Checked", ex);
+                }finally
+                {
+                    totalData.ProgressRing_IsActive = false;
+                }
             }
         }
     }
