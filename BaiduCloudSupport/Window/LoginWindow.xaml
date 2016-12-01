@@ -9,6 +9,6 @@
         mc:Ignorable="d"
         Title="{StaticResource LoginWindow_Title}" Height="500" Width="500" Loaded="MetroWindow_Loaded">
     <Grid>
-        <cefSharp:ChromiumWebBrowser Name="webBrowser" Width="500" Height="500" Visibility="Hidden" />
+        <cefSharp:ChromiumWebBrowser Name="webBrowser" Width="auto" Height="auto" Visibility="Hidden" />
     </Grid>
 </Controls:MetroWindow>

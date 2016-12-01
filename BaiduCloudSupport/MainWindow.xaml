@@ -105,6 +105,7 @@
         </WrapPanel>
         <WrapPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" >
             <Button Name="button_Login"
+                        Margin="0,0,20,0"
                         Width="50"
                         Height="50"
                         ToolTip="{StaticResource MainWindow_Button_Login_ToolTip}"
@@ -114,6 +115,20 @@
                                Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
                     <Rectangle.OpacityMask>
                         <VisualBrush Stretch="Uniform" Visual="{DynamicResource appbar_browser}" />
+                    </Rectangle.OpacityMask>
+                </Rectangle>
+            </Button>
+            <Button Name="button_AdvanceLogin"
+                        Margin="0,0,10,0"
+                        Width="50"
+                        Height="50"
+                        ToolTip="{StaticResource MainWindow_Button_AdvanceLogin_ToolTip}"
+                        Style="{DynamicResource MetroCircleButtonStyle}" Click="button_AdvanceLogin_Click"  >
+                <Rectangle Width="20"
+                               Height="20"
+                               Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                    <Rectangle.OpacityMask>
+                        <VisualBrush Stretch="Uniform" Visual="{DynamicResource appbar_browser_chrome}" />
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </Button>

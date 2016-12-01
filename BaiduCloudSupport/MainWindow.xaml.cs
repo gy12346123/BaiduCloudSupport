@@ -109,7 +109,7 @@ namespace BaiduCloudSupport
         {
             try
             {
-                Window.LoginWindow LW = new Window.LoginWindow();
+                Window.LoginWindow LW = new Window.LoginWindow(Login.BaiduLogin.LoginWeb(Setting.Baidu_client_id, Setting.Baidu_redirect_uri));
                 LW.Owner = this;
                 LW.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 if ((bool)LW.ShowDialog())
@@ -142,6 +142,38 @@ namespace BaiduCloudSupport
             {
                 totalData.ProgressRing_IsActive = false;
             }
+        }
+
+        private async void button_AdvanceLogin_Click(object sender, RoutedEventArgs e)
+        {
+            FileInfo file = new FileInfo(Setting.BasePath + @"Cookie\BaiduCloud.txt");
+            if (file.Exists)
+            {
+                // Cookie existed
+                var result = await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_Button_AdvanceLogin_CookieExisted"), MessageDialogStyle.AffirmativeAndNegative);
+                if (result == MessageDialogResult.Negative)
+                {
+                    return;
+                }
+            }
+            Window.LoginWindow LW = new Window.LoginWindow("http://yun.baidu.com");
+            LW.Owner = this;
+            LW.Width = 800d;
+            LW.Height = 600d;
+            LW.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            //LW.CookieLocalPath = Setting.BasePath + @"Cookie\BaiduCloud.txt";
+            if ((bool)LW.ShowDialog())
+            {
+                List<string> cookieList = LW.CookieList;
+                if (cookieList != null && cookieList.Count() > 0)
+                {
+                    // Save cookies
+                    await Window.LoginWindow.SaveCookies(cookieList, file);
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("MainWindow_Button_AdvanceLogin_CookieSaveSucceed"));
+                    return;
+                }
+            }
+            await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("LoginWindow_LoginFailed"));
         }
 
         private void button_About_Click(object sender, RoutedEventArgs e)

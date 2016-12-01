@@ -74,4 +74,7 @@
     <sys:String x:Key="NewDownloadTaskWindow_Button_Download">Download</sys:String>
     <sys:String x:Key="NewDownloadTaskWindow_TextBlock_Space_Format">Space:{0}GB</sys:String>
     <sys:String x:Key="MainWindow_Button_SearchFile_NoResult">No file found.</sys:String>
+    <sys:String x:Key="MainWindow_Button_AdvanceLogin_ToolTip">Login baidu account to get cookies and use Advance Permissions.</sys:String>
+    <sys:String x:Key="MainWindow_Button_AdvanceLogin_CookieExisted">Cookie existed, overwrite it?</sys:String>
+    <sys:String x:Key="MainWindow_Button_AdvanceLogin_CookieSaveSucceed">Cookies save succeed.</sys:String>
 </ResourceDictionary>
