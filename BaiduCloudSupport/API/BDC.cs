@@ -100,13 +100,14 @@ namespace BaiduCloudSupport.API
         public static FileListStruct[] SingleFloder(string path, int page, int maxNum = 100, int desc = 0, Order order = Order.name)
         {
             if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+            string ConvertedPath = ConvertPath2URLFormat(path);
             HttpHelper http = new HttpHelper();
             HttpItem item = new HttpItem()
             {
-                URL = string.Format("{0}list?dir={1}&page={2}&num={3}&desc={4}&order={5}&clienttype=0&showempty=0&web=1&channel=chunlei&app_id=250528", BDCBaseURL, ConvertPath2URLFormat(path), page, maxNum, desc, order.ToString()),
+                URL = string.Format("{0}list?dir={1}&page={2}&num={3}&desc={4}&order={5}&clienttype=0&showempty=0&web=1&channel=chunlei&app_id=250528", BDCBaseURL, ConvertedPath, page, maxNum, desc, order.ToString()),
                 Encoding = Encoding.UTF8,
                 Timeout = BDC.Timeout,
-                Referer = "http://pan.baidu.com/disk/home",
+                Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=" + ConvertedPath,
                 Host = "pan.baidu.com",
                 Cookie = Cookies
             };
@@ -136,6 +137,49 @@ namespace BaiduCloudSupport.API
             {
                 throw new ErrorCodeException();
             }
+        }
+
+        public static Task<FileListStruct[]> SearchFile(string keyword, int page = 1, int maxNum = 100, int desc = 0, Order order = Order.name)
+        {
+            return Task.Factory.StartNew(()=> {
+                if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+                HttpHelper http = new HttpHelper();
+                HttpItem item = new HttpItem()
+                {
+                    URL = string.Format("{0}search?recursion=1&key={1}&page={2}&num={3}&desc={4}&order={5}&clienttype=0&showempty=0&web=1&channel=chunlei&app_id=250528", BDCBaseURL, keyword, page, maxNum, desc, order.ToString()),
+                    Encoding = Encoding.UTF8,
+                    Timeout = BDC.Timeout,
+                    Referer = "http://pan.baidu.com/disk/home#search/key=" + keyword,
+                    Host = "pan.baidu.com",
+                    Cookie = Cookies
+                };
+                string result = http.GetHtml(item).Html;
+
+                if (result.Contains("list"))
+                {
+                    var json = (JObject)JsonConvert.DeserializeObject(result);
+                    int listCount = json["list"].Count();
+                    FileListStruct[] fileListStruct = new FileListStruct[listCount];
+                    for (int i = 0; i < listCount; i++)
+                    {
+                        fileListStruct[i].fs_id = Convert.ToUInt64(json["list"][i]["fs_id"]);
+                        fileListStruct[i].path = json["list"][i]["path"].ToString();
+                        fileListStruct[i].ctime = Convert.ToUInt32(json["list"][i]["server_ctime"]);
+                        fileListStruct[i].mtime = Convert.ToUInt32(json["list"][i]["server_mtime"]);
+                        fileListStruct[i].size = Convert.ToUInt64(json["list"][i]["size"]);
+                        fileListStruct[i].isdir = Convert.ToUInt32(json["list"][i]["isdir"]);
+                        if (json["list"][i]["md5"] != null)
+                        {
+                            fileListStruct[i].md5 = json["list"][i]["md5"].ToString();
+                        }
+                    }
+                    return fileListStruct;
+                }
+                else
+                {
+                    throw new ErrorCodeException();
+                }
+            });
         }
     }
 }

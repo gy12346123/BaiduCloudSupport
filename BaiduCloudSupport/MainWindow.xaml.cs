@@ -1106,7 +1106,19 @@ namespace BaiduCloudSupport
                 {
                     return;
                 }
-                FileListStruct[] fileList = await PCS.SearchFile("/", keyword);
+                FileListStruct[] fileList;
+                switch (Setting.APIMode)
+                {
+                    case Setting.APIMODE.PCS:
+                        fileList = await PCS.SearchFile("/", keyword);
+                        break;
+                    case Setting.APIMODE.BDC:
+                        fileList = await BDC.SearchFile(keyword);
+                        break;
+                    default:
+                        fileList = await PCS.SearchFile("/", keyword);
+                        break;
+                }
 
                 var floderResult = FileListStruct2FileListDataItem(ref fileList);
                 if (floderResult == null)
