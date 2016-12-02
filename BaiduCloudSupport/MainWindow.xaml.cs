@@ -863,6 +863,7 @@ namespace BaiduCloudSupport
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
                 }
                 totalData.FileListDataItems = floderResult;
+                totalData.PageNowLoaded = path;
                 ChangeNavigation(path);
             }catch (Exception ex)
             {
@@ -1315,6 +1316,39 @@ namespace BaiduCloudSupport
             {
                 LogHelper.WriteLog("MainWindow.MenuItem_CopyTo_Click", ex);
             }finally
+            {
+                totalData.ProgressRing_IsActive = false;
+            }
+        }
+
+        private async void MenuItem_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (Setting.APIMode == Setting.APIMODE.BDC)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_MenuItem_Delete_NotSupport"));
+                    return;
+                }
+                if (dataGrid_FileList.SelectedItems.Count == 0)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+                    return;
+                }
+                totalData.ProgressRing_IsActive = true;
+                foreach (FileListDataItem file in dataGrid_FileList.SelectedItems)
+                {
+                    await PCS.DeleteSingleFile(file.path);
+                }
+                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("MainWindow_MenuItem_Delete_Succeed"));
+                TransferPage(totalData.PageNowLoaded);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.MenuItem_Delete_Click", ex);
+                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_MenuItem_Delete_Fail"));
+            }
+            finally
             {
                 totalData.ProgressRing_IsActive = false;
             }

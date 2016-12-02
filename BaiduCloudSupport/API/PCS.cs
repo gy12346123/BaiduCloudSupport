@@ -78,6 +78,10 @@ namespace BaiduCloudSupport.API
             {
                 convertedPath = convertedPath.Replace("+", "%2B");
             }
+            if (convertedPath.Contains("&"))
+            {
+                convertedPath = convertedPath.Replace("&", "%26");
+            }
             return convertedPath;
         }
 
@@ -519,6 +523,30 @@ namespace BaiduCloudSupport.API
                 LogHelper.WriteLog("PCS.DownloadURL", ex);
                 throw new Exception("PCS.DownloadURL", ex);
             }
+        }
+
+        public static Task<bool> DeleteSingleFile(string access_token, string path)
+        {
+            return Task.Factory.StartNew(()=>{
+                HttpHelper http = new HttpHelper();
+                HttpItem item = new HttpItem()
+                {
+                    URL = DownloadBaseURL + "file?method=delete&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
+                    Encoding = Encoding.UTF8,
+                    Timeout = PCS.Timeout
+                };
+                var result = http.GetHtml(item);
+                if (result.Html.Contains("error_code"))
+                {
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        public static Task<bool> DeleteSingleFile(string path)
+        {
+            return DeleteSingleFile(Setting.Baidu_Access_Token, path);
         }
     }
 }

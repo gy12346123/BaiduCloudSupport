@@ -85,4 +85,8 @@
     <sys:String x:Key="MainWindow_MenuItem_CopyTo_DestError">The copy to folder is error, please try to select it again.</sys:String>
     <sys:String x:Key="MainWindow_MenuItem_CopyTo_Error">Copy file or folder faild.</sys:String>
     <sys:String x:Key="MainWindow_MenuItem_CopyTo_Succeed">Copy file or folder succeed.</sys:String>
+    <sys:String x:Key="DataGrid_FileList_ContextMenu_Delete">Delete</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_Delete_Succeed">All file or folder you selected has gone.</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_Delete_Fail">Delete file or folder failed.</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_Delete_NotSupport">Delete method just support PCS API now.</sys:String>
 </ResourceDictionary>

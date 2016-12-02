@@ -392,5 +392,22 @@ namespace BaiduCloudSupport
                 }
             }
         }
+
+        private string _PageNowLoaded;
+        public string PageNowLoaded
+        {
+            get { return _PageNowLoaded; }
+            set
+            {
+                if (_PageNowLoaded != value)
+                {
+                    _PageNowLoaded = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("PageNowLoaded"));
+                    }
+                }
+            }
+        }
     }
 }
