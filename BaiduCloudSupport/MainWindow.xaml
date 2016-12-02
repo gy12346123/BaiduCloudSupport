@@ -183,6 +183,7 @@
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_MoveTo}" Click="MenuItem_MoveTo_Click" />
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_Delete}" Click="MenuItem_Delete_Click" />
                                 <Separator />
+                                <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_Share}" Click="MenuItem_Share_Click" />
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_GetURL}" Click="MenuItem_GetURL_Click" />
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_Download}" Click="MenuItem_Download_Click" />
                             </ContextMenu>

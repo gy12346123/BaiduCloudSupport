@@ -129,5 +129,29 @@ namespace BaiduCloudSupport.Other
         {
             return System.Web.HttpUtility.UrlDecode(content, e);
         }
+
+        private static int rep = 0;
+        public static string GenerateStr(int count)
+        {
+            string str = string.Empty;
+            long num2 = DateTime.Now.Ticks + Tools.rep;
+            Tools.rep++;
+            Random random = new Random(((int)(((ulong)num2) & 0xffffffffL)) | ((int)(num2 >> Tools.rep)));
+            for (int i = 0; i < count; i++)
+            {
+                char ch;
+                int num = random.Next();
+                if ((num % 2) == 0)
+                {
+                    ch = (char)(0x30 + ((ushort)(num % 10)));
+                }
+                else
+                {
+                    ch = (char)(0x41 + ((ushort)(num % 0x1a)));
+                }
+                str = str + ch.ToString();
+            }
+            return str;
+        }
     }
 }

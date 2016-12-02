@@ -94,4 +94,13 @@
     <sys:String x:Key="MainWindow_MenuItem_MoveTo_DestError">未成功获取到新目录，请重新选择。</sys:String>
     <sys:String x:Key="MainWindow_MenuItem_MoveTo_Error">移动文件或目录失败。</sys:String>
     <sys:String x:Key="MainWindow_MenuItem_MoveTo_Succeed">成功将文件或文件夹移动到指定目录下。</sys:String>
+    <sys:String x:Key="DataGrid_FileList_ContextMenu_Share">分享</sys:String>
+    <sys:String x:Key="GenerateShareLinkWindow_Title">分享文件（夹）</sys:String>
+    <sys:String x:Key="GenerateShareLinkWindow_GeneratePublicLink">公开链接</sys:String>
+    <sys:String x:Key="GenerateShareLinkWindow_TextBlock_GeneratePublicLink">任何人都可查看及下载</sys:String>
+    <sys:String x:Key="GenerateShareLinkWindow_GeneratePrivateLink">私密链接</sys:String>
+    <sys:String x:Key="GenerateShareLinkWindow_TextBox_Watermark">密码</sys:String>
+    <sys:String x:Key="GenerateShareLinkWindow_TextBlock_Succeed">成功生成分享链接</sys:String>
+    <sys:String x:Key="GenerateShareLinkWindow_Copy">复制</sys:String>
+    <sys:String x:Key="GenerateShareLinkWindow_Copy_Format">链接: {0} 密码: {1}</sys:String>
 </ResourceDictionary>

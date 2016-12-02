@@ -1412,5 +1412,13 @@ namespace BaiduCloudSupport
                 totalData.ProgressRing_IsActive = false;
             }
         }
+
+        private void MenuItem_Share_Click(object sender, RoutedEventArgs e)
+        {
+            Window.GenerateShareLinkWindow GSLW = new Window.GenerateShareLinkWindow(((FileListDataItem)dataGrid_FileList.SelectedItem).fs_id);
+            GSLW.Owner = this;
+            GSLW.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            GSLW.ShowDialog();
+        }
     }
 }

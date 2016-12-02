@@ -69,4 +69,13 @@ namespace BaiduCloudSupport.API
         public int dir_empty;
         public string path;
     }
+
+    public struct DBCFileShareStruct
+    {
+        public UInt32 ctime;
+        public ulong shareid;
+        public string link;
+        public string shorturl;
+        public string password;
+    }
 }

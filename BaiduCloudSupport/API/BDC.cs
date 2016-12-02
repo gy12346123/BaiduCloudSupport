@@ -18,6 +18,8 @@ namespace BaiduCloudSupport.API
         /// </summary>
         private static string BDCBaseURL = "http://pan.baidu.com/api/";
 
+        private static string BDCShareURL = "http://pan.baidu.com/share/";
+
         /// <summary>
         /// Http time out
         /// </summary>
@@ -330,6 +332,66 @@ namespace BaiduCloudSupport.API
                     return true;
                 }
                 return false;
+            });
+        }
+
+        public static Task<DBCFileShareStruct> Share(ulong fs_id, string password = "")
+        {
+            return Task.Factory.StartNew(()=> {
+                if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+                if (bdstoken == null || bdstoken.Equals(""))
+                {
+                    if (!GetParamFromHtml())
+                    {
+                        throw new Exception("Get param from html error.");
+                    }
+                }
+                StringBuilder SB = new StringBuilder();
+                SB.Append(string.Format("fid_list=[{0}]&schannel=", fs_id));
+                if (password.Equals(""))
+                {
+                    // No password
+                    SB.Append("0&channel_list=[]");
+                }else if (password.Count() == 4)
+                {
+                    // Set password
+                    SB.Append(string.Format("4&channel_list=[]&pwd={0}", password));
+                }else
+                {
+                    throw new Exception("Password error, set 4 characters.");
+                }
+
+                HttpHelper http = new HttpHelper();
+                HttpItem item = new HttpItem()
+                {
+                    URL = string.Format("{0}set?channel=chunlei&web=1&app_id=250528&clienttype=0&bdstoken={1}", BDCShareURL, bdstoken),
+                    Method = "POST",
+                    Encoding = Encoding.UTF8,
+                    Timeout = BDC.Timeout,
+                    Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=%2F",
+                    Host = "pan.baidu.com",
+                    Cookie = Cookies,
+                    Postdata = SB.ToString(),
+                    PostEncoding = Encoding.UTF8,
+                    ContentType = "application/x-www-form-urlencoded; charset=UTF-8"
+                };
+                string result = http.GetHtml(item).Html;
+
+                if (result.Contains("errno\":0"))
+                {
+                    var json = (JObject)JsonConvert.DeserializeObject(result);
+                    return new DBCFileShareStruct {
+                        ctime = Convert.ToUInt32(json["ctime"]),
+                        shareid = Convert.ToUInt64(json["shareid"]),
+                        link = json["link"].ToString(),
+                        shorturl = json["shorturl"].ToString(),
+                        password = password
+                    };
+                }
+                else
+                {
+                    throw new ErrorCodeException();
+                }
             });
         }
     }
