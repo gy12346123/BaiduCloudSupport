@@ -1274,6 +1274,7 @@ namespace BaiduCloudSupport
             {
                 if (Setting.APIMode == Setting.APIMODE.PCS)
                 {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedChangeApiMode"));
                     return;
                 }
                 if (dataGrid_FileList.SelectedItems.Count == 0)
@@ -1347,6 +1348,64 @@ namespace BaiduCloudSupport
             {
                 LogHelper.WriteLog("MainWindow.MenuItem_Delete_Click", ex);
                 await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_MenuItem_Delete_Fail"));
+            }
+            finally
+            {
+                totalData.ProgressRing_IsActive = false;
+            }
+        }
+
+        private async void MenuItem_MoveTo_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (Setting.APIMode == Setting.APIMODE.PCS)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedChangeApiMode"));
+                    return;
+                }
+                if (dataGrid_FileList.SelectedItems.Count == 0)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+                    return;
+                }
+                totalData.ProgressRing_IsActive = true;
+                Window.FolderListWindow FLW = new Window.FolderListWindow(GlobalLanguage.FindText("DataGrid_FileList_ContextMenu_MoveTo"));
+                FLW.Owner = this;
+                string dest = "";
+                if ((bool)FLW.ShowDialog())
+                {
+                    dest = FLW.SelectedPath;
+                }
+                else
+                {
+                    return;
+                }
+
+                if (!dest.Equals(""))
+                {
+                    List<DBCCopyStruct> copyList = new List<DBCCopyStruct>();
+                    foreach (FileListDataItem file in dataGrid_FileList.SelectedItems)
+                    {
+                        copyList.Add(new DBCCopyStruct { path = file.path, dest = dest, newname = file.file });
+                    }
+                    if (await BDC.MoveTo(copyList))
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("MainWindow_MenuItem_MoveTo_Succeed"));
+                    }
+                    else
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("MainWindow_MenuItem_MoveTo_Error"));
+                    }
+                }
+                else
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_MenuItem_MoveTo_DestError"));
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.MenuItem_MoveTo_Click", ex);
             }
             finally
             {

@@ -89,4 +89,9 @@
     <sys:String x:Key="MainWindow_MenuItem_Delete_Succeed">已删除指定文件或文件夹。</sys:String>
     <sys:String x:Key="MainWindow_MenuItem_Delete_Fail">删除文件或文件夹过程中报错。</sys:String>
     <sys:String x:Key="MainWindow_MenuItem_Delete_NotSupport">删除文件操作目前仅支持PCS API。请从设置中切换。</sys:String>
+    <sys:String x:Key="DataGrid_FileList_ContextMenu_MoveTo">移动到</sys:String>
+    <sys:String x:Key="CommonMessage_NeedChangeApiMode">请在使用此功能前先切换API模式。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_MoveTo_DestError">未成功获取到新目录，请重新选择。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_MoveTo_Error">移动文件或目录失败。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_MoveTo_Succeed">成功将文件或文件夹移动到指定目录下。</sys:String>
 </ResourceDictionary>

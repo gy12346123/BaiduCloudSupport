@@ -288,5 +288,49 @@ namespace BaiduCloudSupport.API
                 return false;
             });
         }
+
+        public static Task<bool> MoveTo(List<DBCCopyStruct> list)
+        {
+            return Task.Factory.StartNew(() => {
+                if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+                if (bdstoken == null || bdstoken.Equals(""))
+                {
+                    if (!GetParamFromHtml())
+                    {
+                        return false;
+                    }
+                }
+                StringBuilder SB = new StringBuilder();
+                SB.Append("filelist=[");
+                foreach (DBCCopyStruct file in list)
+                {
+                    SB.Append("{");
+                    SB.Append(string.Format("\"path\":\"{0}\",\"dest\":\"{1}\",\"newname\":\"{2}\"", file.path, file.dest, file.newname));
+                    SB.Append("},");
+                }
+                SB.Remove(SB.Length - 1, 1);
+                SB.Append("]");
+
+                HttpHelper http = new HttpHelper();
+                HttpItem item = new HttpItem()
+                {
+                    URL = string.Format("{0}filemanager?opera=move&async=2&channel=chunlei&web=1&app_id=250528clienttype=0&bdstoken={1}", BDCBaseURL, bdstoken),
+                    Method = "POST",
+                    Encoding = Encoding.UTF8,
+                    Timeout = BDC.Timeout,
+                    Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=%2F",
+                    Host = "pan.baidu.com",
+                    Cookie = Cookies,
+                    Postdata = SB.ToString(),
+                    PostEncoding = Encoding.UTF8
+                };
+                string result = http.GetHtml(item).Html;
+                if (result.Contains("errno\":0"))
+                {
+                    return true;
+                }
+                return false;
+            });
+        }
     }
 }
