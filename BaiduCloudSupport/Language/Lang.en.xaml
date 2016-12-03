@@ -103,4 +103,6 @@
     <sys:String x:Key="GenerateShareLinkWindow_TextBlock_Succeed">Generate share link succeed</sys:String>
     <sys:String x:Key="GenerateShareLinkWindow_Copy">Copy</sys:String>
     <sys:String x:Key="GenerateShareLinkWindow_Copy_Format">Link: {0} Pass: {1}</sys:String>
+    <sys:String x:Key="MainWindow_Button_TransforLink_Title">GetDownloadURL</sys:String>
+    <sys:String x:Key="MainWindow_Button_TransforLink_Message">Enter baidu share link, example: http://pan.baidu.com/s/1nuP85Ot</sys:String>
 </ResourceDictionary>

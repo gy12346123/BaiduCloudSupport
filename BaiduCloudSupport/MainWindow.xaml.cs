@@ -243,7 +243,8 @@ namespace BaiduCloudSupport
                         LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
                     });
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 LogHelper.WriteLog("MainWindow.MetroWindow_Loaded", ex);
             }finally
@@ -777,6 +778,41 @@ namespace BaiduCloudSupport
             TransferPage(((Button)sender).ToolTip.ToString());
         }
 
+        private async void AddDownloadTask(FileListDataItem item)
+        {
+            Window.NewDownloadTaskWindow taskWindow = new Window.NewDownloadTaskWindow(await PCS.DownloadURL(Setting.Baidu_Access_Token, item.path));
+            taskWindow.Owner = this;
+            if ((bool)taskWindow.ShowDialog())
+            {
+                DownloadListDataItem dataItem = new DownloadListDataItem
+                {
+                    fs_id = item.fs_id,
+                    file = item.file,
+                    size = 0L,
+                    received = 0L,
+                    percentage = 0d,
+                    rate = 0d,
+                    startTime = DateTime.Now,
+                    isSelected = false
+                };
+
+                if (totalData.DownloadListDataItems != null && totalData.DownloadListDataItems.Count() != 0)
+                {
+                    DownloadListAddItem(totalData.DownloadListDataItems, dataItem);
+                }
+                else
+                {
+                    List<DownloadListDataItem> list = new List<DownloadListDataItem>();
+                    list.Add(dataItem);
+                    totalData.DownloadListDataItems = list;
+                }
+
+                CheckDownloadFolder();
+                PCS.DownloadFileSegment(Setting.Baidu_Access_Token, item.fs_id, taskWindow.DownloadURL, Setting.DownloadPath + item.file);
+            }
+            taskWindow = null;
+        }
+
         public async void DownloadFile(FileListDataItem item)
         {
             try
@@ -792,37 +828,7 @@ namespace BaiduCloudSupport
                 else
                 {
                     // Download
-                    Window.NewDownloadTaskWindow taskWindow = new Window.NewDownloadTaskWindow(await PCS.DownloadURL(Setting.Baidu_Access_Token, item.path));
-                    taskWindow.Owner = this;
-                    if ((bool)taskWindow.ShowDialog())
-                    {
-                        DownloadListDataItem dataItem = new DownloadListDataItem
-                        {
-                            fs_id = item.fs_id,
-                            file = item.file,
-                            size = 0L,
-                            received = 0L,
-                            percentage = 0d,
-                            rate = 0d,
-                            startTime = DateTime.Now,
-                            isSelected = false
-                        };
-
-                        if (totalData.DownloadListDataItems != null && totalData.DownloadListDataItems.Count() != 0)
-                        {
-                            DownloadListAddItem(totalData.DownloadListDataItems, dataItem);
-                        }
-                        else
-                        {
-                            List<DownloadListDataItem> list = new List<DownloadListDataItem>();
-                            list.Add(dataItem);
-                            totalData.DownloadListDataItems = list;
-                        }
-
-                        CheckDownloadFolder();
-                        PCS.DownloadFileSegment(Setting.Baidu_Access_Token, item.fs_id, taskWindow.DownloadURL, Setting.DownloadPath + item.file);
-                    }
-                    taskWindow = null;
+                    AddDownloadTask(item);
                 }
             }catch (Exception ex)
             {
@@ -1159,7 +1165,7 @@ namespace BaiduCloudSupport
         {
             try
             {
-                FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
+                DownloadListDataItem item = (DownloadListDataItem)dataGrid_FileDownloadList.SelectedItem;
                 if (item == null)
                 {
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
@@ -1185,7 +1191,7 @@ namespace BaiduCloudSupport
         {
             try
             {
-                FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
+                DownloadListDataItem item = (DownloadListDataItem)dataGrid_FileDownloadList.SelectedItem;
                 if (item == null)
                 {
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
@@ -1419,6 +1425,32 @@ namespace BaiduCloudSupport
             GSLW.Owner = this;
             GSLW.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             GSLW.ShowDialog();
+        }
+
+        private async void button_TransforLink_Click(object sender, RoutedEventArgs e)
+        {
+            var shareLink = await this.ShowInputAsync(GlobalLanguage.FindText("MainWindow_Button_TransforLink_Title"), GlobalLanguage.FindText("MainWindow_Button_TransforLink_Message"));
+            if (shareLink == null || shareLink.Equals(""))
+            {
+                return;
+            }
+            totalData.ProgressRing_IsActive = true;
+            if (!shareLink.StartsWith("http://") && !shareLink.StartsWith("https://"))
+            {
+                shareLink = "http://" + shareLink;
+            }
+            string path = await BDC.Transfer(shareLink);
+            var fileMeta = await PCS.SingleFileMeta(path);
+            string[] fileName = fileMeta.path.Split('/');
+            AddDownloadTask(new FileListDataItem {
+                file = fileName[fileName.Count() - 1],
+                path = fileMeta.path,
+                fs_id = fileMeta.fs_id,
+                mtime = Tools.TimeStamp2DateTime(fileMeta.mtime.ToString()),
+                isdir = fileMeta.isdir,
+                isSelected = false
+            });
+            totalData.ProgressRing_IsActive = false;
         }
     }
 }

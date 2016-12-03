@@ -137,6 +137,20 @@
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </Button>
+            <Button Name="button_TransforLink"
+                        Margin="0,0,10,0"
+                        Width="50"
+                        Height="50"
+                        ToolTip="{StaticResource MainWindow_Button_AdvanceLogin_ToolTip}"
+                        Style="{DynamicResource MetroCircleButtonStyle}" Click="button_TransforLink_Click"  >
+                <Rectangle Width="20"
+                               Height="20"
+                               Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                    <Rectangle.OpacityMask>
+                        <VisualBrush Stretch="Uniform" Visual="{DynamicResource appbar_browser_chrome}" />
+                    </Rectangle.OpacityMask>
+                </Rectangle>
+            </Button>
         </WrapPanel>
         <TabControl Grid.Row="1" Name="tabControl" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5" >
             <TabItem Header="{StaticResource TabItem_FileList}">

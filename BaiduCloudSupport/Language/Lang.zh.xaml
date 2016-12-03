@@ -103,4 +103,6 @@
     <sys:String x:Key="GenerateShareLinkWindow_TextBlock_Succeed">成功生成分享链接</sys:String>
     <sys:String x:Key="GenerateShareLinkWindow_Copy">复制</sys:String>
     <sys:String x:Key="GenerateShareLinkWindow_Copy_Format">链接: {0} 密码: {1}</sys:String>
+    <sys:String x:Key="MainWindow_Button_TransforLink_Title">获取下载链接</sys:String>
+    <sys:String x:Key="MainWindow_Button_TransforLink_Message">请输入分享链接，例如：http://pan.baidu.com/s/1dEDD7t3</sys:String>
 </ResourceDictionary>

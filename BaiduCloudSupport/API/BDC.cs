@@ -40,29 +40,33 @@ namespace BaiduCloudSupport.API
 
         private static string bdstoken;
 
-        /// <summary>
-        /// Convert local path format to url format
-        /// </summary>
-        /// <param name="path">Local file path</param>
-        /// <returns>URL format</returns>
-        private static string ConvertPath2URLFormat(string path)
+        private static string ConvertFileName(string file)
         {
-            string convertedPath;
-            if (path.StartsWith("/"))
-            {
-                convertedPath = path.Replace("/", "%2F");
-            }
-            else
-            {
-                convertedPath = ("%2F" + path).Replace("/", "%2F");
-            }
+            string convertedPath = file;
+
             if (convertedPath.Contains("#"))
             {
-                convertedPath = convertedPath.Replace("#", "%23");
+                convertedPath = convertedPath.Replace("#", @"\u0023");
             }
             if (convertedPath.Contains("+"))
             {
-                convertedPath = convertedPath.Replace("+", "%2B");
+                convertedPath = convertedPath.Replace("+", @"\u002b");
+            }
+            if (convertedPath.Contains("&"))
+            {
+                convertedPath = convertedPath.Replace("&", @"\u0026");
+            }
+            if (convertedPath.Contains(" "))
+            {
+                convertedPath = convertedPath.Replace(" ", @"\u0020");
+            }
+            if (convertedPath.Contains("?"))
+            {
+                convertedPath = convertedPath.Replace("?", @"\u003f");
+            }
+            if (convertedPath.Contains("%"))
+            {
+                convertedPath = convertedPath.Replace("%", @"\u0025");
             }
             return convertedPath;
         }
@@ -392,6 +396,78 @@ namespace BaiduCloudSupport.API
                 {
                     throw new ErrorCodeException();
                 }
+            });
+        }
+
+        public static Task<string> Transfer(string shareLink, string toFolder = "/apps/wp2pcs")
+        {
+            return Task.Factory.StartNew(()=> {
+                if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+                if (bdstoken == null || bdstoken.Equals(""))
+                {
+                    if (!GetParamFromHtml())
+                    {
+                        throw new Exception("Get param from html error.");
+                    }
+                }
+                HttpHelper http = new HttpHelper();
+                HttpItem item = new HttpItem()
+                {
+                    URL = shareLink,
+                    Timeout = BDC.Timeout,
+                    Referer = shareLink,
+                    Host = "pan.baidu.com",
+                    Cookie = Cookies
+                };
+                string result = http.GetHtml(item).Html;
+                Regex regex = new Regex("shareid\":[0-9]{1,},");
+                Match match = regex.Match(result);
+                if (!match.Success)
+                {
+                    throw new Exception("Can not match shareid.");
+                }
+                ulong shareid = Convert.ToUInt64(match.Value.Replace("shareid\":", "").Replace(",", ""));
+                Regex regex2 = new Regex("/share/home\\?uk=[0-9]{1,}\"");
+                Match match2 = regex2.Match(result);
+                if (!match2.Success)
+                {
+                    throw new Exception("Can not match fromuserid.");
+                }
+                ulong fromuserid = Convert.ToUInt64(match2.Value.Replace("/share/home?uk=", "").Replace("\"",""));
+                Regex regex3 = new Regex("server_filename\":\".*?\",\"");
+                Match match3 = regex3.Match(result);
+                if (!match3.Success)
+                {
+                    throw new Exception("Can not match file name.");
+                }
+                string file = match3.Value.Replace("server_filename\":\"", "").Replace("\",\"", "");
+
+                StringBuilder SB = new StringBuilder();
+                SB.Append("filelist=[\"/");
+                SB.Append(ConvertFileName(file));
+                SB.Append("\"]&path=");
+                SB.Append(toFolder);
+
+                HttpItem item_Transfer = new HttpItem()
+                {
+                    URL = string.Format("{0}transfer?shareid={1}&from={2}&bdstoken={3}&channel=chunlei&clienttype=0&web=1&app_id=250528", BDCShareURL, shareid, fromuserid, bdstoken),
+                    Method = "POST",
+                    Encoding = Encoding.UTF8,
+                    Timeout = BDC.Timeout,
+                    Referer = shareLink,
+                    Host = "pan.baidu.com",
+                    Cookie = Cookies,
+                    Postdata = SB.ToString(),
+                    PostEncoding = Encoding.UTF8,
+                    ContentType = "application/x-www-form-urlencoded; charset=UTF-8"
+                };
+                string result_Transfer = http.GetHtml(item_Transfer).Html;
+
+                if (result_Transfer.Contains("errno\":0"))
+                {
+                    return string.Format("{0}/{1}", toFolder, Regex.Unescape(file));
+                }
+                throw new ErrorCodeException("BDC.Transfer");
             });
         }
     }

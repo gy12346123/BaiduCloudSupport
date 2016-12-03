@@ -62,6 +62,10 @@ namespace BaiduCloudSupport.API
         private static string ConvertPath2URLFormat(string path)
         {
             string convertedPath;
+            if (path.Contains("%"))
+            {
+                path = path.Replace("%", "%25");
+            }
             if (path.StartsWith(PCS.BasePath))
             {
                 convertedPath = path.Replace("/", "%2F");
@@ -81,6 +85,14 @@ namespace BaiduCloudSupport.API
             if (convertedPath.Contains("&"))
             {
                 convertedPath = convertedPath.Replace("&", "%26");
+            }
+            if (convertedPath.Contains(" "))
+            {
+                convertedPath = convertedPath.Replace(" ", "%20");
+            }
+            if (convertedPath.Contains("?"))
+            {
+                convertedPath = convertedPath.Replace("?", "%3f");
             }
             return convertedPath;
         }
@@ -247,9 +259,11 @@ namespace BaiduCloudSupport.API
         /// </summary>
         /// <param name="path">File or floder path</param>
         /// <returns>FileMetaStruct</returns>
-        public static PCSFileMetaStruct SingleFileMeta(string path)
+        public static Task<PCSFileMetaStruct> SingleFileMeta(string path)
         {
-            return SingleFileMeta(Setting.Baidu_Access_Token, path);
+            return Task.Factory.StartNew(()=> {
+                return SingleFileMeta(Setting.Baidu_Access_Token, path);
+            });
         }
 
         /// <summary>
