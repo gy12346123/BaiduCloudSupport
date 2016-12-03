@@ -124,7 +124,7 @@
                 </Rectangle>
             </Button>
             <Button Name="button_AdvanceLogin"
-                        Margin="0,0,10,0"
+                        Margin="0,0,20,0"
                         Width="50"
                         Height="50"
                         ToolTip="{StaticResource MainWindow_Button_AdvanceLogin_ToolTip}"
@@ -138,16 +138,16 @@
                 </Rectangle>
             </Button>
             <Button Name="button_TransforLink"
-                        Margin="0,0,10,0"
+                        Margin="0,0,20,0"
                         Width="50"
                         Height="50"
-                        ToolTip="{StaticResource MainWindow_Button_AdvanceLogin_ToolTip}"
+                        ToolTip="{StaticResource MainWindow_Button_TransferLink_ToolTip}"
                         Style="{DynamicResource MetroCircleButtonStyle}" Click="button_TransforLink_Click"  >
                 <Rectangle Width="20"
                                Height="20"
                                Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
                     <Rectangle.OpacityMask>
-                        <VisualBrush Stretch="Uniform" Visual="{DynamicResource appbar_browser_chrome}" />
+                        <VisualBrush Stretch="Uniform" Visual="{DynamicResource appbar_link}" />
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </Button>

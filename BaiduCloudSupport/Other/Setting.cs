@@ -119,5 +119,47 @@ namespace BaiduCloudSupport
                 return false;
             }
         }
+
+        public static bool CheckApiMode(APIMODE needMode, bool autoChange = true)
+        {
+            if (Setting.APIMode == needMode)
+            {
+                return true;
+            }else
+            {
+                if (autoChange)
+                {
+                    switch (needMode)
+                    {
+                        case APIMODE.PCS:
+                            if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
+                            {
+                                Setting.APIMode = APIMODE.PCS;
+                                return true;
+                            }
+                            break;
+                        case APIMODE.BDC:
+                            if (API.BDC.IsCookieFileExist(Setting.Baidu_CookiePath))
+                            {
+                                if (!API.BDC.CheckCookie())
+                                {
+                                    API.BDC.LoadCookie(Setting.Baidu_CookiePath);
+                                }
+                                Setting.APIMode = APIMODE.BDC;
+                                return true;
+                            }
+                            break;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static Task<bool> CheckApiModeAsync(APIMODE needMode, bool autoChange = true)
+        {
+            return Task.Factory.StartNew(()=> {
+                return CheckApiMode(needMode, autoChange);
+            });
+        }
     }
 }
