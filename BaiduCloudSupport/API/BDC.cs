@@ -420,34 +420,48 @@ namespace BaiduCloudSupport.API
                     Cookie = Cookies
                 };
                 string result = http.GetHtml(item).Html;
-                Regex regex = new Regex("shareid\":[0-9]{1,},");
-                Match match = regex.Match(result);
-                if (!match.Success)
+                Match match_ShareId = Regex.Match(result, "shareid\":[0-9]{1,}(?=,)");
+                if (!match_ShareId.Success)
                 {
                     throw new Exception("Can not match shareid.");
                 }
-                ulong shareid = Convert.ToUInt64(match.Value.Replace("shareid\":", "").Replace(",", ""));
-                Regex regex2 = new Regex("/share/home\\?uk=[0-9]{1,}\"");
-                Match match2 = regex2.Match(result);
-                if (!match2.Success)
+                ulong shareid = Convert.ToUInt64(match_ShareId.Value.Replace("shareid\":", ""));
+                Match match_FromUserId = Regex.Match(result, "/share/home\\?uk=[0-9]{1,}(?=\")");
+                if (!match_FromUserId.Success)
                 {
                     throw new Exception("Can not match fromuserid.");
                 }
-                ulong fromuserid = Convert.ToUInt64(match2.Value.Replace("/share/home?uk=", "").Replace("\"",""));
-                Regex regex3 = new Regex("server_filename\":\".*?\",\"");
-                Match match3 = regex3.Match(result);
-                if (!match3.Success)
+                ulong fromuserid = Convert.ToUInt64(match_FromUserId.Value.Replace("/share/home?uk=", ""));
+                Match match_File = Regex.Match(result, "server_filename\":\".*?(?=\",\")");
+                if (!match_File.Success)
                 {
                     throw new Exception("Can not match file name.");
                 }
-                string file = match3.Value.Replace("server_filename\":\"", "").Replace("\",\"", "");
+                string file = match_File.Value.Replace("server_filename\":\"", "");
+                Match Match_ParentPath = Regex.Match(result, "parent_path\":\".*?(?=\",\")");
+                if (!Match_ParentPath.Success)
+                {
+                    throw new Exception("Can not match file parent path.");
+                }
+                string parentPath = Match_ParentPath.Value;
+
+                if (parentPath.Equals("parent_path\":\""))
+                {
+                    parentPath = "%2F";
+                }else
+                {
+                    parentPath = parentPath.Replace("parent_path\":\"", "") + "%2F";
+                }
 
                 StringBuilder SB = new StringBuilder();
-                SB.Append("filelist=[\"/");
-                SB.Append(ConvertFileName(file));
+                //SB.Append("filelist=[\"/");
+                //SB.Append(ConvertFileName(file));
+                SB.Append("filelist=[\"");
+                SB.Append(parentPath);
+                SB.Append(Other.Tools.URLEncoding(Regex.Unescape(file), Encoding.UTF8));
                 SB.Append("\"]&path=");
-                SB.Append(toFolder);
-
+                //SB.Append(toFolder);
+                SB.Append(Other.Tools.URLEncoding(toFolder, Encoding.UTF8));
                 HttpItem item_Transfer = new HttpItem()
                 {
                     URL = string.Format("{0}transfer?shareid={1}&from={2}&bdstoken={3}&channel=chunlei&clienttype=0&web=1&app_id=250528", BDCShareURL, shareid, fromuserid, bdstoken),
