@@ -97,6 +97,15 @@ namespace BaiduCloudSupport.API
             return convertedPath;
         }
 
+        private static string CheckPath (string path)
+        {
+            if (path == null || path.Equals("") || path.Equals("/"))
+            {
+                return PCS.BasePath;
+            }
+            return path;
+        }
+
         /// <summary>
         /// Get user simple info
         /// </summary>
@@ -221,7 +230,7 @@ namespace BaiduCloudSupport.API
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = PCSBaseURL + "file?method=meta&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
+                    URL = PCSBaseURL + "file?method=meta&access_token=" + access_token + "&path=" + Other.Tools.URLEncoding(CheckPath(path), Encoding.UTF8),
                     Encoding = Encoding.UTF8,
                     Timeout = PCS.Timeout
                 };
@@ -277,7 +286,7 @@ namespace BaiduCloudSupport.API
             HttpHelper http = new HttpHelper();
             HttpItem item = new HttpItem()
             {
-                URL = PCSBaseURL + "file?method=list&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
+                URL = PCSBaseURL + "file?method=list&access_token=" + access_token + "&path=" + Other.Tools.URLEncoding(CheckPath(path), Encoding.UTF8),
                 Encoding = Encoding.UTF8,
                 Timeout = PCS.Timeout
             };
@@ -329,7 +338,7 @@ namespace BaiduCloudSupport.API
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = PCSBaseURL + "file?method=search&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path) + "&wd=" + keyword + "&re=" + traversing,
+                    URL = PCSBaseURL + "file?method=search&access_token=" + access_token + "&path=" + Other.Tools.URLEncoding(CheckPath(path), Encoding.UTF8) + "&wd=" + Other.Tools.URLEncoding(keyword, Encoding.UTF8) + "&re=" + traversing,
                     Encoding = Encoding.UTF8,
                     Timeout = PCS.Timeout
                 };
@@ -386,7 +395,7 @@ namespace BaiduCloudSupport.API
                     HttpHelper http = new HttpHelper();
                     HttpItem item = new HttpItem()
                     {
-                        URL = DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile),
+                        URL = DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + Other.Tools.URLEncoding(remoteFile, Encoding.UTF8),
                         Encoding = Encoding.UTF8,
                         Timeout = PCS.Timeout
                     };
@@ -443,7 +452,8 @@ namespace BaiduCloudSupport.API
                 URL = remoteFile;
             }else
             {
-                URL = DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile);
+                //URL = DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile);
+                URL = DownloadURL(remoteFile);
             }
 
             Downloader downloader = DownloadManager.Instance.Add(
@@ -496,7 +506,7 @@ namespace BaiduCloudSupport.API
                     HttpHelper http = new HttpHelper();
                     HttpItem item = new HttpItem()
                     {
-                        URL = DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile),
+                        URL = DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + Other.Tools.URLEncoding(remoteFile, Encoding.UTF8),
                         Encoding = Encoding.UTF8,
                         Timeout = PCS.Timeout
                     };
@@ -524,7 +534,7 @@ namespace BaiduCloudSupport.API
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = DownloadBaseURL + "file?method=download&access_token=" + Setting.Baidu_Access_Token + "&path=" + ConvertPath2URLFormat(remoteFile),
+                    URL = DownloadBaseURL + "file?method=download&access_token=" + Setting.Baidu_Access_Token + "&path=" + Other.Tools.URLEncoding(remoteFile, Encoding.UTF8),
                     Encoding = Encoding.UTF8,
                     Timeout = PCS.Timeout
                 };
@@ -545,7 +555,7 @@ namespace BaiduCloudSupport.API
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = DownloadBaseURL + "file?method=delete&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(path),
+                    URL = DownloadBaseURL + "file?method=delete&access_token=" + access_token + "&path=" + Other.Tools.URLEncoding(path, Encoding.UTF8),
                     Encoding = Encoding.UTF8,
                     Timeout = PCS.Timeout
                 };
