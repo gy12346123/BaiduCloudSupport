@@ -263,7 +263,8 @@ namespace BaiduCloudSupport.API
                     }
                 }
                 StringBuilder SB = new StringBuilder();
-                SB.Append("filelist=[");
+                //SB.Append("filelist=[");
+                SB.Append("[");
                 foreach (DBCCopyStruct file in list)
                 {
                     SB.Append("{");
@@ -272,7 +273,6 @@ namespace BaiduCloudSupport.API
                 }
                 SB.Remove(SB.Length - 1, 1);
                 SB.Append("]");
-
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
@@ -283,7 +283,7 @@ namespace BaiduCloudSupport.API
                     Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=%2F",
                     Host = "pan.baidu.com",
                     Cookie = Cookies,
-                    Postdata = SB.ToString(),
+                    Postdata = "filelist=" + Other.Tools.URLEncoding(SB.ToString(), Encoding.UTF8),
                     PostEncoding = Encoding.UTF8
                 };
                 string result = http.GetHtml(item).Html;
@@ -307,7 +307,8 @@ namespace BaiduCloudSupport.API
                     }
                 }
                 StringBuilder SB = new StringBuilder();
-                SB.Append("filelist=[");
+                //SB.Append("filelist=[");
+                SB.Append("[");
                 foreach (DBCCopyStruct file in list)
                 {
                     SB.Append("{");
@@ -316,7 +317,6 @@ namespace BaiduCloudSupport.API
                 }
                 SB.Remove(SB.Length - 1, 1);
                 SB.Append("]");
-
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
@@ -327,7 +327,7 @@ namespace BaiduCloudSupport.API
                     Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=%2F",
                     Host = "pan.baidu.com",
                     Cookie = Cookies,
-                    Postdata = SB.ToString(),
+                    Postdata = "filelist=" + Other.Tools.URLEncoding(SB.ToString(), Encoding.UTF8),
                     PostEncoding = Encoding.UTF8
                 };
                 string result = http.GetHtml(item).Html;
