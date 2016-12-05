@@ -508,7 +508,7 @@ namespace BaiduCloudSupport.API
                 };
                 var result = http.GetHtml(item);
                 string[] location = result.Header.GetValues("location");
-                return location[0].Replace("\"", "");
+                return location[0];
             }
             catch (Exception ex)
             {

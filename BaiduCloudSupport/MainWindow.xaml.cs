@@ -956,13 +956,13 @@ namespace BaiduCloudSupport
                 if (item.isdir == 0)
                 {
                     totalData.ProgressRing_IsActive = true;
-                    if (!item.path.StartsWith(PCS.BasePath)) return;
-                    if (!await Setting.CheckApiModeAsync(Setting.APIMODE.PCS))
-                    {
-                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
-                        return;
-                    }
-                    string result = await PCS.DownloadURL(Setting.Baidu_Access_Token, item.path);
+                    //if (!item.path.StartsWith(PCS.BasePath)) return;
+                    //if (!await Setting.CheckApiModeAsync(Setting.APIMODE.PCS))
+                    //{
+                    //    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
+                    //    return;
+                    //}
+                    string result = await BDC.DownloadURLAsync(item.path);
                     Clipboard.SetText(result);
                     await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Done"), GlobalLanguage.FindText("MainWindow_MenuItem_GetURL_Done"));
                 }
@@ -1021,11 +1021,11 @@ namespace BaiduCloudSupport
                     return;
                 }
                 totalData.ProgressRing_IsActive = true;
-                if (!await Setting.CheckApiModeAsync(Setting.APIMODE.PCS))
-                {
-                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
-                    return;
-                }
+                //if (!await Setting.CheckApiModeAsync(Setting.APIMODE.PCS))
+                //{
+                //    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
+                //    return;
+                //}
                 int count = 0;
                 //List<string> downloadURLList = new List<string>();
                 //foreach (var file in totalData.FileListDataItems)
@@ -1041,9 +1041,9 @@ namespace BaiduCloudSupport
                 ConcurrentBag<string> bag = new ConcurrentBag<string>();
                 await Task.Factory.StartNew(()=> {
                     Parallel.ForEach(totalData.FileListDataItems, new ParallelOptions { MaxDegreeOfParallelism = 3 }, (file) => {
-                        if (file.isSelected && file.isdir == 0 && file.path.StartsWith(PCS.BasePath))
+                        if (file.isSelected && file.isdir == 0)
                         {
-                            string URL = PCS.DownloadURL(file.path);
+                            string URL = BDC.DownloadURL(file.path);
                             bag.Add(URL);
                             count++;
                         }
