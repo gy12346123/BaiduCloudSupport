@@ -90,6 +90,13 @@ namespace BaiduCloudSupport.API
             }
         }
 
+        public static Task LoadCookieAsync(string path, bool overwrite = false)
+        {
+            return Task.Factory.StartNew(()=> {
+                LoadCookie(path, overwrite);
+            });
+        }
+
         public static bool CheckCookie()
         {
             if (Cookies == null || Cookies.Equals(""))
@@ -148,6 +155,13 @@ namespace BaiduCloudSupport.API
             {
                 throw new ErrorCodeException();
             }
+        }
+
+        public static Task<FileListStruct[]> SingleFolderAsync(string path, int page, int maxNum = 100, int desc = 0, Order order = Order.name)
+        {
+            return Task.Factory.StartNew(()=> {
+                return SingleFolder(path, page, maxNum, desc, order);
+            });
         }
 
         public static Task<DBCFolderListStruct[]> OnlyFolderInfo(string path, int page = 0, int maxNum = 500, int desc = 0, Order order = Order.name)
@@ -496,15 +510,17 @@ namespace BaiduCloudSupport.API
         {
             try
             {
-                string convertedpath = Other.Tools.URLEncoding(remoteFile, Encoding.UTF8);
+                if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+                string convertedFile = Other.Tools.URLEncoding(remoteFile, Encoding.UTF8);
+                string[] pathParam = remoteFile.Split('/');
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
-                    URL = BDCDownloadBaseURL + "file?method=download&app_id=250528&check_blue=1&ec=1&err_ver=1.0&es=1&sup=1&path=" + convertedpath,
+                    URL = BDCDownloadBaseURL + "file?method=download&app_id=250528&check_blue=1&ec=1&err_ver=1.0&es=1&sup=1&path=" + convertedFile,
                     Encoding = Encoding.UTF8,
                     Timeout = BDC.Timeout,
                     Cookie = Cookies,
-                    Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=" + convertedpath
+                    Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=" + Other.Tools.URLEncoding(remoteFile.Replace("/" + pathParam[pathParam.Count() - 1], ""), Encoding.UTF8),
                 };
                 var result = http.GetHtml(item);
                 string[] location = result.Header.GetValues("location");
@@ -523,5 +539,49 @@ namespace BaiduCloudSupport.API
                 return BDC.DownloadURL(remoteFile);
             });
         }
+
+        /// <summary>
+        /// Get baidu cloud quota
+        /// </summary>
+        /// <param name="access_token">Baidu access token</param>
+        /// <returns>[0]:quota, [1]:used</returns>
+        public static ulong[] Quota()
+        {
+            if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+            if (bdstoken == null || bdstoken.Equals(""))
+            {
+                if (!GetParamFromHtml())
+                {
+                    throw new Exception("Get param from html error.");
+                }
+            }
+            HttpHelper http = new HttpHelper();
+            HttpItem item = new HttpItem()
+            {
+                URL = BDCBaseURL + "quota?checkexpire=1&checkfree=1&channel=chunlei&web=1&app_id=250528&bdstoken={0}&clienttype=0" + bdstoken,
+                Encoding = Encoding.UTF8,
+                Timeout = BDC.Timeout,
+                Cookie = Cookies,
+                Referer = "http://pan.baidu.com/disk/home#list/path=%2F&vmode=list"
+            };
+            string result = http.GetHtml(item).Html;
+            if (result.Contains("errno\":0"))
+            {
+                var json = (JObject)JsonConvert.DeserializeObject(result);
+                return new ulong[2] { Convert.ToUInt64(json["total"]) / Convert.ToUInt64(Math.Pow(1024d, 3d)), Convert.ToUInt64(json["used"]) / Convert.ToUInt64(Math.Pow(1024d, 3d)) };
+            }
+            else
+            {
+                throw new ErrorCodeException();
+            }
+        }
+
+        public static Task<ulong[]> QuotaAsync()
+        {
+            return Task.Factory.StartNew(()=> {
+                return Quota();
+            });
+        }
+
     }
 }

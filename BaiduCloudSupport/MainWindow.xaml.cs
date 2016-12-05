@@ -190,46 +190,12 @@ namespace BaiduCloudSupport
             flyoutsControl.DataContext = totalData;
             try
             {
-                if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
+                totalData.ProgressRing_IsActive = true;
+                if (BDC.IsCookieFileExist(Setting.Baidu_CookiePath))
                 {
-                    totalData.ProgressRing_IsActive = true;
-                    if (Setting.Baidu_uname.Equals("") || Setting.UserPortraitFilePath.Equals(""))
-                    {
-                        var result = await ReloadSimpleUserInfo();
-                        if (!result)
-                        {
-                            await Task.Factory.StartNew(() => {
-                                LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
-                            });
-                            await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_AutoLoginFailed"));
-                        }
-                    }
-                    else
-                    {
-                        totalData.uname = Setting.Baidu_uname;
-                        if (!Setting.Baidu_Quota_Total.Equals(""))
-                        {
-                            totalData.Quota_Total = Convert.ToUInt64(Setting.Baidu_Quota_Total);
-                        }
-                        if (!Setting.Baidu_Quota_Used.Equals(""))
-                        {
-                            totalData.Quota_Used = Convert.ToUInt64(Setting.Baidu_Quota_Used);
-                        }
-                        await Task.Factory.StartNew(() => {
-                            LoadUserPortraitFromFile(Setting.UserPortraitFilePath);
-                        });
-                    }
-
-                    // Check Cookie and set API mode
-                    await Task.Factory.StartNew(()=> {
-                        if (BDC.IsCookieFileExist(Setting.Baidu_CookiePath))
-                        {
-                            BDC.LoadCookie(Setting.Baidu_CookiePath);
-                            Setting.APIMode = Setting.APIMODE.BDC;
-                        }
-                    });
-
-                    // Load folder
+                    await BDC.LoadCookieAsync(Setting.Baidu_CookiePath);
+                    Setting.APIMode = Setting.APIMODE.BDC;
+                    await ReloadSimpleUserInfo();
                     var folderResult = await LoadFolder("");
                     if (folderResult == null)
                     {
@@ -237,12 +203,61 @@ namespace BaiduCloudSupport
                     }
                     totalData.FileListDataItems = folderResult;
                 }
-                else
-                {
-                    await Task.Factory.StartNew(() => {
-                        LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
-                    });
-                }
+
+
+                //if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
+                //{
+                //    totalData.ProgressRing_IsActive = true;
+                //    if (Setting.Baidu_uname.Equals("") || Setting.UserPortraitFilePath.Equals(""))
+                //    {
+                //        var result = await ReloadSimpleUserInfo();
+                //        if (!result)
+                //        {
+                //            await Task.Factory.StartNew(() => {
+                //                LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
+                //            });
+                //            await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_AutoLoginFailed"));
+                //        }
+                //    }
+                //    else
+                //    {
+                //        totalData.uname = Setting.Baidu_uname;
+                //        if (!Setting.Baidu_Quota_Total.Equals(""))
+                //        {
+                //            totalData.Quota_Total = Convert.ToUInt64(Setting.Baidu_Quota_Total);
+                //        }
+                //        if (!Setting.Baidu_Quota_Used.Equals(""))
+                //        {
+                //            totalData.Quota_Used = Convert.ToUInt64(Setting.Baidu_Quota_Used);
+                //        }
+                //        await Task.Factory.StartNew(() => {
+                //            LoadUserPortraitFromFile(Setting.UserPortraitFilePath);
+                //        });
+                //    }
+
+                //    // Check Cookie and set API mode
+                //    await Task.Factory.StartNew(()=> {
+                //        if (BDC.IsCookieFileExist(Setting.Baidu_CookiePath))
+                //        {
+                //            BDC.LoadCookie(Setting.Baidu_CookiePath);
+                //            Setting.APIMode = Setting.APIMODE.BDC;
+                //        }
+                //    });
+
+                //    // Load folder
+                //    var folderResult = await LoadFolder("");
+                //    if (folderResult == null)
+                //    {
+                //        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                //    }
+                //    totalData.FileListDataItems = folderResult;
+                //}
+                //else
+                //{
+                //    await Task.Factory.StartNew(() => {
+                //        LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
+                //    });
+                //}
             }
             catch (Exception ex)
             {
@@ -325,7 +340,7 @@ namespace BaiduCloudSupport
             return Task<bool>.Factory.StartNew(() => {
                 try
                 {
-                    ulong[] quota = PCS.Quota();
+                    ulong[] quota = BDC.Quota();
                     if (quota != null && quota.Count() == 2)
                     {
                         totalData.Quota_Total = quota[0];
@@ -335,30 +350,30 @@ namespace BaiduCloudSupport
                     {
                         return false;
                     }
-                    SimpleUserInfoStruct userInfo = PCS.SimpleUser();
-                    if (userInfo.uid != 0)
-                    {
-                        totalData.uid = userInfo.uid;
-                        totalData.uname = userInfo.uname;
-                        if (!Setting.Baidu_portrait.Equals(userInfo.portrait))
-                        {
-                            string imagePath = Setting.BasePath + @"Images\UserInfo\";
-                            string imageFile = imagePath + userInfo.uid + ".jpg";
-                            if (!Directory.Exists(imagePath))
-                            {
-                                Directory.CreateDirectory(imagePath);
-                            }
-                            WebClient web = new WebClient();
-                            web.DownloadFile(new Uri(PCS.UserSmallPortrait(userInfo.portrait)), imageFile);
-                            totalData.portrait = userInfo.portrait;
-                            Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
-                            LoadUserPortraitFromFile(imageFile);
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    //SimpleUserInfoStruct userInfo = PCS.SimpleUser();
+                    //if (userInfo.uid != 0)
+                    //{
+                    //    totalData.uid = userInfo.uid;
+                    //    totalData.uname = userInfo.uname;
+                    //    if (!Setting.Baidu_portrait.Equals(userInfo.portrait))
+                    //    {
+                    //        string imagePath = Setting.BasePath + @"Images\UserInfo\";
+                    //        string imageFile = imagePath + userInfo.uid + ".jpg";
+                    //        if (!Directory.Exists(imagePath))
+                    //        {
+                    //            Directory.CreateDirectory(imagePath);
+                    //        }
+                    //        WebClient web = new WebClient();
+                    //        web.DownloadFile(new Uri(PCS.UserSmallPortrait(userInfo.portrait)), imageFile);
+                    //        totalData.portrait = userInfo.portrait;
+                    //        Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
+                    //        LoadUserPortraitFromFile(imageFile);
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    return false;
+                    //}
                     return true;
                 }
                 catch (Exception ex)
@@ -1482,15 +1497,30 @@ namespace BaiduCloudSupport
                     shareLink = "http://" + shareLink;
                 }
                 string path = await BDC.Transfer(shareLink);
-                var fileMeta = await PCS.SingleFileMeta(path);
-                string[] fileName = fileMeta.path.Split('/');
+                //var fileMeta = await PCS.SingleFileMeta(path);
+                string[] param = path.Split('/');
+                var fileMeta = await BDC.SingleFolderAsync(path.Replace("/" + param[param.Count() - 1], ""), 1);
+                ulong fs_id = 0UL;
+                UInt32 mtime = 0U;
+                UInt32 isdir = 0U;
+                foreach(var file in fileMeta)
+                {
+                    if (file.path.Equals(path))
+                    {
+                        fs_id = file.fs_id;
+                        mtime = file.mtime;
+                        isdir = file.isdir;
+                        break;
+                    }
+                }
+                string[] fileName = path.Split('/');
                 AddDownloadTask(new FileListDataItem
                 {
                     file = fileName[fileName.Count() - 1],
-                    path = fileMeta.path,
-                    fs_id = fileMeta.fs_id,
-                    mtime = Tools.TimeStamp2DateTime(fileMeta.mtime.ToString()),
-                    isdir = fileMeta.isdir,
+                    path = path,
+                    fs_id = fs_id,
+                    mtime = Tools.TimeStamp2DateTime(mtime.ToString()),
+                    isdir = isdir,
                     isSelected = false
                 });
 

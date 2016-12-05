@@ -111,6 +111,7 @@ namespace BaiduCloudSupport.API
         /// </summary>
         /// <param name="access_token">Baidu access token</param>
         /// <returns>SimpleUserInfoStruct</returns>
+        [Obsolete]
         public static SimpleUserInfoStruct SimpleUser(string access_token)
         {
             try
@@ -150,6 +151,7 @@ namespace BaiduCloudSupport.API
         /// Get user simple info with default access_token in App.config
         /// </summary>
         /// <returns>SimpleUserInfoStruct</returns>
+        [Obsolete]
         public static SimpleUserInfoStruct SimpleUser()
         {
             return SimpleUser(Setting.Baidu_Access_Token);
@@ -180,6 +182,7 @@ namespace BaiduCloudSupport.API
         /// </summary>
         /// <param name="access_token">Baidu access token</param>
         /// <returns>[0]:quota, [1]:used</returns>
+        [Obsolete]
         public static ulong[] Quota(string access_token)
         {
             try
@@ -212,6 +215,7 @@ namespace BaiduCloudSupport.API
         /// Get baidu cloud quota with default access_token in App.config
         /// </summary>
         /// <returns>[0]:quota, [1]:used</returns>
+        [Obsolete]
         public static ulong[] Quota()
         {
             return Quota(Setting.Baidu_Access_Token);
@@ -223,6 +227,7 @@ namespace BaiduCloudSupport.API
         /// <param name="access_token">Baidu access token</param>
         /// <param name="path">File or floder path</param>
         /// <returns>FileMetaStruct</returns>
+        [Obsolete]
         public static PCSFileMetaStruct SingleFileMeta(string access_token, string path)
         {
             try
@@ -268,6 +273,7 @@ namespace BaiduCloudSupport.API
         /// </summary>
         /// <param name="path">File or floder path</param>
         /// <returns>FileMetaStruct</returns>
+        [Obsolete]
         public static Task<PCSFileMetaStruct> SingleFileMeta(string path)
         {
             return Task.Factory.StartNew(()=> {
@@ -281,6 +287,7 @@ namespace BaiduCloudSupport.API
         /// <param name="access_token">Baidu access token</param>
         /// <param name="path">Floder path</param>
         /// <returns>FileListStruct[]</returns>
+        [Obsolete]
         public static FileListStruct[] SingleFloder(string access_token, string path)
         {
             HttpHelper http = new HttpHelper();
@@ -319,6 +326,7 @@ namespace BaiduCloudSupport.API
         /// </summary>
         /// <param name="path">Floder path</param>
         /// <returns>FileListStruct[]</returns>
+        [Obsolete]
         public static FileListStruct[] SingleFloder(string path)
         {
             return SingleFloder(Setting.Baidu_Access_Token, path);
@@ -332,6 +340,7 @@ namespace BaiduCloudSupport.API
         /// <param name="keyword">Keyword used to search file</param>
         /// <param name="traversing">Traverse the folder:0.No, 1.Yes</param>
         /// <returns>Task<FileListStruct[]></returns>
+        [Obsolete]
         public static Task<FileListStruct[]> SearchFile(string access_token, string path, string keyword, int traversing = 1)
         {
             return Task.Factory.StartNew(() => {
@@ -374,6 +383,7 @@ namespace BaiduCloudSupport.API
         /// <param name="keyword">Keyword used to search file</param>
         /// <param name="traversing">Traverse the folder:0.No, 1.Yes</param>
         /// <returns>Task<FileListStruct[]></returns>
+        [Obsolete]
         public static Task<FileListStruct[]> SearchFile(string path, string keyword, int traversing = 1)
         {
             return SearchFile(Setting.Baidu_Access_Token, path, keyword, traversing);
@@ -453,7 +463,7 @@ namespace BaiduCloudSupport.API
             }else
             {
                 //URL = DownloadBaseURL + "file?method=download&access_token=" + access_token + "&path=" + ConvertPath2URLFormat(remoteFile);
-                URL = DownloadURL(remoteFile);
+                URL = BDC.DownloadURL(remoteFile);
             }
 
             Downloader downloader = DownloadManager.Instance.Add(
@@ -489,8 +499,8 @@ namespace BaiduCloudSupport.API
             {
                 if (forOnce)
                 {
-                    ResourceLocation[] mirrors = new ResourceLocation[2] { ResourceLocation.FromURL(await PCS.DownloadURL(Setting.Baidu_Access_Token, remotePath)) ,
-                        ResourceLocation.FromURL(await PCS.DownloadURL(Setting.Baidu_Access_Token, remotePath)) };
+                    ResourceLocation[] mirrors = new ResourceLocation[2] { ResourceLocation.FromURL(await BDC.DownloadURLAsync(remotePath)) ,
+                        ResourceLocation.FromURL(await BDC.DownloadURLAsync(remotePath)) };
                     e.Downloader.Mirrors = mirrors.ToList();
                     forOnce = false;
                 }
@@ -508,6 +518,7 @@ namespace BaiduCloudSupport.API
         /// <param name="access_token">Baidu access token</param>
         /// <param name="remoteFile">Remote full file path</param>
         /// <returns>Task<string></returns>
+        [Obsolete]
         public static Task<string> DownloadURL(string access_token, string remoteFile)
         {
             return Task.Factory.StartNew(()=> {
@@ -537,6 +548,7 @@ namespace BaiduCloudSupport.API
         /// </summary>
         /// <param name="remoteFile">Remote full file path</param>
         /// <returns>string URL</returns>
+        [Obsolete]
         public static string DownloadURL(string remoteFile)
         {
             try
@@ -559,6 +571,7 @@ namespace BaiduCloudSupport.API
             }
         }
 
+        [Obsolete]
         public static Task<bool> DeleteSingleFile(string access_token, string path)
         {
             return Task.Factory.StartNew(()=>{
@@ -577,7 +590,7 @@ namespace BaiduCloudSupport.API
                 return true;
             });
         }
-
+        [Obsolete]
         public static Task<bool> DeleteSingleFile(string path)
         {
             return DeleteSingleFile(Setting.Baidu_Access_Token, path);
