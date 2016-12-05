@@ -814,7 +814,7 @@ namespace BaiduCloudSupport
                 }
 
                 CheckDownloadFolder();
-                PCS.DownloadFileSegment(Setting.Baidu_Access_Token, item.fs_id, taskWindow.DownloadURL, Setting.DownloadPath + item.file);
+                PCS.DownloadFileSegment(Setting.Baidu_Access_Token, item.fs_id, taskWindow.DownloadURL, Setting.DownloadPath + item.file, item.path);
             }
             taskWindow = null;
         }
@@ -1175,7 +1175,8 @@ namespace BaiduCloudSupport
                     return;
                 }
                 totalData.FileListDataItems = floderResult;
-                ChangeNavigation(fileList[0].path);
+                string[] pathParam = fileList[0].path.Split('/');
+                ChangeNavigation(fileList[0].path.Replace("/" + pathParam[pathParam.Count() - 1], ""));
             }
             catch (Exception ex)
             {

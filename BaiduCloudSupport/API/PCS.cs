@@ -423,7 +423,7 @@ namespace BaiduCloudSupport.API
             });
         }
 
-        public static void DownloadFileSegment(string access_token, ulong fs_id, string remoteFile, string localFile)
+        public static void DownloadFileSegment(string access_token, ulong fs_id, string remoteFile, string localFile, string remotePath = null)
         {
             if (ForFirst)
             {
@@ -464,9 +464,11 @@ namespace BaiduCloudSupport.API
                 true,
                 fs_id);
             double lastProgress = 0d;
+            bool forOnce = true;
             downloader.InfoReceived += (object sender, EventArgs e) =>
             {
                 MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, 0L, 0d, 0d);
+                forOnce = true;
             };
             downloader.Ending += (object sender, EventArgs e) =>
             {
@@ -483,8 +485,16 @@ namespace BaiduCloudSupport.API
             downloader.StateChanged += (object sender, EventArgs e) => {
                 MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, Math.Round(((Downloader)sender).Progress, 1), Math.Round(((Downloader)sender).Rate / 1000d, 1));
             };
-            //downloader.SegmentFailed += (object sender, SegmentEventArgs e) => {
-            //};
+            downloader.SegmentFailed += async(object sender, SegmentEventArgs e) =>
+            {
+                if (forOnce)
+                {
+                    ResourceLocation[] mirrors = new ResourceLocation[2] { ResourceLocation.FromURL(await PCS.DownloadURL(Setting.Baidu_Access_Token, remotePath)) ,
+                        ResourceLocation.FromURL(await PCS.DownloadURL(Setting.Baidu_Access_Token, remotePath)) };
+                    e.Downloader.Mirrors = mirrors.ToList();
+                    forOnce = false;
+                }
+            };
         }
 
         private static void GetDownloadInfo()

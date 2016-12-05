@@ -153,6 +153,14 @@ namespace MyDownloader.Core
             {
                 return this.mirrors;
             }
+            // Now for test.
+            set
+            {
+                if (this.mirrors != value)
+                {
+                    this.mirrors = value;
+                }
+            }
         }
 
         public long FileSize
@@ -967,14 +975,14 @@ namespace MyDownloader.Core
                     }
                     while (readSize > 0);
 
-                    if (segment.State == SegmentState.Downloading)
-                    {
-                        segment.State = SegmentState.Finished;
+                    //if (segment.State == SegmentState.Downloading)
+                    //{
+                    //    segment.State = SegmentState.Finished;
 
-                        // try to create other segment, 
-                        // spliting the missing bytes from one existing segment
-                        AddNewSegmentIfNeeded();
-                    }
+                    //    // try to create other segment, 
+                    //    // spliting the missing bytes from one existing segment
+                    //    AddNewSegmentIfNeeded();
+                    //}
                 }
                 
                 // raise the event
@@ -993,6 +1001,14 @@ namespace MyDownloader.Core
             }
             finally
             {
+                if (segment.State == SegmentState.Downloading)
+                {
+                    segment.State = SegmentState.Finished;
+
+                    // try to create other segment, 
+                    // spliting the missing bytes from one existing segment
+                    AddNewSegmentIfNeeded();
+                }
                 // clean up the segment
                 segment.InputStream = null;
             }
