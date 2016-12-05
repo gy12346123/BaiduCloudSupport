@@ -20,6 +20,8 @@ namespace BaiduCloudSupport.API
 
         private static string BDCShareURL = "http://pan.baidu.com/share/";
 
+        private static string BDCDownloadBaseURL = "http://d.pcs.baidu.com/rest/2.0/pcs/";
+
         /// <summary>
         /// Http time out
         /// </summary>
@@ -482,6 +484,43 @@ namespace BaiduCloudSupport.API
                     return string.Format("{0}/{1}", toFolder, Regex.Unescape(file));
                 }
                 throw new ErrorCodeException("BDC.Transfer");
+            });
+        }
+
+        /// <summary>
+        /// Get download url use remoteFile
+        /// </summary>
+        /// <param name="remoteFile">Remote full file path</param>
+        /// <returns>string URL</returns>
+        public static string DownloadURL(string remoteFile)
+        {
+            try
+            {
+                string convertedpath = Other.Tools.URLEncoding(remoteFile, Encoding.UTF8);
+                HttpHelper http = new HttpHelper();
+                HttpItem item = new HttpItem()
+                {
+                    URL = BDCDownloadBaseURL + "file?method=download&app_id=250528&check_blue=1&ec=1&err_ver=1.0&es=1&sup=1&path=" + convertedpath,
+                    Encoding = Encoding.UTF8,
+                    Timeout = BDC.Timeout,
+                    Cookie = Cookies,
+                    Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=" + convertedpath
+                };
+                var result = http.GetHtml(item);
+                string[] location = result.Header.GetValues("location");
+                return location[0].Replace("\"", "");
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WriteLog("BDC.DownloadURL", ex);
+                throw new Exception("BDC.DownloadURL", ex);
+            }
+        }
+
+        public static Task<string> DownloadURLAsync(string remoteFile)
+        {
+            return Task.Factory.StartNew(()=> {
+                return BDC.DownloadURL(remoteFile);
             });
         }
     }

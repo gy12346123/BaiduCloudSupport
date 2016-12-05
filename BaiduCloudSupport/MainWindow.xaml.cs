@@ -713,12 +713,12 @@ namespace BaiduCloudSupport
                 if (item.isdir == 0)
                 {
                     // File
-                    if (!item.path.StartsWith(PCS.BasePath)) return;
-                    if (!await Setting.CheckApiModeAsync(Setting.APIMODE.PCS))
-                    {
-                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
-                        return;
-                    }
+                    //if (!item.path.StartsWith(PCS.BasePath)) return;
+                    //if (!await Setting.CheckApiModeAsync(Setting.APIMODE.PCS))
+                    //{
+                    //    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
+                    //    return;
+                    //}
                     DownloadFile(item);
                 }else
                 {
@@ -786,7 +786,7 @@ namespace BaiduCloudSupport
 
         private async void AddDownloadTask(FileListDataItem item)
         {
-            Window.NewDownloadTaskWindow taskWindow = new Window.NewDownloadTaskWindow(await PCS.DownloadURL(Setting.Baidu_Access_Token, item.path));
+            Window.NewDownloadTaskWindow taskWindow = new Window.NewDownloadTaskWindow(await BDC.DownloadURLAsync(item.path));
             taskWindow.Owner = this;
             if ((bool)taskWindow.ShowDialog())
             {
@@ -985,15 +985,16 @@ namespace BaiduCloudSupport
                     if (item.isdir == 0)
                     {
                         // File
-                        if (!await Setting.CheckApiModeAsync(Setting.APIMODE.PCS))
-                        {
-                            await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
-                            return;
-                        }
-                        if (item.path.StartsWith(PCS.BasePath))
-                        {
-                            DownloadFile(item);
-                        }
+                        //if (!await Setting.CheckApiModeAsync(Setting.APIMODE.PCS))
+                        //{
+                        //    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
+                        //    return;
+                        //}
+                        //if (item.path.StartsWith(PCS.BasePath))
+                        //{
+                        //    DownloadFile(item);
+                        //}
+                        DownloadFile(item);
                     }
                     else
                     {
