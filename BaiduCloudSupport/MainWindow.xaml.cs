@@ -1586,5 +1586,55 @@ namespace BaiduCloudSupport
             }
             
         }
+
+        private async void MenuItem_Rename_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (dataGrid_FileList.SelectedItems.Count == 0)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+                    return;
+                }
+                if (dataGrid_FileList.SelectedItems.Count > 1)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_MenuItem_Rename_SupportOne"));
+                    return;
+                }
+                if (!BDC.CheckCookie())
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
+                    return;
+                }
+                totalData.ProgressRing_IsActive = true;
+                FileListDataItem item = (FileListDataItem)dataGrid_FileList.SelectedItem;
+                var newName = await this.ShowInputAsync(GlobalLanguage.FindText("MainWindow_MenuItem_Rename_NewName_Title"), GlobalLanguage.FindText("MainWindow_MenuItem_Rename_NewName_Message"));
+                if (newName == null || newName.Equals(""))
+                {
+                    return;
+                }
+                if (await BDC.RenameAsync(item.path, newName))
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("MainWindow_MenuItem_Rename_NewName_Succeed"));
+                    var folderResult = await LoadFolder(totalData.PageNowLoaded);
+                    if (folderResult == null)
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                    }
+                    totalData.FileListDataItems = folderResult;
+                }
+                else
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("MainWindow_MenuItem_Rename_NewName_Failed"));
+                }
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.MenuItem_Rename_Click", ex);
+                await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("CommonMessage_Exception"));
+            }finally
+            {
+                totalData.ProgressRing_IsActive = false;
+            }
+        }
     }
 }

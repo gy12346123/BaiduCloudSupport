@@ -686,5 +686,54 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        public static bool Rename(string path, string newName)
+        {
+            if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+            if (bdstoken == null || bdstoken.Equals(""))
+            {
+                if (!GetParamFromHtml())
+                {
+                    return false;
+                }
+            }
+            string[] param = path.Split('/');
+            string GetOnePath = path.Replace("/" + param[param.Count() - 1], "");
+            StringBuilder SB = new StringBuilder();
+            SB.Append("[{");
+            SB.Append(string.Format("\"path\":\"{0}\",\"newname\":\"{1}\"", path, newName));
+            SB.Append("}]");
+            HttpHelper http = new HttpHelper();
+            HttpItem item = new HttpItem()
+            {
+                URL = string.Format("{0}filemanager?opera=rename&async=2&channel=chunlei&web=1&app_id=250528&bdstoken={1}&clienttype=0", BDCBaseURL, bdstoken),
+                Method = "POST",
+                Encoding = Encoding.UTF8,
+                Timeout = BDC.Timeout,
+                Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=" + Other.Tools.URLEncoding(GetOnePath, Encoding.UTF8),
+                Host = "pan.baidu.com",
+                Cookie = Cookies,
+                Postdata = "filelist=" + Other.Tools.URLEncoding(SB.ToString(), Encoding.UTF8),
+                Accept = " application/json, text/javascript, */*; q=0.01",
+                PostEncoding = Encoding.UTF8,
+                ContentType = "application/x-www-form-urlencoded; charset=UTF-8",
+            };
+            string result = http.GetHtml(item).Html;
+            if (result.Contains("errno\":0"))
+            {
+                return true;
+            }
+            else
+            {
+                throw new ErrorCodeException();
+            }
+        }
+
+        public static Task<bool> RenameAsync(string path, string newName)
+        {
+            return Task.Factory.StartNew(()=> {
+                return Rename(path, newName);
+            });
+        }
+
     }
 }

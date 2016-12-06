@@ -114,4 +114,10 @@
     <sys:String x:Key="MainWindow_MenuItem_CreateFolder_Title">创建文件夹</sys:String>
     <sys:String x:Key="MainWindow_MenuItem_CreateFolder_Message">请输入文件夹名。。</sys:String>
     <sys:String x:Key="MainWindow_MenuItem_CreateFolder_Succeed">创建文件夹成功。</sys:String>
+    <sys:String x:Key="DataGrid_FileList_ContextMenu_Rename">重命名</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_Rename_SupportOne">重命名单次操作仅支持单文件或文件夹。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_Rename_NewName_Title">新名称</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_Rename_NewName_Message">请输入新的文件（夹）名（勿忘记输入拓展名）。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_Rename_NewName_Succeed">重命名成功。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_Rename_NewName_Failed">重命名失败。</sys:String>
 </ResourceDictionary>
