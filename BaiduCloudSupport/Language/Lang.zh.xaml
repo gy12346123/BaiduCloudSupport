@@ -120,4 +120,6 @@
     <sys:String x:Key="MainWindow_MenuItem_Rename_NewName_Message">请输入新的文件（夹）名（勿忘记输入拓展名）。</sys:String>
     <sys:String x:Key="MainWindow_MenuItem_Rename_NewName_Succeed">重命名成功。</sys:String>
     <sys:String x:Key="MainWindow_MenuItem_Rename_NewName_Failed">重命名失败。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_GetURL_ShortUrl_Title">短链接</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_GetURL_ShortUrl_Message">是否需要将获得的长链接转换为短链接（可以将短链接用于迅雷下载）？</sys:String>
 </ResourceDictionary>

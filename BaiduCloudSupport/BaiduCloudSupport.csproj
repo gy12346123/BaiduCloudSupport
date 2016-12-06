@@ -133,6 +133,7 @@
     <Compile Include="API\PCS.cs" />
     <Compile Include="API\DataInfo.cs" />
     <Compile Include="API\PCSException.cs" />
+    <Compile Include="API\ShortURL.cs" />
     <Compile Include="Login\BaiduLogin.cs" />
     <Compile Include="Window\FolderListWindow.xaml.cs">
       <DependentUpon>FolderListWindow.xaml</DependentUpon>

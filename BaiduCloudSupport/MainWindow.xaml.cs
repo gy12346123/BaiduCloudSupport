@@ -982,7 +982,13 @@ namespace BaiduCloudSupport
                     //    return;
                     //}
                     string result = await BDC.DownloadURLAsync(item.path);
-                    Clipboard.SetText(result);
+                    if (await this.ShowMessageAsync(GlobalLanguage.FindText("MainWindow_MenuItem_GetURL_ShortUrl_Title"), GlobalLanguage.FindText("MainWindow_MenuItem_GetURL_ShortUrl_Message"), MessageDialogStyle.AffirmativeAndNegative) == MessageDialogResult.Affirmative)
+                    {
+                        Clipboard.SetText(await ShortURL.ShortenAsync(result));
+                    }else
+                    {
+                        Clipboard.SetText(result);
+                    }
                     await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Done"), GlobalLanguage.FindText("MainWindow_MenuItem_GetURL_Done"));
                 }
             }catch (Exception ex)
