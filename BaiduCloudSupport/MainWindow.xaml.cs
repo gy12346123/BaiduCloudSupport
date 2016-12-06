@@ -115,15 +115,16 @@ namespace BaiduCloudSupport
                 if ((bool)LW.ShowDialog())
                 {
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("LoginWindow_LoginSucceed"));
-                    totalData.ProgressRing_IsActive = true;
-                    var result = await ReloadSimpleUserInfo();
-                    if (!result)
-                    {
-                        await Task.Factory.StartNew(() => {
-                            LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
-                        });
-                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_AutoLoginFailed"));
-                    }
+                    //totalData.ProgressRing_IsActive = true;
+                    //var result = await ReloadSimpleUserInfo();
+                    //if (!result)
+                    //{
+                    //    await Task.Factory.StartNew(() => {
+                    //        LoadUserPortraitFromFile(Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png");
+                    //    });
+                    //    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_AutoLoginFailed"));
+                    //}
+
                     //var floderResult = await LoadFolder("");
                     //if (floderResult == null)
                     //{
@@ -200,7 +201,7 @@ namespace BaiduCloudSupport
                 if (BDC.IsCookieFileExist(Setting.Baidu_CookiePath))
                 {
                     await BDC.LoadCookieAsync(Setting.Baidu_CookiePath);
-                    Setting.APIMode = Setting.APIMODE.BDC;
+                    //Setting.APIMode = Setting.APIMODE.BDC;
                     await ReloadSimpleUserInfo();
                     var folderResult = await LoadFolder("");
                     if (folderResult == null)

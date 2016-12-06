@@ -435,11 +435,11 @@ namespace BaiduCloudSupport.API
         {
             if (ForFirst)
             {
+                ForFirst = false;
                 ProtocolProviderFactory.RegisterProtocolHandler("http", typeof(MyDownloader.Extension.Protocols.HttpProtocolProvider));
                 ProtocolProviderFactory.RegisterProtocolHandler("https", typeof(MyDownloader.Extension.Protocols.HttpProtocolProvider));
                 ProtocolProviderFactory.RegisterProtocolHandler("ftp", typeof(MyDownloader.Extension.Protocols.FtpProtocolProvider));
                 new HttpFtpProtocolExtension();
-                ForFirst = false;
             }
             DownloadManager.Instance.DownloadAdded += (object sender, DownloaderEventArgs e) =>
             {
@@ -475,8 +475,8 @@ namespace BaiduCloudSupport.API
             bool forOnce = true;
             downloader.InfoReceived += (object sender, EventArgs e) =>
             {
-                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, 0L, 0d, 0d);
                 forOnce = true;
+                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, 0L, 0d, 0d);
             };
             downloader.Ending += (object sender, EventArgs e) =>
             {
@@ -497,10 +497,10 @@ namespace BaiduCloudSupport.API
             {
                 if (forOnce)
                 {
+                    forOnce = false;
                     ResourceLocation[] mirrors = new ResourceLocation[2] { ResourceLocation.FromURL(await BDC.DownloadURLAsync(remotePath)) ,
                         ResourceLocation.FromURL(await BDC.DownloadURLAsync(remotePath)) };
                     e.Downloader.Mirrors = mirrors.ToList();
-                    forOnce = false;
                 }
             };
         }

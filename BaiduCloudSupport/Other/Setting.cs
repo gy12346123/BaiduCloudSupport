@@ -21,7 +21,7 @@ namespace BaiduCloudSupport
         /// <summary>
         /// API mode selector, 0:PCS, 1:BDC
         /// </summary>
-        public static APIMODE APIMode = APIMODE.PCS;
+        public static APIMODE APIMode = APIMODE.BDC;
 
         /// <summary>
         /// Program text language
