@@ -110,4 +110,8 @@
     <sys:String x:Key="MainWindow_Button_TransferLink_ToolTip">分享链接直接获取下载链接。将分享链接中的文件保存至PCS根目录下并获取其下载链接。</sys:String>
     <sys:String x:Key="MainWindow_ChangeApiMode_FailMessage">切换API模式失败，请重新登录您的账号重试。</sys:String>
     <sys:String x:Key="CommonMessage_NeedLogin">请先登录。</sys:String>
+    <sys:String x:Key="DataGrid_FileList_ContextMenu_CreateFolder">创建文件夹</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_CreateFolder_Title">创建文件夹</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_CreateFolder_Message">请输入文件夹名。。</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_CreateFolder_Succeed">创建文件夹成功。</sys:String>
 </ResourceDictionary>

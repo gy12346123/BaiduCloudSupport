@@ -1545,5 +1545,46 @@ namespace BaiduCloudSupport
                 totalData.ProgressRing_IsActive = false;
             }
         }
+
+        private async void MenuItem_CreateFolder_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!BDC.CheckCookie())
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
+                    return;
+                }
+                var folderPath = await this.ShowInputAsync(GlobalLanguage.FindText("MainWindow_MenuItem_CreateFolder_Title"), GlobalLanguage.FindText("MainWindow_MenuItem_CreateFolder_Message"));
+                if (folderPath == null || folderPath.Equals(""))
+                {
+                    return;
+                }
+                totalData.ProgressRing_IsActive = true;
+                if (await BDC.CreateFolderAsync(string.Format("{0}/{1}", totalData.PageNowLoaded, folderPath)))
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("MainWindow_MenuItem_CreateFolder_Succeed"));
+                    var folderResult = await LoadFolder(totalData.PageNowLoaded);
+                    if (folderResult == null)
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                    }
+                    totalData.FileListDataItems = folderResult;
+                }
+                else
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("MainWindow_Button_TransforLink_ErrorCodeMessage"));
+                }
+            }catch(Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.MenuItem_CreateFolder_Click", ex);
+                await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("CommonMessage_Exception"));
+            }
+            finally
+            {
+                totalData.ProgressRing_IsActive = false;
+            }
+            
+        }
     }
 }

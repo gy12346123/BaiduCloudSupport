@@ -193,6 +193,7 @@
                             <ContextMenu>
                                 <MenuItem Header="{StaticResource DataGrid_FileList_SelectAll}" Click="MenuItem_SelectAll_Click" />
                                 <Separator />
+                                <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_CreateFolder}" Click="MenuItem_CreateFolder_Click"  />
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_CopyTo}" Click="MenuItem_CopyTo_Click" />
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_MoveTo}" Click="MenuItem_MoveTo_Click" />
                                 <MenuItem Header="{StaticResource DataGrid_FileList_ContextMenu_Delete}" Click="MenuItem_Delete_Click" />

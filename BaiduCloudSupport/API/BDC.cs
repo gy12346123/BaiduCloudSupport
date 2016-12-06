@@ -643,5 +643,48 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        public static bool CreateFolder(string path)
+        {
+            if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+            if (bdstoken == null || bdstoken.Equals(""))
+            {
+                if (!GetParamFromHtml())
+                {
+                    throw new Exception("Get param from html error.");
+                }
+            }
+            string[] param = path.Split('/');
+            string GetOnePath = path.Replace("/" + param[param.Count() - 1], "");
+            HttpHelper http = new HttpHelper();
+            HttpItem item = new HttpItem()
+            {
+                URL = string.Format("{0}create?a=commit&channel=chunlei&web=1&app_id=250528&bdstoken={1}&clienttype=0", BDCBaseURL, bdstoken),
+                Method = "POST",
+                Timeout = BDC.Timeout,
+                Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=" + Other.Tools.URLEncoding(GetOnePath, Encoding.UTF8),
+                Host = "pan.baidu.com",
+                Cookie = Cookies,
+                Postdata = string.Format("path={0}&isdir=1&block_list=%5B%5D", Other.Tools.URLEncoding(path, Encoding.UTF8)),
+                PostEncoding = Encoding.UTF8,
+                ContentType = "application/x-www-form-urlencoded; charset=UTF-8"
+            };
+            string result = http.GetHtml(item).Html;
+            if (result.Contains("errno\":0"))
+            {
+                return true;
+            }
+            else
+            {
+                throw new ErrorCodeException();
+            }
+        }
+
+        public static Task<bool> CreateFolderAsync(string path)
+        {
+            return Task.Factory.StartNew(()=> {
+                return CreateFolder(path);
+            });
+        }
+
     }
 }
