@@ -170,6 +170,7 @@ namespace BaiduCloudSupport
                     // Save cookies
                     await Window.LoginWindow.SaveCookies(cookieList, file);
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("MainWindow_Button_AdvanceLogin_CookieSaveSucceed"));
+                    LoadMainWindowContent();
                     return;
                 }
             }
@@ -184,10 +185,15 @@ namespace BaiduCloudSupport
             AB.ShowDialog();
         }
 
-        private async void MetroWindow_Loaded(object sender, RoutedEventArgs e)
+        private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
             grid_Main.DataContext = totalData;
             flyoutsControl.DataContext = totalData;
+            LoadMainWindowContent();
+        }
+
+        private async void LoadMainWindowContent()
+        {
             try
             {
                 totalData.ProgressRing_IsActive = true;
@@ -261,8 +267,9 @@ namespace BaiduCloudSupport
             }
             catch (Exception ex)
             {
-                LogHelper.WriteLog("MainWindow.MetroWindow_Loaded", ex);
-            }finally
+                LogHelper.WriteLog("MainWindow.LoadMainWindowContent", ex);
+            }
+            finally
             {
                 totalData.ProgressRing_IsActive = false;
             }
@@ -346,25 +353,28 @@ namespace BaiduCloudSupport
                         totalData.Quota_Total = quota[0];
                         totalData.Quota_Used = quota[1];
                     }
-                    SimpleUserInfoStruct userInfo = PCS.SimpleUser(Setting.Baidu_Access_Token);
-                    if (userInfo.uid != 0)
+                    if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
                     {
-                        totalData.uid = userInfo.uid;
-                        totalData.uname = userInfo.uname;
-                        if (!Setting.Baidu_portrait.Equals(userInfo.portrait))
+                        SimpleUserInfoStruct userInfo = PCS.SimpleUser(Setting.Baidu_Access_Token);
+                        if (userInfo.uid != 0)
                         {
-                            string imagePath = Setting.BasePath + @"Images\UserInfo\";
-                            string imageFile = imagePath + userInfo.uid + ".jpg";
-                            if (!Directory.Exists(imagePath))
+                            totalData.uid = userInfo.uid;
+                            totalData.uname = userInfo.uname;
+                            if (!Setting.Baidu_portrait.Equals(userInfo.portrait))
                             {
-                                Directory.CreateDirectory(imagePath);
+                                string imagePath = Setting.BasePath + @"Images\UserInfo\";
+                                string imageFile = imagePath + userInfo.uid + ".jpg";
+                                if (!Directory.Exists(imagePath))
+                                {
+                                    Directory.CreateDirectory(imagePath);
+                                }
+                                WebClient web = new WebClient();
+                                web.DownloadFile(new Uri(PCS.UserSmallPortrait(userInfo.portrait)), imageFile);
+                                totalData.portrait = userInfo.portrait;
+                                Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
+                                LoadUserPortraitFromFile(imageFile);
+                                return true;
                             }
-                            WebClient web = new WebClient();
-                            web.DownloadFile(new Uri(PCS.UserSmallPortrait(userInfo.portrait)), imageFile);
-                            totalData.portrait = userInfo.portrait;
-                            Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
-                            LoadUserPortraitFromFile(imageFile);
-                            return true;
                         }
                     }
                     LoadUserPortraitFromFile(Setting.UserPortraitFilePath == "" ? Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png" : Setting.UserPortraitFilePath);
@@ -603,17 +613,17 @@ namespace BaiduCloudSupport
                     break;
             }
 
-            switch(Setting.APIMode)
-            {
-                case Setting.APIMODE.PCS:
-                    radioButton_PCS.IsChecked = true;
-                    radioButton_BDC.IsChecked = false;
-                    break;
-                case Setting.APIMODE.BDC:
-                    radioButton_PCS.IsChecked = false;
-                    radioButton_BDC.IsChecked = true;
-                    break;
-            }
+            //switch(Setting.APIMode)
+            //{
+            //    case Setting.APIMODE.PCS:
+            //        radioButton_PCS.IsChecked = true;
+            //        radioButton_BDC.IsChecked = false;
+            //        break;
+            //    case Setting.APIMODE.BDC:
+            //        radioButton_PCS.IsChecked = false;
+            //        radioButton_BDC.IsChecked = true;
+            //        break;
+            //}
 
             ToggleFlyout(0);
         }
@@ -733,29 +743,35 @@ namespace BaiduCloudSupport
             wrapPanel_Navigation.Children.Clear();
             string basePath;
             string[] eachFolder;
-            switch (Setting.APIMode)
+            if (path.Equals("/"))
             {
-                case Setting.APIMODE.PCS:
-                    if (path.Replace(PCS.BasePath, "").Equals("/"))
-                    {
-                        return;
-                    }
-                    basePath = PCS.BasePath;
-                    eachFolder = path.Replace(PCS.BasePath, "").Split('/');
-                    break;
-                case Setting.APIMODE.BDC:
-                    if (path.Equals("/"))
-                    {
-                        return;
-                    }
-                    basePath = "/";
-                    eachFolder = path.Split('/');
-                    break;
-                default:
-                    basePath = PCS.BasePath;
-                    eachFolder = path.Replace(PCS.BasePath, "").Split('/');
-                    break;
+                return;
             }
+            basePath = "/";
+            eachFolder = path.Split('/');
+            //switch (Setting.APIMode)
+            //{
+            //    case Setting.APIMODE.PCS:
+            //        if (path.Replace(PCS.BasePath, "").Equals("/"))
+            //        {
+            //            return;
+            //        }
+            //        basePath = PCS.BasePath;
+            //        eachFolder = path.Replace(PCS.BasePath, "").Split('/');
+            //        break;
+            //    case Setting.APIMODE.BDC:
+            //        if (path.Equals("/"))
+            //        {
+            //            return;
+            //        }
+            //        basePath = "/";
+            //        eachFolder = path.Split('/');
+            //        break;
+            //    default:
+            //        basePath = PCS.BasePath;
+            //        eachFolder = path.Replace(PCS.BasePath, "").Split('/');
+            //        break;
+            //}
             //string basePath = PCS.BasePath;
             if (eachFolder == null)
             {
@@ -952,6 +968,11 @@ namespace BaiduCloudSupport
                 }
                 if (item.isdir == 0)
                 {
+                    if (!BDC.CheckCookie())
+                    {
+                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
+                        return;
+                    }
                     totalData.ProgressRing_IsActive = true;
                     //if (!item.path.StartsWith(PCS.BasePath)) return;
                     //if (!await Setting.CheckApiModeAsync(Setting.APIMODE.PCS))
@@ -991,6 +1012,11 @@ namespace BaiduCloudSupport
                         //{
                         //    DownloadFile(item);
                         //}
+                        if (!BDC.CheckCookie())
+                        {
+                            await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
+                            return;
+                        }
                         DownloadFile(item);
                     }
                     else
@@ -1015,6 +1041,11 @@ namespace BaiduCloudSupport
             {
                 if (totalData.FileListDataItems == null)
                 {
+                    return;
+                }
+                if (!BDC.CheckCookie())
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
                     return;
                 }
                 totalData.ProgressRing_IsActive = true;
@@ -1145,6 +1176,11 @@ namespace BaiduCloudSupport
                 string keyword = await this.ShowInputAsync(GlobalLanguage.FindText("MainWindow_Button_SearchFile_Title"), GlobalLanguage.FindText("MainWindow_Button_SearchFile_Message"));
                 if (keyword == null || keyword.Equals(""))
                 {
+                    return;
+                }
+                if (!BDC.CheckCookie())
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
                     return;
                 }
                 FileListStruct[] fileList = await BDC.SearchFile(keyword);
@@ -1296,9 +1332,9 @@ namespace BaiduCloudSupport
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
                     return;
                 }
-                if (!await Setting.CheckApiModeAsync(Setting.APIMODE.BDC))
+                if (!BDC.CheckCookie())
                 {
-                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
                     return;
                 }
                 Window.FolderListWindow FLW = new Window.FolderListWindow(GlobalLanguage.FindText("DataGrid_FileList_ContextMenu_CopyTo"));
@@ -1323,7 +1359,8 @@ namespace BaiduCloudSupport
                     if (await BDC.CopyTo(copyList))
                     {
                         await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("MainWindow_MenuItem_CopyTo_Succeed"));
-                    }else
+                    }
+                    else
                     {
                         await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("MainWindow_MenuItem_CopyTo_Error"));
                     }
@@ -1350,18 +1387,12 @@ namespace BaiduCloudSupport
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
                     return;
                 }
-                if (!await Setting.CheckApiModeAsync(Setting.APIMODE.PCS))
-                {
-                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
-                    return;
-                }
+                List<string> pathList = new List<string>();
                 foreach (FileListDataItem file in dataGrid_FileList.SelectedItems)
                 {
-                    if (file.path.StartsWith(PCS.BasePath))
-                    {
-                        await PCS.DeleteSingleFile(file.path);
-                    }
+                    pathList.Add(file.path);
                 }
+                await BDC.DeleteAsync(pathList.ToArray());
                 await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("MainWindow_MenuItem_Delete_Succeed"));
                 TransferPage(totalData.PageNowLoaded);
             }
@@ -1386,9 +1417,9 @@ namespace BaiduCloudSupport
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
                     return;
                 }
-                if (!await Setting.CheckApiModeAsync(Setting.APIMODE.BDC))
+                if (!BDC.CheckCookie())
                 {
-                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
                     return;
                 }
                 Window.FolderListWindow FLW = new Window.FolderListWindow(GlobalLanguage.FindText("DataGrid_FileList_ContextMenu_MoveTo"));
@@ -1413,6 +1444,12 @@ namespace BaiduCloudSupport
                     if (await BDC.MoveTo(copyList))
                     {
                         await this.ShowMessageAsync(GlobalLanguage.FindText("CommonMessage_Result"), GlobalLanguage.FindText("MainWindow_MenuItem_MoveTo_Succeed"));
+                        var folderResult = await LoadFolder(totalData.PageNowLoaded);
+                        if (folderResult == null)
+                        {
+                            await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                        }
+                        totalData.FileListDataItems = folderResult;
                     }
                     else
                     {
@@ -1436,9 +1473,9 @@ namespace BaiduCloudSupport
 
         private async void MenuItem_Share_Click(object sender, RoutedEventArgs e)
         {
-            if (!await Setting.CheckApiModeAsync(Setting.APIMODE.BDC))
+            if (!BDC.CheckCookie())
             {
-                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
+                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
                 return;
             }
             Window.GenerateShareLinkWindow GSLW = new Window.GenerateShareLinkWindow(((FileListDataItem)dataGrid_FileList.SelectedItem).fs_id);
@@ -1451,9 +1488,9 @@ namespace BaiduCloudSupport
         {
             try
             {
-                if (!await Setting.CheckApiModeAsync(Setting.APIMODE.BDC))
+                if (!BDC.CheckCookie())
                 {
-                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_ChangeApiMode_FailMessage"));
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
                     return;
                 }
                 var shareLink = await this.ShowInputAsync(GlobalLanguage.FindText("MainWindow_Button_TransforLink_Title"), GlobalLanguage.FindText("MainWindow_Button_TransforLink_Message"));

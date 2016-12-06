@@ -127,29 +127,35 @@ namespace BaiduCloudSupport.Window
             wrapPanel_Navigation.Children.Clear();
             string basePath;
             string[] eachFolder;
-            switch (Setting.APIMode)
+            if (path.Equals("/"))
             {
-                case Setting.APIMODE.PCS:
-                    if (path.Replace(PCS.BasePath, "").Equals("/"))
-                    {
-                        return;
-                    }
-                    basePath = PCS.BasePath;
-                    eachFolder = path.Replace(PCS.BasePath, "").Split('/');
-                    break;
-                case Setting.APIMODE.BDC:
-                    if (path.Equals("/"))
-                    {
-                        return;
-                    }
-                    basePath = "/";
-                    eachFolder = path.Split('/');
-                    break;
-                default:
-                    basePath = PCS.BasePath;
-                    eachFolder = path.Replace(PCS.BasePath, "").Split('/');
-                    break;
+                return;
             }
+            basePath = "/";
+            eachFolder = path.Split('/');
+            //switch (Setting.APIMode)
+            //{
+            //    case Setting.APIMODE.PCS:
+            //        if (path.Replace(PCS.BasePath, "").Equals("/"))
+            //        {
+            //            return;
+            //        }
+            //        basePath = PCS.BasePath;
+            //        eachFolder = path.Replace(PCS.BasePath, "").Split('/');
+            //        break;
+            //    case Setting.APIMODE.BDC:
+            //        if (path.Equals("/"))
+            //        {
+            //            return;
+            //        }
+            //        basePath = "/";
+            //        eachFolder = path.Split('/');
+            //        break;
+            //    default:
+            //        basePath = PCS.BasePath;
+            //        eachFolder = path.Replace(PCS.BasePath, "").Split('/');
+            //        break;
+            //}
             //string basePath = PCS.BasePath;
             if (eachFolder == null)
             {

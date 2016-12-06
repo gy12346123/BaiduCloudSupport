@@ -109,4 +109,5 @@
     <sys:String x:Key="CommonMessage_Exception">System get exception message but we haven't handle it.</sys:String>
     <sys:String x:Key="MainWindow_Button_TransferLink_ToolTip">Transfer file or folder in PCS root folder with share link, and get DownloadURL.</sys:String>
     <sys:String x:Key="MainWindow_ChangeApiMode_FailMessage">Change api mode failed, please login your account, and try again.</sys:String>
+    <sys:String x:Key="CommonMessage_NeedLogin">Please login first.</sys:String>
 </ResourceDictionary>

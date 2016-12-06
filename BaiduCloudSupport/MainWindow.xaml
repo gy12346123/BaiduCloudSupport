@@ -74,11 +74,11 @@
                             Width="120"
                             VerticalAlignment="Center" 
                             SelectionChanged="splitButton_Setting_Language_SelectionChanged" />
-                        <TextBlock Text="{StaticResource Flyout_Setting_APIMode}" FontSize="20" FontWeight="Bold" Margin="10" />
+                        <!--<TextBlock Text="{StaticResource Flyout_Setting_APIMode}" FontSize="20" FontWeight="Bold" Margin="10" />
                         <WrapPanel Margin="100,0,0,0">
                             <RadioButton Name="radioButton_PCS" GroupName="apimode" Content="{StaticResource Flyout_Setting_RadioButton_APIMode_PCS}" IsChecked="True" Checked="radioButton_PCS_Checked" />
                             <RadioButton Name="radioButton_BDC" GroupName="apimode" Content="{StaticResource Flyout_Setting_RadioButton_APIMode_BDC}" Margin="100,0,0,0" Checked="radioButton_BDC_Checked" />
-                        </WrapPanel>
+                        </WrapPanel>-->
                         <TextBlock Text="{StaticResource Flyout_Setting_DownloadPath}" FontSize="20" FontWeight="Bold" Margin="10" />
                         <WrapPanel Margin="70,0,0,0">
                             <TextBox Width="200" Text="{Binding DownloadDefaultFolderPath}" IsReadOnly="True" />

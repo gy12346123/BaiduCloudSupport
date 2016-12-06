@@ -346,7 +346,9 @@ namespace BaiduCloudSupport.API
                     Host = "pan.baidu.com",
                     Cookie = Cookies,
                     Postdata = "filelist=" + Other.Tools.URLEncoding(SB.ToString(), Encoding.UTF8),
-                    PostEncoding = Encoding.UTF8
+                    Accept = " application/json, text/javascript, */*; q=0.01",
+                    PostEncoding = Encoding.UTF8,
+                    ContentType = "application/x-www-form-urlencoded; charset=UTF-8",
                 };
                 string result = http.GetHtml(item).Html;
                 if (result.Contains("errno\":0"))
@@ -498,7 +500,7 @@ namespace BaiduCloudSupport.API
                     ProtocolVersion = new Version(1,1),
                     KeepAlive = true
                 };
-                string result_Transfer = new HttpHelper().GetHtml(item_Transfer).Html;
+                string result_Transfer = http.GetHtml(item_Transfer).Html;
 
                 if (result_Transfer.Contains("errno\":0"))
                 {
@@ -587,6 +589,57 @@ namespace BaiduCloudSupport.API
         {
             return Task.Factory.StartNew(()=> {
                 return Quota();
+            });
+        }
+
+        public static bool Delete(string[] path)
+        {
+            if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+            if (bdstoken == null || bdstoken.Equals(""))
+            {
+                if (!GetParamFromHtml())
+                {
+                    throw new Exception("Get param from html error.");
+                }
+            }
+            StringBuilder SB = new StringBuilder();
+            SB.Append("[");
+            foreach (string p in path)
+            {
+                SB.Append(string.Format("\"{0}\",", p));
+            }
+            SB.Remove(SB.Length - 1, 1);
+            SB.Append("]");
+            string[] param = path[0].Split('/');
+            string GetOnePath = path[0].Replace("/" + param[param.Count() - 1], "");
+            HttpHelper http = new HttpHelper();
+            HttpItem item = new HttpItem()
+            {
+                URL = string.Format("{0}filemanager?opera=delete&async=2&channel=chunlei&web=1&app_id=250528&bdstoken={1}&clienttype=0", BDCBaseURL, bdstoken),
+                Method = "POST",
+                Timeout = BDC.Timeout,
+                Referer = "http://pan.baidu.com/disk/home#list/vmode=list&path=" + Other.Tools.URLEncoding(GetOnePath, Encoding.UTF8),
+                Host = "pan.baidu.com",
+                Cookie = Cookies,
+                Postdata = "filelist=" + Other.Tools.URLEncoding(SB.ToString(), Encoding.UTF8),
+                PostEncoding = Encoding.UTF8,
+                ContentType = "application/x-www-form-urlencoded; charset=UTF-8"
+            };
+            string result = http.GetHtml(item).Html;
+            if (result.Contains("errno\":0"))
+            {
+                return true;
+            }
+            else
+            {
+                throw new ErrorCodeException();
+            }
+        }
+
+        public static Task<bool> DeleteAsync(string[] path)
+        {
+            return Task.Factory.StartNew(()=> {
+                return Delete(path);
             });
         }
 

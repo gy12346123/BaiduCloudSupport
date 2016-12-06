@@ -109,4 +109,5 @@
     <sys:String x:Key="CommonMessage_Exception">系统报错，但我们尚未处理这个错误信息。</sys:String>
     <sys:String x:Key="MainWindow_Button_TransferLink_ToolTip">分享链接直接获取下载链接。将分享链接中的文件保存至PCS根目录下并获取其下载链接。</sys:String>
     <sys:String x:Key="MainWindow_ChangeApiMode_FailMessage">切换API模式失败，请重新登录您的账号重试。</sys:String>
+    <sys:String x:Key="CommonMessage_NeedLogin">请先登录。</sys:String>
 </ResourceDictionary>
