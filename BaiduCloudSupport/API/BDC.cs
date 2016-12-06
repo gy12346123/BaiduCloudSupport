@@ -300,7 +300,9 @@ namespace BaiduCloudSupport.API
                     Host = "pan.baidu.com",
                     Cookie = Cookies,
                     Postdata = "filelist=" + Other.Tools.URLEncoding(SB.ToString(), Encoding.UTF8),
-                    PostEncoding = Encoding.UTF8
+                    Accept = " application/json, text/javascript, */*; q=0.01",
+                    PostEncoding = Encoding.UTF8,
+                    ContentType = "application/x-www-form-urlencoded; charset=UTF-8",
                 };
                 string result = http.GetHtml(item).Html;
                 if (result.Contains("errno\":0"))
@@ -433,9 +435,11 @@ namespace BaiduCloudSupport.API
                     Timeout = BDC.Timeout,
                     Referer = shareLink,
                     Host = "pan.baidu.com",
+                    Accept = "*/*",
                     Cookie = Cookies
                 };
                 string result = http.GetHtml(item).Html;
+                //string cookie = http.GetHtml(item).Cookie;
                 Match match_ShareId = Regex.Match(result, "shareid\":[0-9]{1,}(?=,)");
                 if (!match_ShareId.Success)
                 {
@@ -480,7 +484,7 @@ namespace BaiduCloudSupport.API
                 SB.Append(Other.Tools.URLEncoding(toFolder, Encoding.UTF8));
                 HttpItem item_Transfer = new HttpItem()
                 {
-                    URL = string.Format("{0}transfer?shareid={1}&from={2}&bdstoken={3}&channel=chunlei&clienttype=0&web=1&app_id=250528", BDCShareURL, shareid, fromuserid, bdstoken),
+                    URL = string.Format("{0}transfer?shareid={1}&from={2}&ondup=newcopy&async=1&bdstoken={3}&channel=chunlei&clienttype=0&web=1&app_id=250528", BDCShareURL, shareid, fromuserid, bdstoken),
                     Method = "POST",
                     Encoding = Encoding.UTF8,
                     Timeout = BDC.Timeout,
@@ -489,9 +493,12 @@ namespace BaiduCloudSupport.API
                     Cookie = Cookies,
                     Postdata = SB.ToString(),
                     PostEncoding = Encoding.UTF8,
-                    ContentType = "application/x-www-form-urlencoded; charset=UTF-8"
+                    ContentType = "application/x-www-form-urlencoded; charset=UTF-8",
+                    Accept = "*/*",
+                    ProtocolVersion = new Version(1,1),
+                    KeepAlive = true
                 };
-                string result_Transfer = http.GetHtml(item_Transfer).Html;
+                string result_Transfer = new HttpHelper().GetHtml(item_Transfer).Html;
 
                 if (result_Transfer.Contains("errno\":0"))
                 {

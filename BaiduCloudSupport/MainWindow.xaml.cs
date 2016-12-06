@@ -124,12 +124,12 @@ namespace BaiduCloudSupport
                         });
                         await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_AutoLoginFailed"));
                     }
-                    var floderResult = await LoadFolder("");
-                    if (floderResult == null)
-                    {
-                        await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
-                    }
-                    totalData.FileListDataItems = floderResult;
+                    //var floderResult = await LoadFolder("");
+                    //if (floderResult == null)
+                    //{
+                    //    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_LoadFolderInfoFailed"));
+                    //}
+                    //totalData.FileListDataItems = floderResult;
                 }
                 else
                 {
@@ -346,35 +346,29 @@ namespace BaiduCloudSupport
                         totalData.Quota_Total = quota[0];
                         totalData.Quota_Used = quota[1];
                     }
-                    else
+                    SimpleUserInfoStruct userInfo = PCS.SimpleUser(Setting.Baidu_Access_Token);
+                    if (userInfo.uid != 0)
                     {
-                        return false;
+                        totalData.uid = userInfo.uid;
+                        totalData.uname = userInfo.uname;
+                        if (!Setting.Baidu_portrait.Equals(userInfo.portrait))
+                        {
+                            string imagePath = Setting.BasePath + @"Images\UserInfo\";
+                            string imageFile = imagePath + userInfo.uid + ".jpg";
+                            if (!Directory.Exists(imagePath))
+                            {
+                                Directory.CreateDirectory(imagePath);
+                            }
+                            WebClient web = new WebClient();
+                            web.DownloadFile(new Uri(PCS.UserSmallPortrait(userInfo.portrait)), imageFile);
+                            totalData.portrait = userInfo.portrait;
+                            Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
+                            LoadUserPortraitFromFile(imageFile);
+                            return true;
+                        }
                     }
-                    //SimpleUserInfoStruct userInfo = PCS.SimpleUser();
-                    //if (userInfo.uid != 0)
-                    //{
-                    //    totalData.uid = userInfo.uid;
-                    //    totalData.uname = userInfo.uname;
-                    //    if (!Setting.Baidu_portrait.Equals(userInfo.portrait))
-                    //    {
-                    //        string imagePath = Setting.BasePath + @"Images\UserInfo\";
-                    //        string imageFile = imagePath + userInfo.uid + ".jpg";
-                    //        if (!Directory.Exists(imagePath))
-                    //        {
-                    //            Directory.CreateDirectory(imagePath);
-                    //        }
-                    //        WebClient web = new WebClient();
-                    //        web.DownloadFile(new Uri(PCS.UserSmallPortrait(userInfo.portrait)), imageFile);
-                    //        totalData.portrait = userInfo.portrait;
-                    //        Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
-                    //        LoadUserPortraitFromFile(imageFile);
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    return false;
-                    //}
-                    return true;
+                    LoadUserPortraitFromFile(Setting.UserPortraitFilePath == "" ? Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png" : Setting.UserPortraitFilePath);
+                    return false;
                 }
                 catch (Exception ex)
                 {
@@ -391,19 +385,7 @@ namespace BaiduCloudSupport
                 {
                     path = "/";
                 }
-                FileListStruct[] fileListStruct;
-                switch (Setting.APIMode)
-                {
-                    case Setting.APIMODE.PCS:
-                        fileListStruct = PCS.SingleFloder(path);
-                        break;
-                    case Setting.APIMODE.BDC:
-                        fileListStruct = BDC.SingleFolder(path, page);
-                        break;
-                    default:
-                        fileListStruct = PCS.SingleFloder(path);
-                        break;
-                }
+                FileListStruct[] fileListStruct = BDC.SingleFolder(path, page);
                 return FileListStruct2FileListDataItem(ref fileListStruct);
             });
         }
@@ -843,7 +825,7 @@ namespace BaiduCloudSupport
                 {
                     // File too big
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_FileTooBig"));
-                    string url = await PCS.DownloadURL(Setting.Baidu_Access_Token, item.path);
+                    string url = await BDC.DownloadURLAsync(item.path);
                     Clipboard.SetText(url);
                 }
                 else
@@ -1165,19 +1147,7 @@ namespace BaiduCloudSupport
                 {
                     return;
                 }
-                FileListStruct[] fileList;
-                switch (Setting.APIMode)
-                {
-                    case Setting.APIMODE.PCS:
-                        fileList = await PCS.SearchFile("/", keyword);
-                        break;
-                    case Setting.APIMODE.BDC:
-                        fileList = await BDC.SearchFile(keyword);
-                        break;
-                    default:
-                        fileList = await PCS.SearchFile("/", keyword);
-                        break;
-                }
+                FileListStruct[] fileList = await BDC.SearchFile(keyword);
 
                 var floderResult = FileListStruct2FileListDataItem(ref fileList);
                 if (floderResult == null)

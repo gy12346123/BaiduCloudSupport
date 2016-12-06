@@ -111,7 +111,6 @@ namespace BaiduCloudSupport.API
         /// </summary>
         /// <param name="access_token">Baidu access token</param>
         /// <returns>SimpleUserInfoStruct</returns>
-        [Obsolete]
         public static SimpleUserInfoStruct SimpleUser(string access_token)
         {
             try
@@ -151,7 +150,6 @@ namespace BaiduCloudSupport.API
         /// Get user simple info with default access_token in App.config
         /// </summary>
         /// <returns>SimpleUserInfoStruct</returns>
-        [Obsolete]
         public static SimpleUserInfoStruct SimpleUser()
         {
             return SimpleUser(Setting.Baidu_Access_Token);
