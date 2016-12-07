@@ -43,7 +43,9 @@ namespace BaiduCloudSupport.API
         /// </summary>
         private static int Timeout = 30000;
 
-        private static bool ForFirst = true;
+        public static bool RegisterForFirst = true;
+
+        private static object _registerLock = new object();
 
         /// <summary>
         /// Set http Get or Post timeout value
@@ -431,25 +433,24 @@ namespace BaiduCloudSupport.API
             });
         }
 
-        /// <summary>
-        /// Download file use multi segments
-        /// </summary>
-        /// <param name="fs_id">fs_id</param>
-        /// <param name="remoteFile">Download URL</param>
-        /// <param name="localFile">Local save path</param>
-        /// <param name="remotePath">path</param>
-        public static void DownloadFileSegment(ulong fs_id, string remoteFile, string localFile, string remotePath = null)
+        public static void Init()
         {
-            // For first register protocol
-            if (ForFirst)
+            lock(_registerLock)
             {
-                ForFirst = false;
-                ProtocolProviderFactory.RegisterProtocolHandler("http", typeof(MyDownloader.Extension.Protocols.HttpProtocolProvider));
-                ProtocolProviderFactory.RegisterProtocolHandler("https", typeof(MyDownloader.Extension.Protocols.HttpProtocolProvider));
-                ProtocolProviderFactory.RegisterProtocolHandler("ftp", typeof(MyDownloader.Extension.Protocols.FtpProtocolProvider));
-                new HttpFtpProtocolExtension();
+                // For first register protocol
+                if (RegisterForFirst)
+                {
+                    RegisterForFirst = false;
+                    ProtocolProviderFactory.RegisterProtocolHandler("http", typeof(MyDownloader.Extension.Protocols.HttpProtocolProvider));
+                    ProtocolProviderFactory.RegisterProtocolHandler("https", typeof(MyDownloader.Extension.Protocols.HttpProtocolProvider));
+                    ProtocolProviderFactory.RegisterProtocolHandler("ftp", typeof(MyDownloader.Extension.Protocols.FtpProtocolProvider));
+                    new HttpFtpProtocolExtension();
+                }
             }
+        }
 
+        public static void DownloadManagerEvent()
+        {
             // Download item added event
             DownloadManager.Instance.DownloadAdded += (object sender, DownloaderEventArgs e) =>
             {
@@ -464,6 +465,60 @@ namespace BaiduCloudSupport.API
                 MainWindow.totalData.TotalDownload = DownloadManager.Instance.Downloads.Count();
                 GetDownloadInfo();
             };
+        }
+
+        public static void DownloaderEvent(ref Downloader downloader)
+        {
+            // Downloader info received event
+            downloader.InfoReceived += (object sender, EventArgs e) =>
+            {
+                ((Downloader)sender).ReGenerateURL = true;
+                MainWindow.DownloadListChangeItems(((Downloader)sender).fs_id, ((Downloader)sender).FileSize / 1048576L, 0L, 0d, 0d);
+            };
+            // Downloader ending event
+            downloader.Ending += (object sender, EventArgs e) =>
+            {
+                MainWindow.DownloadListChangeItems(((Downloader)sender).fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, 100d, 0d);
+            };
+            // Downloader data received event
+            downloader.DataReceived += (object sender, DownloaderEventArgs e) => {
+                if (e.Downloader.Progress - e.Downloader.PreProgress > 1d)
+                {
+                    MainWindow.DownloadListChangeItems(e.Downloader.fs_id, e.Downloader.FileSize / 1048576L, e.Downloader.Transfered / 1048576L, Math.Round(e.Downloader.Progress, 1), Math.Round(e.Downloader.Rate / 1000d, 1));
+                    e.Downloader.PreProgress = e.Downloader.Progress;
+                    GetDownloadInfo();
+                }
+            };
+            // Downloader state changed event
+            downloader.StateChanged += (object sender, EventArgs e) => {
+                MainWindow.DownloadListChangeItems(((Downloader)sender).fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, Math.Round(((Downloader)sender).Progress, 1), Math.Round(((Downloader)sender).Rate / 1000d, 1));
+            };
+            // Downloader segment failed event
+            downloader.SegmentFailed += async (object sender, SegmentEventArgs e) =>
+            {
+                if (((Downloader)sender).ReGenerateURL)
+                {
+                    ((Downloader)sender).ReGenerateURL = false;
+                    e.Downloader.ResourceLocation = ResourceLocation.FromURL(await BDC.DownloadURLAsync(((Downloader)sender).BaiduCloudPath));
+                    ResourceLocation[] mirrors = new ResourceLocation[2] { ResourceLocation.FromURL(await BDC.DownloadURLAsync(((Downloader)sender).BaiduCloudPath)) ,
+                        ResourceLocation.FromURL(await BDC.DownloadURLAsync(((Downloader)sender).BaiduCloudPath)) };
+                    e.Downloader.Mirrors = mirrors.ToList();
+                }
+            };
+        }
+
+        /// <summary>
+        /// Download file use multi segments
+        /// </summary>
+        /// <param name="fs_id">fs_id</param>
+        /// <param name="remoteFile">Download URL</param>
+        /// <param name="localFile">Local save path</param>
+        /// <param name="remotePath">path</param>
+        public static void DownloadFileSegment(ulong fs_id, string remoteFile, string localFile, string remotePath = null)
+        {
+
+            Init();
+
             // If remoteFile not a url, get the download url
             string URL;
             if (remoteFile.Contains("http://") || remoteFile.Contains("https://"))
@@ -481,44 +536,47 @@ namespace BaiduCloudSupport.API
                 Convert.ToInt32(Setting.DownloadSegment),
                 true,
                 fs_id);
-            double lastProgress = 0d;
-            bool forOnce = true;
-            // Downloader info received event
-            downloader.InfoReceived += (object sender, EventArgs e) =>
-            {
-                forOnce = true;
-                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, 0L, 0d, 0d);
-            };
-            // Downloader ending event
-            downloader.Ending += (object sender, EventArgs e) =>
-            {
-                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, 100d, 0d);
-            };
-            // Downloader data received event
-            downloader.DataReceived += (object sender, DownloaderEventArgs e) => {
-                if (e.Downloader.Progress - lastProgress > 1d)
-                {
-                    MainWindow.DownloadListChangeItems(fs_id, e.Downloader.FileSize / 1048576L, e.Downloader.Transfered / 1048576L, Math.Round(e.Downloader.Progress, 1), Math.Round(e.Downloader.Rate / 1000d, 1));
-                    lastProgress = e.Downloader.Progress;
-                    GetDownloadInfo();
-                }
-            };
-            // Downloader state changed event
-            downloader.StateChanged += (object sender, EventArgs e) => {
-                MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, Math.Round(((Downloader)sender).Progress, 1), Math.Round(((Downloader)sender).Rate / 1000d, 1));
-            };
-            // Downloader segment failed event
-            downloader.SegmentFailed += async(object sender, SegmentEventArgs e) =>
-            {
-                if (forOnce)
-                {
-                    forOnce = false;
-                    e.Downloader.ResourceLocation = ResourceLocation.FromURL(await BDC.DownloadURLAsync(remotePath));
-                    ResourceLocation[] mirrors = new ResourceLocation[2] { ResourceLocation.FromURL(await BDC.DownloadURLAsync(remotePath)) ,
-                        ResourceLocation.FromURL(await BDC.DownloadURLAsync(remotePath)) };
-                    e.Downloader.Mirrors = mirrors.ToList();
-                }
-            };
+            downloader.BaiduCloudPath = remotePath;
+            DownloaderEvent(ref downloader);
+
+            //double lastProgress = 0d;
+            //bool forOnce = true;
+            //// Downloader info received event
+            //downloader.InfoReceived += (object sender, EventArgs e) =>
+            //{
+            //    forOnce = true;
+            //    MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, 0L, 0d, 0d);
+            //};
+            //// Downloader ending event
+            //downloader.Ending += (object sender, EventArgs e) =>
+            //{
+            //    MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, 100d, 0d);
+            //};
+            //// Downloader data received event
+            //downloader.DataReceived += (object sender, DownloaderEventArgs e) => {
+            //    if (e.Downloader.Progress - lastProgress > 1d)
+            //    {
+            //        MainWindow.DownloadListChangeItems(fs_id, e.Downloader.FileSize / 1048576L, e.Downloader.Transfered / 1048576L, Math.Round(e.Downloader.Progress, 1), Math.Round(e.Downloader.Rate / 1000d, 1));
+            //        lastProgress = e.Downloader.Progress;
+            //        GetDownloadInfo();
+            //    }
+            //};
+            //// Downloader state changed event
+            //downloader.StateChanged += (object sender, EventArgs e) => {
+            //    MainWindow.DownloadListChangeItems(fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, Math.Round(((Downloader)sender).Progress, 1), Math.Round(((Downloader)sender).Rate / 1000d, 1));
+            //};
+            //// Downloader segment failed event
+            //downloader.SegmentFailed += async(object sender, SegmentEventArgs e) =>
+            //{
+            //    if (forOnce)
+            //    {
+            //        forOnce = false;
+            //        e.Downloader.ResourceLocation = ResourceLocation.FromURL(await BDC.DownloadURLAsync(remotePath));
+            //        ResourceLocation[] mirrors = new ResourceLocation[2] { ResourceLocation.FromURL(await BDC.DownloadURLAsync(remotePath)) ,
+            //            ResourceLocation.FromURL(await BDC.DownloadURLAsync(remotePath)) };
+            //        e.Downloader.Mirrors = mirrors.ToList();
+            //    }
+            //};
         }
 
         private static void GetDownloadInfo()

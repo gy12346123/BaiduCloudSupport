@@ -35,6 +35,11 @@ namespace MyDownloader.Extension.PersistedList
             public SegmentItem[] Segments;
 
             public SerializableDictionary<string, object> extendedProperties;
+
+            [XmlAttribute("fs_id")]
+            public ulong fs_id;
+
+            public string BaiduCloudPath;
         }
 
         [Serializable]
@@ -120,6 +125,8 @@ namespace MyDownloader.Extension.PersistedList
                     di.requestedSegments = downloader.RequestedSegments;
                     di.createdDateTime = downloader.CreatedDateTime;
                     di.extendedProperties = new SerializableDictionary<string,object>(downloader.ExtendedProperties);
+                    di.fs_id = downloader.fs_id;
+                    di.BaiduCloudPath = downloader.BaiduCloudPath;
 
                     using (downloader.LockSegments())
                     {
@@ -148,8 +155,12 @@ namespace MyDownloader.Extension.PersistedList
 
         private string GetDatabaseFile()
         {
-            string file = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\" + "downloads.xml";
-            return file;
+            string path = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Download\\";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            return path + "downloads.xml";
         }
 
         private void LoadSavedList()
@@ -215,8 +226,10 @@ namespace MyDownloader.Extension.PersistedList
                     downloads[i].remoteInfo,
                     downloads[i].requestedSegments,
                     false,
-                    downloads[i].createdDateTime);
+                    downloads[i].createdDateTime,
+                    downloads[i].fs_id);
 
+                d.BaiduCloudPath = downloads[i].BaiduCloudPath;
                 if (downloads[i].extendedProperties != null)
                 {
                     SerializableDictionary<string, object>.Enumerator e = downloads[i].extendedProperties.GetEnumerator();

@@ -67,6 +67,8 @@ namespace BaiduCloudSupport
 
         private System.Windows.Forms.NotifyIcon notifyIcon;
 
+        private MyDownloader.Extension.PersistedList.PersistedListExtension persistedListExtension;
+
         public MainWindow()
         {
             // Set default Language
@@ -191,6 +193,8 @@ namespace BaiduCloudSupport
             grid_Main.DataContext = totalData;
             flyoutsControl.DataContext = totalData;
             LoadMainWindowContent();
+            persistedListExtension = new MyDownloader.Extension.PersistedList.PersistedListExtension();
+            InitDownloadList();
         }
 
         private async void LoadMainWindowContent()
@@ -279,6 +283,7 @@ namespace BaiduCloudSupport
         private void MetroWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             removeIcon();
+            persistedListExtension.Dispose();
         }
 
         private void startIcon()
@@ -813,7 +818,9 @@ namespace BaiduCloudSupport
                     percentage = 0d,
                     rate = 0d,
                     startTime = DateTime.Now,
-                    isSelected = false
+                    isSelected = false,
+                    state = DownloaderState.NeedToPrepare,
+                    Left = TimeSpan.Zero
                 };
 
                 if (totalData.DownloadListDataItems != null && totalData.DownloadListDataItems.Count() != 0)
@@ -913,7 +920,9 @@ namespace BaiduCloudSupport
                     percentage = file.percentage,
                     rate = file.rate,
                     startTime = file.startTime,
-                    isSelected = file.isSelected
+                    isSelected = file.isSelected,
+                    Left = file.Left,
+                    state = file.state
                 });
             }
             newList.Add(dataItem);
@@ -937,12 +946,45 @@ namespace BaiduCloudSupport
                             percentage = percentage,
                             rate = rate,
                             startTime = file.startTime,
-                            isSelected = file.isSelected
+                            isSelected = file.isSelected,
+                            Left = file.Left,
+                            state = file.state
                         });
                     }else
                     {
                         newList.Add(file);
                     }
+                }
+                totalData.DownloadListDataItems = newList;
+            }
+        }
+
+        private void InitDownloadList()
+        {
+            PCS.DownloadManagerEvent();
+            if (DownloadManager.Instance.Downloads.Count() > 0)
+            {
+                PCS.Init();
+                List<DownloadListDataItem> newList = new List<DownloadListDataItem>();
+                foreach (var downloader in DownloadManager.Instance.Downloads)
+                {
+                    newList.Add(new DownloadListDataItem {
+                        fs_id = downloader.fs_id,
+                        file = System.IO.Path.GetFileName(downloader.LocalFile),
+                        size = downloader.FileSize / 1048576L,
+                        received = downloader.Transfered / 1048576L,
+                        percentage = Math.Round(downloader.Progress, 1),
+                        rate = 0d,
+                        startTime = downloader.CreatedDateTime,
+                        isSelected = false,
+                        Left = downloader.Left,
+                        state = downloader.State
+                    });
+                }
+                var list = DownloadManager.Instance.Downloads.ToArray();
+                for (int i = 0; i < list.Count(); i++)
+                {
+                    PCS.DownloaderEvent(ref list[i]);
                 }
                 totalData.DownloadListDataItems = newList;
             }

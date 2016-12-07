@@ -181,6 +181,14 @@ namespace MyDownloader.Core
             return d;
         }
 
+        public Downloader Add(ResourceLocation rl, ResourceLocation[] mirrors, string localFile, List<Segment> segments, RemoteFileInfo remoteInfo, int requestedSegmentCount, bool autoStart, DateTime createdDateTime, ulong fs_id)
+        {
+            Downloader d = new Downloader(rl, mirrors, localFile, segments, remoteInfo, requestedSegmentCount, createdDateTime, fs_id);
+            Add(d, autoStart);
+
+            return d;
+        }
+
         public void Add(Downloader downloader, bool autoStart)
         {
             downloader.StateChanged += new EventHandler(downloader_StateChanged);

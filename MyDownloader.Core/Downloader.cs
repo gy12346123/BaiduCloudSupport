@@ -33,6 +33,9 @@ namespace MyDownloader.Core
         private string statusMessage;
 
         private ulong _fs_id;
+        private string _BaiduCloudPath;
+        private bool _ReGenerateURL = true;
+        private double _PreProgress;
 
         private Downloader(
             ResourceLocation rl,
@@ -96,6 +99,33 @@ namespace MyDownloader.Core
             this.remoteFileInfo = remoteInfo;
             this.requestedSegmentCount = requestedSegmentCount;
             this.segments = segments;
+        }
+
+        public Downloader(
+            ResourceLocation rl,
+            ResourceLocation[] mirrors,
+            string localFile,
+            List<Segment> segments,
+            RemoteFileInfo remoteInfo,
+            int requestedSegmentCount,
+            DateTime createdDateTime,
+            ulong fs_id) :
+            this(rl, mirrors, localFile)
+        {
+            if (segments.Count > 0)
+            {
+                SetState(DownloaderState.Prepared);
+            }
+            else
+            {
+                SetState(DownloaderState.NeedToPrepare);
+            }
+
+            this.createdDateTime = createdDateTime;
+            this.remoteFileInfo = remoteInfo;
+            this.requestedSegmentCount = requestedSegmentCount;
+            this.segments = segments;
+            this._fs_id = fs_id;
         }
 
         public Downloader(
@@ -350,6 +380,42 @@ namespace MyDownloader.Core
         public ulong fs_id
         {
             get { return _fs_id; }
+        }
+
+        public string BaiduCloudPath
+        {
+            get { return _BaiduCloudPath; }
+            set
+            {
+                if (_BaiduCloudPath != value)
+                {
+                    _BaiduCloudPath = value;
+                }
+            }
+        }
+
+        public bool ReGenerateURL
+        {
+            get { return _ReGenerateURL; }
+            set
+            {
+                if (_ReGenerateURL != value)
+                {
+                    _ReGenerateURL = value;
+                }
+            }
+        }
+
+        public double PreProgress
+        {
+            get { return _PreProgress; }
+            set
+            {
+                if (_PreProgress != value)
+                {
+                    _PreProgress = value;
+                }
+            }
         }
 
         #endregion
