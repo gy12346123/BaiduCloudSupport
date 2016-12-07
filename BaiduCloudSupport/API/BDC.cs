@@ -18,8 +18,14 @@ namespace BaiduCloudSupport.API
         /// </summary>
         private static string BDCBaseURL = "http://pan.baidu.com/api/";
 
+        /// <summary>
+        /// Baidu cloud share base URL
+        /// </summary>
         private static string BDCShareURL = "http://pan.baidu.com/share/";
 
+        /// <summary>
+        /// Baidu cloud download base URL
+        /// </summary>
         private static string BDCDownloadBaseURL = "http://d.pcs.baidu.com/rest/2.0/pcs/";
 
         /// <summary>
@@ -36,10 +42,19 @@ namespace BaiduCloudSupport.API
             Timeout = time;
         }
 
+        /// <summary>
+        /// Order by
+        /// </summary>
         public enum Order { name, time, size };
 
+        /// <summary>
+        /// Baidu cloud cookies
+        /// </summary>
         private static string Cookies;
 
+        /// <summary>
+        /// bdstoken
+        /// </summary>
         private static string bdstoken;
 
         private static string ConvertFileName(string file)
@@ -73,6 +88,11 @@ namespace BaiduCloudSupport.API
             return convertedPath;
         }
 
+        /// <summary>
+        /// Load cookies from local file
+        /// </summary>
+        /// <param name="path">Local path</param>
+        /// <param name="overwrite">Need overwrite</param>
         public static void LoadCookie(string path, bool overwrite = false)
         {
             if (Cookies == null || Cookies.Equals("") || overwrite)
@@ -90,6 +110,12 @@ namespace BaiduCloudSupport.API
             }
         }
 
+        /// <summary>
+        /// Async load cookies form local file
+        /// </summary>
+        /// <param name="path">Local path</param>
+        /// <param name="overwrite">Need overwrite</param>
+        /// <returns></returns>
         public static Task LoadCookieAsync(string path, bool overwrite = false)
         {
             return Task.Factory.StartNew(()=> {
@@ -97,6 +123,10 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        /// <summary>
+        /// Check cookie
+        /// </summary>
+        /// <returns></returns>
         public static bool CheckCookie()
         {
             if (Cookies == null || Cookies.Equals(""))
@@ -106,6 +136,11 @@ namespace BaiduCloudSupport.API
             return true;
         }
 
+        /// <summary>
+        /// Check cookie file exist
+        /// </summary>
+        /// <param name="path">Local path</param>
+        /// <returns></returns>
         public static bool IsCookieFileExist(string path)
         {
             if (File.Exists(path))
@@ -115,6 +150,15 @@ namespace BaiduCloudSupport.API
             return false;
         }
 
+        /// <summary>
+        /// Load single folder info
+        /// </summary>
+        /// <param name="path">Remote path</param>
+        /// <param name="page">Show page</param>
+        /// <param name="maxNum">Max item number in one page</param>
+        /// <param name="desc">Descent</param>
+        /// <param name="order">Order</param>
+        /// <returns>FileListStruct[]</returns>
         public static FileListStruct[] SingleFolder(string path, int page, int maxNum = 100, int desc = 0, Order order = Order.name)
         {
             if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
@@ -157,6 +201,15 @@ namespace BaiduCloudSupport.API
             }
         }
 
+        /// <summary>
+        /// Async load single folder info
+        /// </summary>
+        /// <param name="path">Remote path</param>
+        /// <param name="page">Show page</param>
+        /// <param name="maxNum">Max item number in one page</param>
+        /// <param name="desc">Descent</param>
+        /// <param name="order">Order</param>
+        /// <returns>FileListStruct[]</returns>
         public static Task<FileListStruct[]> SingleFolderAsync(string path, int page, int maxNum = 100, int desc = 0, Order order = Order.name)
         {
             return Task.Factory.StartNew(()=> {
@@ -164,6 +217,15 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        /// <summary>
+        /// Only load folder info
+        /// </summary>
+        /// <param name="path">Remote path</param>
+        /// <param name="page">Show page</param>
+        /// <param name="maxNum">Max item number in one page</param>
+        /// <param name="desc">Descent</param>
+        /// <param name="order">Order</param>
+        /// <returns>DBCFolderListStruct[]</returns>
         public static Task<DBCFolderListStruct[]> OnlyFolderInfo(string path, int page = 0, int maxNum = 500, int desc = 0, Order order = Order.name)
         {
             return Task.Factory.StartNew(()=> {
@@ -200,7 +262,16 @@ namespace BaiduCloudSupport.API
             });
         }
 
-        public static Task<FileListStruct[]> SearchFile(string keyword, int page = 1, int maxNum = 100, int desc = 0, Order order = Order.name)
+        /// <summary>
+        /// Search file or folder
+        /// </summary>
+        /// <param name="keyword">Keyword</param>
+        /// <param name="page">Show page</param>
+        /// <param name="maxNum">Max item number in one page</param>
+        /// <param name="desc">Descent</param>
+        /// <param name="order">Order</param>
+        /// <returns>FileListStruct[]</returns>
+        public static Task<FileListStruct[]> Search(string keyword, int page = 1, int maxNum = 100, int desc = 0, Order order = Order.name)
         {
             return Task.Factory.StartNew(()=> {
                 if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
@@ -244,6 +315,10 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        /// <summary>
+        /// Get query param
+        /// </summary>
+        /// <returns></returns>
         private static bool GetParamFromHtml()
         {
             HttpHelper http = new HttpHelper();
@@ -267,6 +342,11 @@ namespace BaiduCloudSupport.API
             return false;
         }
 
+        /// <summary>
+        /// Copy file or folder to
+        /// </summary>
+        /// <param name="list">DBCCopyStruct list</param>
+        /// <returns>bool</returns>
         public static Task<bool> CopyTo(List<DBCCopyStruct> list)
         {
             return Task.Factory.StartNew(()=> {
@@ -313,6 +393,11 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        /// <summary>
+        /// Move file or folder to
+        /// </summary>
+        /// <param name="list">DBCCopyStruct list</param>
+        /// <returns>bool</returns>
         public static Task<bool> MoveTo(List<DBCCopyStruct> list)
         {
             return Task.Factory.StartNew(() => {
@@ -359,6 +444,12 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        /// <summary>
+        /// Share link
+        /// </summary>
+        /// <param name="fs_id">fs_id</param>
+        /// <param name="password">Password if need</param>
+        /// <returns>DBCFileShareStruct</returns>
         public static Task<DBCFileShareStruct> Share(ulong fs_id, string password = "")
         {
             return Task.Factory.StartNew(()=> {
@@ -419,6 +510,12 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        /// <summary>
+        /// Move file to toFolder and get download URL
+        /// </summary>
+        /// <param name="shareLink">Share link</param>
+        /// <param name="toFolder">Remote path</param>
+        /// <returns>Download URL</returns>
         public static Task<string> Transfer(string shareLink, string toFolder = "/apps/wp2pcs")
         {
             return Task.Factory.StartNew(()=> {
@@ -542,6 +639,11 @@ namespace BaiduCloudSupport.API
             }
         }
 
+        /// <summary>
+        /// Async get download url use remoteFile
+        /// </summary>
+        /// <param name="remoteFile">Remote full file path</param>
+        /// <returns>string URL</returns>
         public static Task<string> DownloadURLAsync(string remoteFile)
         {
             return Task.Factory.StartNew(()=> {
@@ -585,6 +687,11 @@ namespace BaiduCloudSupport.API
             }
         }
 
+        /// <summary>
+        /// Async get baidu cloud quota
+        /// </summary>
+        /// <param name="access_token">Baidu access token</param>
+        /// <returns>[0]:quota, [1]:used</returns>
         public static Task<ulong[]> QuotaAsync()
         {
             return Task.Factory.StartNew(()=> {
@@ -643,6 +750,11 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        /// <summary>
+        /// Create folder
+        /// </summary>
+        /// <param name="path">New folder path</param>
+        /// <returns>bool</returns>
         public static bool CreateFolder(string path)
         {
             if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
@@ -679,6 +791,11 @@ namespace BaiduCloudSupport.API
             }
         }
 
+        /// <summary>
+        /// Async create folder
+        /// </summary>
+        /// <param name="path">New folder path</param>
+        /// <returns>bool</returns>
         public static Task<bool> CreateFolderAsync(string path)
         {
             return Task.Factory.StartNew(()=> {
@@ -686,6 +803,12 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        /// <summary>
+        /// Rename file or folder
+        /// </summary>
+        /// <param name="path">File or folder path which need rename</param>
+        /// <param name="newName">New name</param>
+        /// <returns>bool</returns>
         public static bool Rename(string path, string newName)
         {
             if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
@@ -728,6 +851,12 @@ namespace BaiduCloudSupport.API
             }
         }
 
+        /// <summary>
+        /// Async rename file or folder
+        /// </summary>
+        /// <param name="path">File or folder path which need rename</param>
+        /// <param name="newName">New name</param>
+        /// <returns>bool</returns>
         public static Task<bool> RenameAsync(string path, string newName)
         {
             return Task.Factory.StartNew(()=> {

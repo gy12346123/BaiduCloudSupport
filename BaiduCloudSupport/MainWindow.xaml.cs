@@ -828,7 +828,7 @@ namespace BaiduCloudSupport
                 }
 
                 CheckDownloadFolder();
-                PCS.DownloadFileSegment(Setting.Baidu_Access_Token, item.fs_id, taskWindow.DownloadURL, Setting.DownloadPath + item.file, item.path);
+                PCS.DownloadFileSegment(item.fs_id, taskWindow.DownloadURL, Setting.DownloadPath + item.file, item.path);
             }
             taskWindow = null;
         }
@@ -1190,7 +1190,7 @@ namespace BaiduCloudSupport
                     await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("CommonMessage_NeedLogin"));
                     return;
                 }
-                FileListStruct[] fileList = await BDC.SearchFile(keyword);
+                FileListStruct[] fileList = await BDC.Search(keyword);
 
                 var floderResult = FileListStruct2FileListDataItem(ref fileList);
                 if (floderResult == null)

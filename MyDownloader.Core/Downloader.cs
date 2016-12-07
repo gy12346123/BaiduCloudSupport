@@ -145,6 +145,13 @@ namespace MyDownloader.Core
             {
                 return this.resourceLocation;
             }
+            set
+            {
+                if (this.resourceLocation != value)
+                {
+                    this.resourceLocation = value;
+                }
+            }
         }
 
         public List<ResourceLocation> Mirrors
