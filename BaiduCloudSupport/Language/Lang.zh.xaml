@@ -124,4 +124,10 @@
     <sys:String x:Key="MainWindow_MenuItem_GetURL_ShortUrl_Message">是否需要将获得的长链接转换为短链接（可以将短链接用于迅雷下载）？</sys:String>
     <sys:String x:Key="MainWindow_Button_ClearCookies">Cookie</sys:String>
     <sys:String x:Key="MainWindow_Button_ClearCookies_Succeed">成功清除Cookies。</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_Left">还需用时</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_Left_Format">hh\:mm\:ss</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_State">状态</sys:String>
+    <sys:String x:Key="DataGrid_DownloadList_MenuItem_Delete">删除</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_DownloadList_Delete_NeedDeleteSource_Title">关于原文件</sys:String>
+    <sys:String x:Key="MainWindow_MenuItem_DownloadList_Delete_NeedDeleteSource_Message">是否需要同时删除原文件（请慎重）？</sys:String>
 </ResourceDictionary>

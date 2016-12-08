@@ -418,7 +418,7 @@ namespace BaiduCloudSupport.API
                             //MainWindow.totalData.SingleFileBytesReceived = e.BytesReceived;
                             //MainWindow.totalData.SingleFileProgressPercentage = e.ProgressPercentage;
                             double percent = Math.Round(Convert.ToDouble(e.BytesReceived) / Convert.ToDouble(e.TotalBytesToReceive) * 100, 1);
-                            MainWindow.DownloadListChangeItems(fs_id, e.TotalBytesToReceive, e.BytesReceived, percent, 0d);
+                            MainWindow.DownloadListChangeItems(fs_id, e.TotalBytesToReceive, e.BytesReceived, percent, 0d, TimeSpan.Zero, DownloaderState.Ended);
                         };
                         web.DownloadFileCompleted += (object sender, System.ComponentModel.AsyncCompletedEventArgs e) => {
                             //MainWindow.totalData.SingleFileProgressPercentage = 100;
@@ -483,25 +483,26 @@ namespace BaiduCloudSupport.API
             downloader.InfoReceived += (object sender, EventArgs e) =>
             {
                 ((Downloader)sender).ReGenerateURL = true;
-                MainWindow.DownloadListChangeItems(((Downloader)sender).fs_id, ((Downloader)sender).FileSize / 1048576L, 0L, 0d, 0d);
+                MainWindow.DownloadListChangeItems(((Downloader)sender).fs_id, ((Downloader)sender).FileSize / 1048576L, 0L, 0d, 0d, ((Downloader)sender).Left, ((Downloader)sender).State);
             };
             // Downloader ending event
             downloader.Ending += (object sender, EventArgs e) =>
             {
-                MainWindow.DownloadListChangeItems(((Downloader)sender).fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, 100d, 0d);
+                MainWindow.DownloadListChangeItems(((Downloader)sender).fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, 100d, 0d, TimeSpan.FromMilliseconds(0d), ((Downloader)sender).State);
             };
             // Downloader data received event
             downloader.DataReceived += (object sender, DownloaderEventArgs e) => {
                 if (e.Downloader.Progress - e.Downloader.PreProgress > 1d)
                 {
-                    MainWindow.DownloadListChangeItems(e.Downloader.fs_id, e.Downloader.FileSize / 1048576L, e.Downloader.Transfered / 1048576L, Math.Round(e.Downloader.Progress, 1), Math.Round(e.Downloader.Rate / 1000d, 1));
+                    MainWindow.DownloadListChangeItems(e.Downloader.fs_id, e.Downloader.FileSize / 1048576L, e.Downloader.Transfered / 1048576L, Math.Round(e.Downloader.Progress, 1), Math.Round(e.Downloader.Rate / 1000d, 1), e.Downloader.Left, e.Downloader.State);
                     e.Downloader.PreProgress = e.Downloader.Progress;
                     GetDownloadInfo();
                 }
             };
             // Downloader state changed event
             downloader.StateChanged += (object sender, EventArgs e) => {
-                MainWindow.DownloadListChangeItems(((Downloader)sender).fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, Math.Round(((Downloader)sender).Progress, 1), Math.Round(((Downloader)sender).Rate / 1000d, 1));
+                MainWindow.DownloadListChangeItems(((Downloader)sender).fs_id, ((Downloader)sender).FileSize / 1048576L, ((Downloader)sender).Transfered / 1048576L, Math.Round(((Downloader)sender).Progress, 1), Math.Round(((Downloader)sender).Rate / 1000d, 1), ((Downloader)sender).Left, ((Downloader)sender).State);
+                MainWindow.persistedListExtension.Save(MainWindow.persistedListExtension.SaveFromStateChange);
             };
             // Downloader segment failed event
             downloader.SegmentFailed += async (object sender, SegmentEventArgs e) =>

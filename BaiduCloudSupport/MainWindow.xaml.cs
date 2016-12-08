@@ -67,7 +67,7 @@ namespace BaiduCloudSupport
 
         private System.Windows.Forms.NotifyIcon notifyIcon;
 
-        private MyDownloader.Extension.PersistedList.PersistedListExtension persistedListExtension;
+        public static MyDownloader.Extension.PersistedList.PersistedListExtension persistedListExtension;
 
         public MainWindow()
         {
@@ -824,8 +824,8 @@ namespace BaiduCloudSupport
                     rate = 0d,
                     startTime = DateTime.Now,
                     isSelected = false,
-                    state = DownloaderState.NeedToPrepare,
-                    Left = TimeSpan.Zero
+                    state = DownloaderStateChinese.需解析,
+                    left = TimeSpan.FromMilliseconds(0d),
                 };
 
                 if (totalData.DownloadListDataItems != null && totalData.DownloadListDataItems.Count() != 0)
@@ -926,15 +926,18 @@ namespace BaiduCloudSupport
                     rate = file.rate,
                     startTime = file.startTime,
                     isSelected = file.isSelected,
-                    Left = file.Left,
+                    left = file.left,
                     state = file.state
                 });
             }
-            newList.Add(dataItem);
+            if (dataItem != null)
+            {
+                newList.Add(dataItem);
+            }
             totalData.DownloadListDataItems = newList;
         }
 
-        public static void DownloadListChangeItems(ulong fs_id, long size, long received, double percentage, double rate)
+        public static void DownloadListChangeItems(ulong fs_id, long size, long received, double percentage, double rate, TimeSpan left, DownloaderState state)
         {
             lock (_DownloadListChangeLock)
             {
@@ -952,8 +955,8 @@ namespace BaiduCloudSupport
                             rate = rate,
                             startTime = file.startTime,
                             isSelected = file.isSelected,
-                            Left = file.Left,
-                            state = file.state
+                            left = left,
+                            state = Other.Tools.ConvertDownloaderState(state)
                         });
                     }else
                     {
@@ -982,8 +985,8 @@ namespace BaiduCloudSupport
                         rate = 0d,
                         startTime = downloader.CreatedDateTime,
                         isSelected = false,
-                        Left = downloader.Left,
-                        state = downloader.State
+                        left = downloader.Left,
+                        state = Other.Tools.ConvertDownloaderState(downloader.State)
                     });
                 }
                 var list = DownloadManager.Instance.Downloads.ToArray();
@@ -1719,6 +1722,30 @@ namespace BaiduCloudSupport
                 LogHelper.WriteLog("MainWindow.button_ClearCookies_Click", ex);
                 await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("CommonMessage_Exception"));
             }
+        }
+
+        private async void MenuItem_DownloadList_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            if (dataGrid_FileDownloadList.SelectedItems.Count == 0)
+            {
+                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+                return;
+            }
+            var needDeleteSource = await this.ShowMessageAsync(GlobalLanguage.FindText("MainWindow_MenuItem_DownloadList_Delete_NeedDeleteSource_Title"), GlobalLanguage.FindText("MainWindow_MenuItem_DownloadList_Delete_NeedDeleteSource_Message"), MessageDialogStyle.AffirmativeAndNegative);
+
+            foreach (DownloadListDataItem file in dataGrid_FileDownloadList.SelectedItems)
+            {
+                totalData.DownloadListDataItems.Remove(file);
+                if (needDeleteSource == MessageDialogResult.Affirmative)
+                {
+                    string path = System.IO.Path.Combine(Setting.DownloadPath, file.file);
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+                }
+            }
+            DownloadListAddItem(totalData.DownloadListDataItems, null);
         }
     }
 }

@@ -99,7 +99,7 @@ namespace BaiduCloudSupport.API
         public double rate { get; set; }
         public DateTime startTime { get; set; }
         public bool isSelected { get; set; }
-        public TimeSpan Left { get; set; }
-        public MyDownloader.Core.DownloaderState state { get; set; }
+        public TimeSpan left { get; set; }
+        public MyDownloader.Core.DownloaderStateChinese state { get; set; }
     }
 }

@@ -66,6 +66,7 @@ namespace MyDownloader.Extension.PersistedList
         private object SaveFromDispose = new object();
         private object SaveFromTimer = new object();
         private object SaveFromListChange = new object();
+        public object SaveFromStateChange = new object();
 
         #region IExtension Members
 
@@ -99,6 +100,11 @@ namespace MyDownloader.Extension.PersistedList
         #endregion
 
         #region Methods
+
+        public void Save(object state)
+        {
+            PersistList(state);
+        }
 
         private void PersistList(object state)
         {

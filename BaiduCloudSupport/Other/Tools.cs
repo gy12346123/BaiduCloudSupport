@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyDownloader.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -153,6 +154,33 @@ namespace BaiduCloudSupport.Other
                 str = str + ch.ToString();
             }
             return str;
+        }
+
+        public static DownloaderStateChinese ConvertDownloaderState(DownloaderState state)
+        {
+            switch (state)
+            {
+                case DownloaderState.NeedToPrepare:
+                    return DownloaderStateChinese.需解析;
+                case DownloaderState.Preparing:
+                    return DownloaderStateChinese.解析中;
+                case DownloaderState.WaitingForReconnect:
+                    return DownloaderStateChinese.等待重连;
+                case DownloaderState.Prepared:
+                    return DownloaderStateChinese.解析完毕;
+                case DownloaderState.Working:
+                    return DownloaderStateChinese.下载中;
+                case DownloaderState.Pausing:
+                    return DownloaderStateChinese.暂停中;
+                case DownloaderState.Paused:
+                    return DownloaderStateChinese.已暂停;
+                case DownloaderState.Ended:
+                    return DownloaderStateChinese.已结束;
+                case DownloaderState.EndedWithError:
+                    return DownloaderStateChinese.出错;
+                default:
+                    throw new Exception();
+            }
         }
     }
 }
