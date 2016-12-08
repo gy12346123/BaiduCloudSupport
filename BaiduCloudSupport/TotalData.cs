@@ -409,5 +409,23 @@ namespace BaiduCloudSupport
                 }
             }
         }
+
+        private int _PageCounter = 1;
+
+        public int PageCounter
+        {
+            get { return _PageCounter; }
+            set
+            {
+                if (_PageCounter != value)
+                {
+                    _PageCounter = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("PageCounter"));
+                    }
+                }
+            }
+        }
     }
 }

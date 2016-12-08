@@ -403,6 +403,44 @@ namespace BaiduCloudSupport
                     path = "/";
                 }
                 FileListStruct[] fileListStruct = BDC.SingleFolder(path, page);
+                if (!path.Equals(totalData.PageNowLoaded))
+                {
+                    totalData.PageCounter = 1;
+                }
+                if (fileListStruct.Count() >= 100)
+                {
+                    this.Dispatcher.Invoke(() => {
+                        if (button_FileList_NextPage.Visibility != Visibility.Visible)
+                        {
+                            button_FileList_NextPage.Visibility = Visibility.Visible;
+                        }
+                    });
+                }else
+                {
+                    this.Dispatcher.Invoke(() => {
+                        if (button_FileList_NextPage.Visibility == Visibility.Visible)
+                        {
+                            button_FileList_NextPage.Visibility = Visibility.Hidden;
+                        }
+                    });
+                }
+                if (page > 1)
+                {
+                    this.Dispatcher.Invoke(() => {
+                        if (button_FileList_PrePage.Visibility != Visibility.Visible)
+                        {
+                            button_FileList_PrePage.Visibility = Visibility.Visible;
+                        }
+                    });
+                }else
+                {
+                    this.Dispatcher.Invoke(() => {
+                        if (button_FileList_PrePage.Visibility == Visibility.Visible)
+                        {
+                            button_FileList_PrePage.Visibility = Visibility.Hidden;
+                        }
+                    });
+                }
                 return FileListStruct2FileListDataItem(ref fileListStruct);
             });
         }
@@ -1726,39 +1764,92 @@ namespace BaiduCloudSupport
 
         private async void MenuItem_DownloadList_Delete_Click(object sender, RoutedEventArgs e)
         {
-            if (dataGrid_FileDownloadList.SelectedItems.Count == 0)
+            try
             {
-                await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
-                return;
-            }
-            var downloader = DownloadManager.Instance.Downloads;
-            var needDeleteSource = await this.ShowMessageAsync(GlobalLanguage.FindText("MainWindow_MenuItem_DownloadList_Delete_NeedDeleteSource_Title"), GlobalLanguage.FindText("MainWindow_MenuItem_DownloadList_Delete_NeedDeleteSource_Message"), MessageDialogStyle.AffirmativeAndNegative);
-
-            foreach (DownloadListDataItem file in dataGrid_FileDownloadList.SelectedItems)
-            {
-                if (DownloadManager.Instance.Downloads.Count() > 0)
+                if (dataGrid_FileDownloadList.SelectedItems.Count == 0)
                 {
-                    foreach (var d in downloader)
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
+                    return;
+                }
+                var downloader = DownloadManager.Instance.Downloads;
+                var needDeleteSource = await this.ShowMessageAsync(GlobalLanguage.FindText("MainWindow_MenuItem_DownloadList_Delete_NeedDeleteSource_Title"), GlobalLanguage.FindText("MainWindow_MenuItem_DownloadList_Delete_NeedDeleteSource_Message"), MessageDialogStyle.AffirmativeAndNegative);
+
+                foreach (DownloadListDataItem file in dataGrid_FileDownloadList.SelectedItems)
+                {
+                    if (DownloadManager.Instance.Downloads.Count() > 0)
                     {
-                        if (file.fs_id == d.fs_id)
+                        foreach (var d in downloader)
                         {
-                            DownloadManager.Instance.RemoveDownload(d);
-                            break;
+                            if (file.fs_id == d.fs_id)
+                            {
+                                DownloadManager.Instance.RemoveDownload(d);
+                                break;
+                            }
+                        }
+                    }
+
+                    totalData.DownloadListDataItems.Remove(file);
+                    if (needDeleteSource == MessageDialogResult.Affirmative)
+                    {
+                        string path = System.IO.Path.Combine(Setting.DownloadPath, file.file);
+                        if (File.Exists(path))
+                        {
+                            File.Delete(path);
                         }
                     }
                 }
-
-                totalData.DownloadListDataItems.Remove(file);
-                if (needDeleteSource == MessageDialogResult.Affirmative)
-                {
-                    string path = System.IO.Path.Combine(Setting.DownloadPath, file.file);
-                    if (File.Exists(path))
-                    {
-                        File.Delete(path);
-                    }
-                }
+                DownloadListAddItem(totalData.DownloadListDataItems, null);
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.MenuItem_DownloadList_Delete_Click", ex);
+                await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("CommonMessage_Exception"));
             }
-            DownloadListAddItem(totalData.DownloadListDataItems, null);
+        }
+
+        private async void button_FileList_NextPage_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                totalData.ProgressRing_IsActive = true;
+                var fileList = await LoadFolder(totalData.PageNowLoaded, ++totalData.PageCounter);
+                if (fileList == null || fileList.Count() == 0)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("MainWindow_Button_FileList_NextPage_LastPage_Title"), GlobalLanguage.FindText("MainWindow_Button_FileList_NextPage_LastPage_Message"));
+                    return;
+                }
+                totalData.FileListDataItems = fileList;
+            }catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.button_FileList_NextPage_Click", ex);
+                await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("CommonMessage_Exception"));
+            }finally
+            {
+                totalData.ProgressRing_IsActive = false;
+            }
+        }
+
+        private async void button_FileList_PrePage_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                totalData.ProgressRing_IsActive = true;
+                var fileList = await LoadFolder(totalData.PageNowLoaded, --totalData.PageCounter);
+                if (fileList == null || fileList.Count() == 0)
+                {
+                    await this.ShowMessageAsync(GlobalLanguage.FindText("MainWindow_Button_FileList_NextPage_LastPage_Title"), GlobalLanguage.FindText("MainWindow_Button_FileList_NextPage_LastPage_Message"));
+                    return;
+                }
+                totalData.FileListDataItems = fileList;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WriteLog("MainWindow.button_FileList_NextPage_Click", ex);
+                await this.ShowMessageAsync(GlobalLanguage.FindText("Message_Fail"), GlobalLanguage.FindText("CommonMessage_Exception"));
+            }
+            finally
+            {
+                totalData.ProgressRing_IsActive = false;
+            }
         }
     }
 }

@@ -159,11 +159,13 @@
             <TabItem Header="{StaticResource TabItem_FileList}">
                 <StackPanel>
                     <WrapPanel Width="auto" Margin="5,0,5,0">
-                        <Controls:WindowCommands Grid.Row="1" Height="20" Width="500" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
+                        <Controls:WindowCommands Grid.Row="1" Height="20" Width="450" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
                             <WrapPanel Name="wrapPanel_Navigation" />
                         </Controls:WindowCommands>
-                        <Button Name="button_GetDownloadURLSelected" Content="{StaticResource MainWindow_Button_GetDownloadURLSelected}" Height="20" Width="70" Margin="5" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="{StaticResource MainWindow_Button_GetDownloadURLSelected_ToolTip}" Click="button_GetDownloadURLSelected_Click" />
-                        <Button Name="button_SearchFile" Content="{StaticResource MainWindow_Button_SearchFile}" Height="20" Width="70" Margin="5" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="{StaticResource MainWindow_Button_SearchFile_ToolTip}" Click="button_SearchFile_Click"/>
+                        <Button Name="button_GetDownloadURLSelected" Content="{StaticResource MainWindow_Button_GetDownloadURLSelected}" Height="20" Width="60" Margin="5" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="{StaticResource MainWindow_Button_GetDownloadURLSelected_ToolTip}" Click="button_GetDownloadURLSelected_Click" />
+                        <Button Name="button_SearchFile" Content="{StaticResource MainWindow_Button_SearchFile}" Height="20" Width="60" Margin="5" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="{StaticResource MainWindow_Button_SearchFile_ToolTip}" Click="button_SearchFile_Click"/>
+                        <Button Name="button_FileList_NextPage" Content="{StaticResource MainWindow_Button_FileList_NextPage}" Height="20" Width="60" Margin="5" Style="{StaticResource AccentedSquareButtonStyle}" Visibility="Hidden" Click="button_FileList_NextPage_Click" />
+                        <Button Name="button_FileList_PrePage" Content="{StaticResource MainWindow_Button_FileList_PrePage}" Height="20" Width="60" Margin="5" Style="{StaticResource AccentedSquareButtonStyle}" Visibility="Hidden" Click="button_FileList_PrePage_Click" />
                     </WrapPanel>
                     <DataGrid x:Name="dataGrid_FileList" ItemsSource="{Binding FileListDataItems}" Width="auto" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="DataGrid_MouseDoubleClick" >
                         <DataGrid.Columns>
