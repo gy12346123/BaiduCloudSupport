@@ -85,7 +85,10 @@
                             <Button Name="button_LoadDownloadPath" Content="{StaticResource Flyout_Setting_Button_DownloadPath}" Width="70" Height="25" Style="{StaticResource AccentedSquareButtonStyle}" Click="button_LoadDownloadPath_Click" />
                         </WrapPanel>
                         <TextBlock Text="{StaticResource Flyout_Setting_ClearConfigData}" FontSize="20" FontWeight="Bold" Margin="10" />
-                        <Button Name="button_ClearAccountSetting" Content="{StaticResource MainWindow_Button_ClearAccountSetting}" Width="70" Height="25" Style="{StaticResource AccentedSquareButtonStyle}" Click="button_ClearAccountSetting_Click" />
+                        <WrapPanel Margin="100,0,0,0">
+                            <Button Name="button_ClearAccountSetting" Content="{StaticResource MainWindow_Button_ClearAccountSetting}" Width="70" Height="25" Style="{StaticResource AccentedSquareButtonStyle}" Click="button_ClearAccountSetting_Click" />
+                            <Button Name="button_ClearCookies" Content="{StaticResource MainWindow_Button_ClearCookies}" Width="70" Height="25" Margin="70,0,0,0" Style="{StaticResource AccentedSquareButtonStyle}" Click="button_ClearCookies_Click" />
+                        </WrapPanel>
                     </StackPanel>
                 </ScrollViewer>
             </Controls:Flyout>

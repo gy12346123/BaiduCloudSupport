@@ -433,6 +433,9 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        /// <summary>
+        /// For download method init for first
+        /// </summary>
         public static void Init()
         {
             lock(_registerLock)
@@ -449,6 +452,9 @@ namespace BaiduCloudSupport.API
             }
         }
 
+        /// <summary>
+        /// DownloadManager handle event
+        /// </summary>
         public static void DownloadManagerEvent()
         {
             // Download item added event
@@ -467,6 +473,10 @@ namespace BaiduCloudSupport.API
             };
         }
 
+        /// <summary>
+        /// Downloader handle event
+        /// </summary>
+        /// <param name="downloader">Downloader</param>
         public static void DownloaderEvent(ref Downloader downloader)
         {
             // Downloader info received event
