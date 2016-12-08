@@ -193,6 +193,7 @@ namespace BaiduCloudSupport
             grid_Main.DataContext = totalData;
             flyoutsControl.DataContext = totalData;
             LoadMainWindowContent();
+            PCS.DownloadManagerEvent();
             persistedListExtension = new MyDownloader.Extension.PersistedList.PersistedListExtension();
             InitDownloadList();
         }
@@ -969,7 +970,6 @@ namespace BaiduCloudSupport
 
         private void InitDownloadList()
         {
-            PCS.DownloadManagerEvent();
             if (DownloadManager.Instance.Downloads.Count() > 0)
             {
                 PCS.Init();
@@ -1731,10 +1731,23 @@ namespace BaiduCloudSupport
                 await this.ShowMessageAsync(GlobalLanguage.FindText("CommonTitle_Notice"), GlobalLanguage.FindText("MainWindow_DataGrid_SelectedNull"));
                 return;
             }
+            var downloader = DownloadManager.Instance.Downloads;
             var needDeleteSource = await this.ShowMessageAsync(GlobalLanguage.FindText("MainWindow_MenuItem_DownloadList_Delete_NeedDeleteSource_Title"), GlobalLanguage.FindText("MainWindow_MenuItem_DownloadList_Delete_NeedDeleteSource_Message"), MessageDialogStyle.AffirmativeAndNegative);
 
             foreach (DownloadListDataItem file in dataGrid_FileDownloadList.SelectedItems)
             {
+                if (DownloadManager.Instance.Downloads.Count() > 0)
+                {
+                    foreach (var d in downloader)
+                    {
+                        if (file.fs_id == d.fs_id)
+                        {
+                            DownloadManager.Instance.RemoveDownload(d);
+                            break;
+                        }
+                    }
+                }
+
                 totalData.DownloadListDataItems.Remove(file);
                 if (needDeleteSource == MessageDialogResult.Affirmative)
                 {

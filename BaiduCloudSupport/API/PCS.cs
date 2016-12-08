@@ -471,6 +471,11 @@ namespace BaiduCloudSupport.API
                 MainWindow.totalData.TotalDownload = DownloadManager.Instance.Downloads.Count();
                 GetDownloadInfo();
             };
+            DownloadManager.Instance.DownloadRemoved += (object sender, DownloaderEventArgs e) => {
+                DownloadManager.Instance.ClearEnded();
+                MainWindow.totalData.TotalDownload = DownloadManager.Instance.Downloads.Count();
+                GetDownloadInfo();
+            };
         }
 
         /// <summary>
