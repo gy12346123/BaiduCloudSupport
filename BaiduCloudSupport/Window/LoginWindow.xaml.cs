@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -101,6 +102,11 @@ namespace BaiduCloudSupport.Window
                         CookieVisitor visitor = new CookieVisitor();
                         visitor.SendCookie += visitor_SendCookie;
                         cookieManager.VisitAllCookies(visitor);
+                        Match match_Uid = Regex.Match(result, "(?<=\"uk\":)[0-9]{1,}(?=,)");
+                        if (match_Uid.Success)
+                        {
+                            Setting.WriteAppSetting("Baidu_uid", match_Uid.Value, true);
+                        }
                         this.DialogResult = true;
                     }
                     else if (address.Contains("error_description"))

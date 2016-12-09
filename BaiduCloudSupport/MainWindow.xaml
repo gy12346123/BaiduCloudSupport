@@ -112,7 +112,7 @@
             <TextBlock Text="{Binding Quota_Used,StringFormat='{StaticResource MainWindow_Quota_Used}'}" Margin="10,0,0,0" VerticalAlignment="Center" />
         </WrapPanel>
         <WrapPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" >
-            <Button Name="button_Login"
+            <!--<Button Name="button_Login"
                         Margin="0,0,20,0"
                         Width="50"
                         Height="50"
@@ -125,7 +125,7 @@
                         <VisualBrush Stretch="Uniform" Visual="{DynamicResource appbar_browser}" />
                     </Rectangle.OpacityMask>
                 </Rectangle>
-            </Button>
+            </Button>-->
             <Button Name="button_AdvanceLogin"
                         Margin="0,0,20,0"
                         Width="50"

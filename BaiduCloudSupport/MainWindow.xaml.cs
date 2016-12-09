@@ -360,30 +360,49 @@ namespace BaiduCloudSupport
                         totalData.Quota_Total = quota[0];
                         totalData.Quota_Used = quota[1];
                     }
-                    if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
+                    var useInfo = BDC.SimpleUser(Convert.ToUInt64(Setting.Baidu_uid));
+                    totalData.uname = useInfo.uname;
+                    totalData.uid = Convert.ToUInt64(useInfo.uid);
+                    if (!useInfo.portrait.Equals(Setting.Baidu_portrait))
                     {
-                        SimpleUserInfoStruct userInfo = PCS.SimpleUser(Setting.Baidu_Access_Token);
-                        if (userInfo.uid != 0)
+                        string imagePath = Setting.BasePath + @"Images\UserInfo\";
+                        string imageFile = imagePath + useInfo.uid + ".jpg";
+                        if (!Directory.Exists(imagePath))
                         {
-                            totalData.uid = userInfo.uid;
-                            totalData.uname = userInfo.uname;
-                            if (!Setting.Baidu_portrait.Equals(userInfo.portrait))
-                            {
-                                string imagePath = Setting.BasePath + @"Images\UserInfo\";
-                                string imageFile = imagePath + userInfo.uid + ".jpg";
-                                if (!Directory.Exists(imagePath))
-                                {
-                                    Directory.CreateDirectory(imagePath);
-                                }
-                                WebClient web = new WebClient();
-                                web.DownloadFile(new Uri(PCS.UserSmallPortrait(userInfo.portrait)), imageFile);
-                                totalData.portrait = userInfo.portrait;
-                                Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
-                                LoadUserPortraitFromFile(imageFile);
-                                return true;
-                            }
+                            Directory.CreateDirectory(imagePath);
                         }
+                        WebClient web = new WebClient();
+                        web.DownloadFile(new Uri(useInfo.portrait), imageFile);
+                        totalData.portrait = useInfo.portrait;
+                        Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
+                        LoadUserPortraitFromFile(imageFile);
+                        return true;
                     }
+
+                    //if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
+                    //{
+                    //    SimpleUserInfoStruct userInfo = PCS.SimpleUser(Setting.Baidu_Access_Token);
+                    //    if (userInfo.uid != 0)
+                    //    {
+                    //        totalData.uid = userInfo.uid;
+                    //        totalData.uname = userInfo.uname;
+                    //        if (!Setting.Baidu_portrait.Equals(userInfo.portrait))
+                    //        {
+                    //            string imagePath = Setting.BasePath + @"Images\UserInfo\";
+                    //            string imageFile = imagePath + userInfo.uid + ".jpg";
+                    //            if (!Directory.Exists(imagePath))
+                    //            {
+                    //                Directory.CreateDirectory(imagePath);
+                    //            }
+                    //            WebClient web = new WebClient();
+                    //            web.DownloadFile(new Uri(PCS.UserSmallPortrait(userInfo.portrait)), imageFile);
+                    //            totalData.portrait = userInfo.portrait;
+                    //            Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
+                    //            LoadUserPortraitFromFile(imageFile);
+                    //            return true;
+                    //        }
+                    //    }
+                    //}
                     LoadUserPortraitFromFile(Setting.UserPortraitFilePath == "" ? Setting.BasePath + @"Images\UserInfo\UserPortraitDefault.png" : Setting.UserPortraitFilePath);
                     return false;
                 }

@@ -836,7 +836,7 @@ namespace BaiduCloudSupport.API
                 Host = "pan.baidu.com",
                 Cookie = Cookies,
                 Postdata = "filelist=" + Other.Tools.URLEncoding(SB.ToString(), Encoding.UTF8),
-                Accept = " application/json, text/javascript, */*; q=0.01",
+                Accept = "application/json, text/javascript, */*; q=0.01",
                 PostEncoding = Encoding.UTF8,
                 ContentType = "application/x-www-form-urlencoded; charset=UTF-8",
             };
@@ -864,5 +864,45 @@ namespace BaiduCloudSupport.API
             });
         }
 
+        public static SimpleUserInfoStruct SimpleUser(ulong uid)
+        {
+            if (!CheckCookie()) LoadCookie(Setting.Baidu_CookiePath);
+            HttpHelper http = new HttpHelper();
+            HttpItem item = new HttpItem()
+            {
+                URL = string.Format("{0}user/getinfo?clienttype=0&channel=chunlei&web=1&app_id=250528", BDCBaseURL),
+                Method = "POST",
+                Encoding = Encoding.UTF8,
+                Timeout = BDC.Timeout,
+                Referer = "http://pan.baidu.com/disk/home",
+                Host = "pan.baidu.com",
+                Cookie = Cookies,
+                Postdata = String.Format("user_list=[{0}]", uid),
+                Accept = "*/*",
+                PostEncoding = Encoding.UTF8,
+                ContentType = "application/x-www-form-urlencoded; charset=UTF-8",
+            };
+            string result = http.GetHtml(item).Html;
+            if (result.Contains("errno\":0"))
+            {
+                var json = (JObject)JsonConvert.DeserializeObject(result);
+                return new SimpleUserInfoStruct {
+                    uname = json["records"][0]["uname"].ToString(),
+                    uid = Convert.ToUInt64(json["records"][0]["uk"]),
+                    portrait = json["records"][0]["avatar_url"].ToString()
+                };
+            }
+            else
+            {
+                throw new ErrorCodeException();
+            }
+        }
+
+        public static Task<SimpleUserInfoStruct> SimpleUserAsync(ulong uid)
+        {
+            return Task.Factory.StartNew(()=> {
+                return SimpleUser(uid);
+            });
+        }
     }
 }
