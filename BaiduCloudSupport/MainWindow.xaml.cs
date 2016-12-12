@@ -1632,7 +1632,16 @@ namespace BaiduCloudSupport
                 {
                     shareLink = "http://" + shareLink;
                 }
-                string path = await BDC.Transfer(shareLink);
+                string toFolder = "/Temp";
+                try
+                {
+                    var testPath = await BDC.OnlyFolderInfo(toFolder);
+                }catch (ErrorCodeException)
+                {
+                    await BDC.CreateFolderAsync(toFolder);
+                }
+                
+                string path = await BDC.Transfer(shareLink, toFolder);
                 //var fileMeta = await PCS.SingleFileMeta(path);
                 string[] param = path.Split('/');
                 var fileMeta = await BDC.SingleFolderAsync(path.Replace("/" + param[param.Count() - 1], ""), 1);
