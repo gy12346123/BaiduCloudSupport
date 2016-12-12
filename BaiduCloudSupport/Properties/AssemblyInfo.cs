@@ -55,3 +55,4 @@ using System.Windows;
 [assembly: InternalsVisibleTo("BaiduCloudSupport.Tests")]
 [assembly: InternalsVisibleTo("BaiduCloudSupport.Explorables")]
 //[assembly: AssemblyFileVersion("1.0.*")]
+[assembly: log4net.Config.XmlConfigurator(ConfigFileExtension = "config", Watch = true)]
