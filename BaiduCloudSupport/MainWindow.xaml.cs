@@ -360,24 +360,28 @@ namespace BaiduCloudSupport
                         totalData.Quota_Total = quota[0];
                         totalData.Quota_Used = quota[1];
                     }
-                    var useInfo = BDC.SimpleUser(Convert.ToUInt64(Setting.Baidu_uid));
-                    totalData.uname = useInfo.uname;
-                    totalData.uid = Convert.ToUInt64(useInfo.uid);
-                    if (!useInfo.portrait.Equals(Setting.Baidu_portrait))
+                    if (Setting.Baidu_uid != null && !Setting.Baidu_uid.Equals(""))
                     {
-                        string imagePath = Setting.BasePath + @"Images\UserInfo\";
-                        string imageFile = imagePath + useInfo.uid + ".jpg";
-                        if (!Directory.Exists(imagePath))
+                        var useInfo = BDC.SimpleUser(Convert.ToUInt64(Setting.Baidu_uid));
+                        totalData.uname = useInfo.uname;
+                        totalData.uid = Convert.ToUInt64(useInfo.uid);
+                        if (!useInfo.portrait.Equals(Setting.Baidu_portrait))
                         {
-                            Directory.CreateDirectory(imagePath);
+                            string imagePath = Setting.BasePath + @"Images\UserInfo\";
+                            string imageFile = imagePath + useInfo.uid + ".jpg";
+                            if (!Directory.Exists(imagePath))
+                            {
+                                Directory.CreateDirectory(imagePath);
+                            }
+                            WebClient web = new WebClient();
+                            web.DownloadFile(new Uri(useInfo.portrait), imageFile);
+                            totalData.portrait = useInfo.portrait;
+                            Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
+                            LoadUserPortraitFromFile(imageFile);
+                            return true;
                         }
-                        WebClient web = new WebClient();
-                        web.DownloadFile(new Uri(useInfo.portrait), imageFile);
-                        totalData.portrait = useInfo.portrait;
-                        Setting.WriteAppSetting("UserPortraitFilePath", imageFile, true);
-                        LoadUserPortraitFromFile(imageFile);
-                        return true;
                     }
+
 
                     //if (Setting.Baidu_Access_Token != null && !Setting.Baidu_Access_Token.Equals(""))
                     //{
